@@ -26,7 +26,7 @@ export default function SpotsPage() {
   );
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
+    <div className="flex flex-col min-h-full">
       <div className="px-4 pt-4 pb-1">
         <h1 className="font-serif text-xl font-bold" data-testid="text-spots-title">{t("spots.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("spots.subtitle")}</p>
@@ -75,14 +75,14 @@ export default function SpotsPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   {spot.instagram && (
-                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild data-testid={`button-instagram-${spot.id}`}>
+                    <Button variant="ghost" size="icon" asChild data-testid={`button-instagram-${spot.id}`}>
                       <a href={spot.instagram.startsWith("http") ? spot.instagram : `https://instagram.com/${spot.instagram.replace("@", "")}`} target="_blank" rel="noopener noreferrer">
                         <SiInstagram className="h-3.5 w-3.5" />
                       </a>
                     </Button>
                   )}
                   {spot.website && (
-                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild data-testid={`button-website-${spot.id}`}>
+                    <Button variant="ghost" size="icon" asChild data-testid={`button-website-${spot.id}`}>
                       <a href={spot.website.startsWith("http") ? spot.website : `https://${spot.website}`} target="_blank" rel="noopener noreferrer">
                         <Globe className="h-3.5 w-3.5" />
                       </a>

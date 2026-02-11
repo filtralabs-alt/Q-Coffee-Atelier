@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
@@ -54,8 +55,8 @@ export default function LibraryPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col min-h-full pb-20">
-        <div className="px-4 pt-4 pb-2">
+      <div className="flex flex-col min-h-full">
+        <div className="px-4 pt-4 pb-3">
           <h1 className="font-serif text-xl font-bold">{t("library.title")}</h1>
         </div>
         <div className="flex-1 flex items-center justify-center px-4">
@@ -72,8 +73,8 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      <div className="px-4 pt-4 pb-2">
+    <div className="flex flex-col min-h-full">
+      <div className="px-4 pt-4 pb-3">
         <h1 className="font-serif text-xl font-bold" data-testid="text-library-title">{t("library.title")}</h1>
       </div>
       <div className="flex-1 px-4 space-y-3 pb-4">
@@ -96,7 +97,7 @@ export default function LibraryPage() {
               </div>
             </Card>
             {expandedModule === mod.key && (
-              <Card className="p-4 mt-1 ml-2 border-l-2 border-l-primary" data-testid={`content-module-${mod.key}`}>
+              <Card className="p-4 mt-2 ml-4" data-testid={`content-module-${mod.key}`}>
                 <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
                   {contentMap[mod.key]?.[lang] || ""}
                 </div>

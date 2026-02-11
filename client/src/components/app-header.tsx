@@ -5,8 +5,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Coffee, LogOut, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { Link } from "wouter";
+import logoIcon from "@assets/cris-du-cafe-icon.png";
 
 export function AppHeader() {
   const { user } = useAuth();
@@ -17,16 +18,16 @@ export function AppHeader() {
     : "U";
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
-      <div className="flex items-center justify-between gap-2 px-4 py-2.5">
+    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b">
+      <div className="flex items-center justify-between gap-2 px-4 h-12">
         <Link href="/" data-testid="link-home">
           <div className="flex items-center gap-2">
-            <Coffee className="h-5 w-5 text-primary" />
+            <img src={logoIcon} alt="Cris Du Café" className="h-7 w-7" data-testid="img-header-logo" />
             <span className="font-serif text-base font-bold tracking-tight">{t("app.name")}</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <LangToggle />
           <ThemeToggle />
           <DropdownMenu>

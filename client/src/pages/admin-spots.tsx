@@ -102,7 +102,7 @@ export default function AdminSpotsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-full pb-20 px-4">
+      <div className="flex items-center justify-center min-h-full  px-4">
         <Card className="p-8 text-center max-w-sm w-full">
           <p className="text-muted-foreground mb-4">{t("library.locked")}</p>
           <Button asChild><a href="/api/login">{t("nav.login")}</a></Button>
@@ -112,7 +112,7 @@ export default function AdminSpotsPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
+    <div className="flex flex-col min-h-full ">
       <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
         <h1 className="font-serif text-xl font-bold" data-testid="text-admin-title">{t("admin.title")}</h1>
         {!showForm && (

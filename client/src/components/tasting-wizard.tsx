@@ -89,7 +89,7 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
+    <div className="flex flex-col min-h-full ">
       <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
         <h1 className="font-serif text-xl font-bold">{t("wizard.title")}</h1>
         <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-wizard">

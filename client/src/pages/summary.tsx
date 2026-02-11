@@ -46,7 +46,7 @@ export default function SummaryPage() {
   );
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
+    <div className="flex flex-col min-h-full">
       <div className="px-4 pt-4 pb-2">
         <h1 className="font-serif text-xl font-bold" data-testid="text-summary-title">{t("summary.title")}</h1>
       </div>

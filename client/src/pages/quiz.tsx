@@ -76,8 +76,8 @@ export default function QuizPage() {
 
   if (!selectedLevel) {
     return (
-      <div className="flex flex-col min-h-full pb-20">
-        <div className="px-4 pt-4 pb-2">
+      <div className="flex flex-col min-h-full">
+        <div className="px-4 pt-4 pb-3">
           <h1 className="font-serif text-xl font-bold" data-testid="text-quiz-title">{t("quiz.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("quiz.subtitle")}</p>
         </div>
@@ -85,13 +85,13 @@ export default function QuizPage() {
           {levels.map((level) => (
             <Card
               key={level.key}
-              className="p-5 hover-elevate cursor-pointer"
+              className="p-5 hover-elevate cursor-pointer active-elevate-2"
               onClick={() => setSelectedLevel(level.key)}
               data-testid={`card-quiz-${level.key}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className={`h-10 w-10 rounded-md flex items-center justify-center ${level.color}`}>
+                  <div className={`h-11 w-11 rounded-md flex items-center justify-center ${level.color}`}>
                     <HelpCircle className="h-5 w-5" />
                   </div>
                   <div>
@@ -123,7 +123,7 @@ export default function QuizPage() {
     const scorePct = (score / questions.length) * 100;
     const badge = getBadge(scorePct);
     return (
-      <div className="flex flex-col min-h-full pb-20">
+      <div className="flex flex-col min-h-full">
         <div className="px-4 pt-4 pb-2">
           <Button variant="ghost" size="sm" onClick={reset} data-testid="button-quiz-back">
             <ArrowLeft className="h-4 w-4 mr-1" /> {t("quiz.back")}
@@ -147,7 +147,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
+    <div className="flex flex-col min-h-full">
       <div className="px-4 pt-4 pb-2 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <Button variant="ghost" size="sm" onClick={reset} data-testid="button-quiz-back-to-levels">

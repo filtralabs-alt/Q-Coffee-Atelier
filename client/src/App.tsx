@@ -17,12 +17,13 @@ import LibraryPage from "@/pages/library";
 import AdminSpotsPage from "@/pages/admin-spots";
 import NotFound from "@/pages/not-found";
 import { Skeleton } from "@/components/ui/skeleton";
+import logoIcon from "@assets/cris-du-cafe-icon.png";
 
 function AuthenticatedLayout() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col h-[100dvh] bg-background">
       <AppHeader />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px]">
         <Switch>
           <Route path="/" component={JournalPage} />
           <Route path="/summary" component={SummaryPage} />
@@ -43,10 +44,10 @@ function AppContent() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="space-y-4 text-center">
-          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-          <Skeleton className="h-4 w-32 mx-auto" />
+      <div className="flex items-center justify-center h-[100dvh] bg-background">
+        <div className="space-y-4 text-center animate-pulse">
+          <img src={logoIcon} alt="Cris Du Café" className="h-16 w-16 mx-auto" />
+          <p className="font-serif text-lg font-bold text-foreground/70">Cris Du Café</p>
         </div>
       </div>
     );

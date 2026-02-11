@@ -61,8 +61,8 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
+    <div className="flex flex-col min-h-full">
+      <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-2">
         <h1 className="font-serif text-xl font-bold" data-testid="text-journal-title">{t("journal.title")}</h1>
         <Button onClick={() => setShowWizard(true)} data-testid="button-new-tasting">
           <Plus className="h-4 w-4 mr-1.5" />
@@ -70,7 +70,7 @@ export default function JournalPage() {
         </Button>
       </div>
 
-      <div className="px-4 pb-2">
+      <div className="px-4 pb-3">
         <Button variant="outline" size="sm" asChild data-testid="button-qcoffee-global">
           <a href={Q_COFFEE_GO_URL} target="_blank" rel="noopener noreferrer">
             {t("journal.evaluate")} <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
@@ -110,11 +110,11 @@ export default function JournalPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 text-muted-foreground"
+                    className="text-muted-foreground"
                     onClick={() => setDeleteId(entry.id)}
                     data-testid={`button-delete-${entry.id}`}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
