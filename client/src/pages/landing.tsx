@@ -49,7 +49,7 @@ export default function LandingPage() {
                   <Coffee className="h-3.5 w-3.5" />
                   <span>Atelier de Dégustation</span>
                 </div>
-                <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+                <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
                   {t("app.hero.title")}
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
