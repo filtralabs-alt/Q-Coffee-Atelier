@@ -15,7 +15,6 @@ import SummaryPage from "@/pages/summary";
 import SpotsPage from "@/pages/spots";
 import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
-import AdminSpotsPage from "@/pages/admin-spots";
 import AdminDashboardPage from "@/pages/admin-dashboard";
 import NotFound from "@/pages/not-found";
 import logoIcon from "@assets/cris-du-cafe-icon.png";
@@ -31,7 +30,6 @@ function AuthenticatedLayout() {
           <Route path="/spots" component={SpotsPage} />
           <Route path="/quiz" component={QuizPage} />
           <Route path="/library" component={LibraryPage} />
-          <Route path="/admin" component={AdminSpotsPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

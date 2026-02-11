@@ -70,39 +70,6 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/coffee-spots", isAuthenticated, async (req: any, res) => {
-    try {
-      const parsed = insertCoffeeSpotSchema.safeParse(req.body);
-      if (!parsed.success) {
-        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
-      }
-      const spot = await storage.createCoffeeSpot(parsed.data);
-      res.json(spot);
-    } catch (error) {
-      console.error("Error creating spot:", error);
-      res.status(500).json({ message: "Failed to create spot" });
-    }
-  });
-
-  app.patch("/api/coffee-spots/:id", isAuthenticated, async (req: any, res) => {
-    try {
-      const spot = await storage.updateCoffeeSpot(req.params.id, req.body);
-      res.json(spot);
-    } catch (error) {
-      console.error("Error updating spot:", error);
-      res.status(500).json({ message: "Failed to update spot" });
-    }
-  });
-
-  app.delete("/api/coffee-spots/:id", isAuthenticated, async (req: any, res) => {
-    try {
-      await storage.deleteCoffeeSpot(req.params.id);
-      res.json({ ok: true });
-    } catch (error) {
-      console.error("Error deleting spot:", error);
-      res.status(500).json({ message: "Failed to delete spot" });
-    }
-  });
 
   app.post("/api/quiz-results", isAuthenticated, async (req: any, res) => {
     try {
