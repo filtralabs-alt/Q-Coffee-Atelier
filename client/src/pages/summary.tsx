@@ -47,19 +47,19 @@ export default function SummaryPage() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <div className="px-4 pt-4 pb-2">
-        <h1 className="font-serif text-xl font-bold" data-testid="text-summary-title">{t("summary.title")}</h1>
+      <div className="px-5 pt-5 pb-4">
+        <h1 className="font-serif text-xl font-semibold" data-testid="text-summary-title">{t("summary.title")}</h1>
       </div>
 
-      <div className="flex-1 px-4 space-y-4 pb-4">
+      <div className="flex-1 px-5 space-y-4 pb-4">
         {isLoading ? (
           <>
-            <Card className="p-4 space-y-3">
+            <Card className="p-5 space-y-3">
               <Skeleton className="h-6 w-32" />
               <Skeleton className="h-4 w-48" />
               <Skeleton className="h-4 w-40" />
             </Card>
-            <Card className="p-4 space-y-3">
+            <Card className="p-5 space-y-3">
               <Skeleton className="h-6 w-32" />
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
@@ -73,7 +73,7 @@ export default function SummaryPage() {
           </div>
         ) : (
           <>
-            <Card className="p-4" data-testid="card-summary-overview">
+            <Card className="p-5" data-testid="card-summary-overview">
               <div className="flex items-center gap-2 mb-3">
                 <Coffee className="h-5 w-5 text-primary" />
                 <span className="font-semibold text-sm">
@@ -99,7 +99,7 @@ export default function SummaryPage() {
               )}
             </Card>
 
-            <Card className="p-4 space-y-4" data-testid="card-sensory-profile">
+            <Card className="p-5 space-y-4" data-testid="card-sensory-profile">
               <h3 className="font-semibold text-sm flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />
                 {t("summary.sensorProfile")}
@@ -109,7 +109,7 @@ export default function SummaryPage() {
               {renderBar(summary.avgSweetness, t("summary.avgSweetness"), <Candy className="h-3.5 w-3.5" />)}
             </Card>
 
-            <Card className="p-4" data-testid="card-tip">
+            <Card className="p-5" data-testid="card-tip">
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Lightbulb className="h-4 w-4 text-primary" />

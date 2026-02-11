@@ -79,7 +79,7 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
       <Card className="w-full max-w-sm p-6 space-y-6">
         <div className="text-center space-y-2">
           <img src={logoIcon} alt="Cris Du Café" className="h-12 w-12 mx-auto" />
-          <h1 className="font-serif text-xl font-bold" data-testid="text-admin-login-title">Administration</h1>
+          <h1 className="font-serif text-xl font-semibold" data-testid="text-admin-login-title">Administration</h1>
           <p className="text-sm text-muted-foreground">Panneau de gestion Cris Du Café</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -396,10 +396,10 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
-      <header className="flex items-center justify-between gap-2 px-4 py-3 border-b bg-card/80 backdrop-blur-md shrink-0">
-        <div className="flex items-center gap-2">
+      <header className="flex items-center justify-between gap-2 px-5 py-3 border-b border-border/50 bg-background/80 backdrop-blur-md shrink-0">
+        <div className="flex items-center gap-2.5">
           <img src={logoIcon} alt="" className="h-7 w-7" />
-          <h1 className="font-serif text-lg font-bold" data-testid="text-admin-dashboard-title">Administration</h1>
+          <h1 className="font-serif text-lg font-semibold" data-testid="text-admin-dashboard-title">Administration</h1>
         </div>
         <Button variant="ghost" size="icon" onClick={handleLogout} data-testid="button-admin-logout">
           <LogOut className="h-4 w-4" />
@@ -407,7 +407,7 @@ export default function AdminDashboardPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        <div className="max-w-2xl mx-auto px-5 py-5 space-y-5">
           {stats && <StatsCards stats={stats} />}
 
           <Tabs defaultValue="spots" className="w-full">

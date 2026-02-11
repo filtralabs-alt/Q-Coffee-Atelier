@@ -62,15 +62,15 @@ export default function JournalPage() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-2">
-        <h1 className="font-serif text-xl font-bold" data-testid="text-journal-title">{t("journal.title")}</h1>
+      <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-2">
+        <h1 className="font-serif text-xl font-semibold" data-testid="text-journal-title">{t("journal.title")}</h1>
         <Button onClick={() => setShowWizard(true)} data-testid="button-new-tasting">
           <Plus className="h-4 w-4 mr-1.5" />
           {t("journal.add")}
         </Button>
       </div>
 
-      <div className="px-4 pb-3">
+      <div className="px-5 pb-3">
         <Button variant="outline" size="sm" asChild data-testid="button-qcoffee-global">
           <a href={Q_COFFEE_GO_URL} target="_blank" rel="noopener noreferrer">
             {t("journal.evaluate")} <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
@@ -78,10 +78,10 @@ export default function JournalPage() {
         </Button>
       </div>
 
-      <div className="flex-1 px-4 space-y-3 pb-4">
+      <div className="flex-1 px-5 space-y-3 pb-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} className="p-4 space-y-3">
+            <Card key={i} className="p-5 space-y-3">
               <Skeleton className="h-5 w-40" />
               <Skeleton className="h-4 w-60" />
               <div className="flex gap-2">
@@ -97,7 +97,7 @@ export default function JournalPage() {
           </div>
         ) : (
           entries.map((entry) => (
-            <Card key={entry.id} className="p-4" data-testid={`card-tasting-${entry.id}`}>
+            <Card key={entry.id} className="p-5" data-testid={`card-tasting-${entry.id}`}>
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
                   <h3 className="font-semibold text-sm" data-testid={`text-coffee-name-${entry.id}`}>{entry.coffeeName}</h3>

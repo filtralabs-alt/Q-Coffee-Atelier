@@ -90,14 +90,14 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
 
   return (
     <div className="flex flex-col min-h-full ">
-      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
-        <h1 className="font-serif text-xl font-bold">{t("wizard.title")}</h1>
+      <div className="px-5 pt-5 pb-2 flex items-center justify-between gap-2">
+        <h1 className="font-serif text-xl font-semibold">{t("wizard.title")}</h1>
         <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-wizard">
           <X className="h-5 w-5" />
         </Button>
       </div>
 
-      <div className="px-4 mb-4">
+      <div className="px-5 mb-4">
         <div className="flex items-center gap-2">
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center gap-2 flex-1">
@@ -112,9 +112,9 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         </div>
       </div>
 
-      <div className="flex-1 px-4 space-y-4">
+      <div className="flex-1 px-5 space-y-4">
         {step === 1 && (
-          <Card className="p-4 space-y-4" data-testid="wizard-step1">
+          <Card className="p-5 space-y-4" data-testid="wizard-step1">
             <div className="space-y-2">
               <Label htmlFor="coffeeName">{t("wizard.coffeeName")}</Label>
               <Input
@@ -172,7 +172,7 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         )}
 
         {step === 2 && (
-          <Card className="p-4 space-y-4" data-testid="wizard-step2">
+          <Card className="p-5 space-y-4" data-testid="wizard-step2">
             <div className="space-y-3">
               <Label>{t("wizard.method")}</Label>
               <RadioGroup value={method} onValueChange={setMethod} className="space-y-2">
@@ -200,7 +200,7 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         )}
 
         {step === 3 && (
-          <Card className="p-4 space-y-5" data-testid="wizard-step3">
+          <Card className="p-5 space-y-5" data-testid="wizard-step3">
             <div className="space-y-2">
               <Label>{t("wizard.aromas")}</Label>
               <div className="flex flex-wrap gap-1.5">
@@ -284,7 +284,7 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         )}
       </div>
 
-      <div className="px-4 py-3 flex items-center justify-between gap-3">
+      <div className="px-5 py-4 flex items-center justify-between gap-3">
         <Button
           variant="outline"
           onClick={() => step === 1 ? onClose() : setStep(step - 1)}

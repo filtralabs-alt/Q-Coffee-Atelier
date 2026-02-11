@@ -15,7 +15,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t" data-testid="mobile-nav">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-t border-border/50" data-testid="mobile-nav">
       <div className="flex items-stretch justify-around gap-1">
         {navItems.map((item) => {
           const isActive = location === item.href;
@@ -26,12 +26,12 @@ export function MobileNav() {
               data-testid={`nav-link-${item.href.replace("/", "") || "home"}`}
               className="flex-1"
             >
-              <div className={`flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] relative transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+              <div className={`flex flex-col items-center justify-center gap-1 py-2.5 min-h-[56px] relative transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                 {isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary" />
                 )}
-                <item.icon className={`h-5 w-5 transition-transform ${isActive ? "scale-110" : ""}`} strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] leading-tight ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+                <item.icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 1.5} />
+                <span className={`text-[10px] leading-tight ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
               </div>
             </Link>
           );

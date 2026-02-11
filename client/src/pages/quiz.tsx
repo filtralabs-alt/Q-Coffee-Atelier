@@ -77,15 +77,15 @@ export default function QuizPage() {
   if (!selectedLevel) {
     return (
       <div className="flex flex-col min-h-full">
-        <div className="px-4 pt-4 pb-3">
-          <h1 className="font-serif text-xl font-bold" data-testid="text-quiz-title">{t("quiz.title")}</h1>
+        <div className="px-5 pt-5 pb-4">
+          <h1 className="font-serif text-xl font-semibold" data-testid="text-quiz-title">{t("quiz.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("quiz.subtitle")}</p>
         </div>
-        <div className="flex-1 px-4 space-y-3 pb-4">
+        <div className="flex-1 px-5 space-y-3 pb-4">
           {levels.map((level) => (
             <Card
               key={level.key}
-              className="p-5 hover-elevate cursor-pointer active-elevate-2"
+              className="p-6 hover-elevate cursor-pointer active-elevate-2"
               onClick={() => setSelectedLevel(level.key)}
               data-testid={`card-quiz-${level.key}`}
             >
@@ -124,16 +124,16 @@ export default function QuizPage() {
     const badge = getBadge(scorePct);
     return (
       <div className="flex flex-col min-h-full">
-        <div className="px-4 pt-4 pb-2">
+        <div className="px-5 pt-4 pb-2">
           <Button variant="ghost" size="sm" onClick={reset} data-testid="button-quiz-back">
             <ArrowLeft className="h-4 w-4 mr-1" /> {t("quiz.back")}
           </Button>
         </div>
-        <div className="flex-1 px-4 flex items-center justify-center">
+        <div className="flex-1 px-5 flex items-center justify-center">
           <Card className="p-6 text-center max-w-sm mx-auto w-full" data-testid="card-quiz-result">
             <div className="space-y-4">
               <Trophy className={`h-16 w-16 mx-auto ${scorePct >= 70 ? "text-amber-500" : "text-muted-foreground"}`} />
-              <h2 className="font-serif text-2xl font-bold">{t("quiz.score")}</h2>
+              <h2 className="font-serif text-2xl font-semibold">{t("quiz.score")}</h2>
               <div className="text-4xl font-bold text-primary" data-testid="text-quiz-score">{score}/{questions.length}</div>
               <Badge variant="secondary" className="text-sm px-3 py-1" data-testid="text-quiz-badge">{badge}</Badge>
               <Button onClick={reset} className="w-full mt-4" data-testid="button-quiz-retry">
@@ -148,7 +148,7 @@ export default function QuizPage() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <div className="px-4 pt-4 pb-2 space-y-2">
+      <div className="px-5 pt-4 pb-2 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <Button variant="ghost" size="sm" onClick={reset} data-testid="button-quiz-back-to-levels">
             <ArrowLeft className="h-4 w-4 mr-1" /> {t("quiz.back")}
@@ -160,8 +160,8 @@ export default function QuizPage() {
         <Progress value={pct} className="h-1.5" />
       </div>
 
-      <div className="flex-1 px-4 space-y-3 pb-4">
-        <Card className="p-4" data-testid="card-quiz-question">
+      <div className="flex-1 px-5 space-y-3 pb-4">
+        <Card className="p-5" data-testid="card-quiz-question">
           <h3 className="font-semibold text-base mb-4 leading-relaxed" data-testid="text-quiz-question">
             {question.question[lang]}
           </h3>

@@ -27,12 +27,12 @@ export default function SpotsPage() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <div className="px-4 pt-4 pb-1">
-        <h1 className="font-serif text-xl font-bold" data-testid="text-spots-title">{t("spots.title")}</h1>
+      <div className="px-5 pt-5 pb-2">
+        <h1 className="font-serif text-xl font-semibold" data-testid="text-spots-title">{t("spots.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("spots.subtitle")}</p>
       </div>
 
-      <div className="px-4 py-3">
+      <div className="px-5 py-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -46,10 +46,10 @@ export default function SpotsPage() {
         </div>
       </div>
 
-      <div className="flex-1 px-4 space-y-3 pb-4">
+      <div className="flex-1 px-5 space-y-3 pb-4">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="p-4 space-y-2">
+            <Card key={i} className="p-5 space-y-2">
               <Skeleton className="h-5 w-40" />
               <Skeleton className="h-4 w-32" />
               <div className="flex gap-2">
@@ -65,7 +65,7 @@ export default function SpotsPage() {
           </div>
         ) : (
           filtered.map((spot) => (
-            <Card key={spot.id} className="p-4 hover-elevate" data-testid={`card-spot-${spot.id}`}>
+            <Card key={spot.id} className="p-5 hover-elevate" data-testid={`card-spot-${spot.id}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="space-y-1 flex-1">
                   <h3 className="font-semibold text-sm" data-testid={`text-spot-name-${spot.id}`}>{spot.name}</h3>

@@ -18,16 +18,16 @@ export function AppHeader() {
     : "U";
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b">
-      <div className="flex items-center justify-between gap-2 px-4 h-12">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+      <div className="flex items-center justify-between gap-2 px-5 h-14">
         <Link href="/" data-testid="link-home">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <img src={logoIcon} alt="Cris Du Café" className="h-7 w-7" data-testid="img-header-logo" />
-            <span className="font-serif text-base font-bold tracking-tight">{t("app.name")}</span>
+            <span className="font-serif text-lg font-semibold tracking-tight">{t("app.name")}</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <LangToggle />
           <ThemeToggle />
           <DropdownMenu>
