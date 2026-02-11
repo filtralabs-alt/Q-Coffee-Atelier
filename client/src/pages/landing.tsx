@@ -3,7 +3,7 @@ import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Coffee, BookOpen, Award, ExternalLink } from "lucide-react";
+import { Coffee, BookOpen, Award, ExternalLink, ShieldCheck } from "lucide-react";
 import logoFull from "@assets/cris-du-cafe-logo.png";
 import logoIcon from "@assets/cris-du-cafe-icon.png";
 
@@ -22,7 +22,10 @@ export default function LandingPage() {
             <LangToggle />
             <ThemeToggle />
             <Button asChild data-testid="button-login-header">
-              <a href="/api/login">{t("nav.login")}</a>
+              <a href="/api/login">
+                <ShieldCheck className="mr-1.5 h-4 w-4" />
+                {t("app.login.secure")}
+              </a>
             </Button>
           </div>
         </div>
@@ -54,7 +57,10 @@ export default function LandingPage() {
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <Button size="lg" asChild data-testid="button-hero-cta">
-                    <a href="/api/login">{t("app.hero.cta")}</a>
+                    <a href="/api/login">
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      {t("app.hero.cta")}
+                    </a>
                   </Button>
                   <Button variant="outline" size="lg" asChild data-testid="button-hero-qcoffee">
                     <a href="https://qcoffeego.com" target="_blank" rel="noopener noreferrer">
@@ -62,6 +68,10 @@ export default function LandingPage() {
                     </a>
                   </Button>
                 </div>
+                <p className="flex items-center gap-2 text-xs text-muted-foreground pt-1" data-testid="text-login-hint">
+                  <ShieldCheck className="h-3.5 w-3.5 text-green-600 dark:text-green-400 shrink-0" />
+                  {t("app.login.redirect")}
+                </p>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-2">
                   <span className="flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-green-500" />

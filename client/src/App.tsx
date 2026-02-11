@@ -1,9 +1,10 @@
+import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { I18nProvider } from "@/lib/i18n";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { AppHeader } from "@/components/app-header";
@@ -16,7 +17,6 @@ import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
 import AdminSpotsPage from "@/pages/admin-spots";
 import NotFound from "@/pages/not-found";
-import { Skeleton } from "@/components/ui/skeleton";
 import logoIcon from "@assets/cris-du-cafe-icon.png";
 
 function AuthenticatedLayout() {
@@ -39,8 +39,45 @@ function AuthenticatedLayout() {
   );
 }
 
+function WelcomeScreen({ name, onDone }: { name: string; onDone: () => void }) {
+  const { t } = useI18n();
+
+  useEffect(() => {
+    const timer = setTimeout(onDone, 1800);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
+  return (
+    <div className="flex items-center justify-center h-[100dvh] bg-background">
+      <div className="text-center space-y-4 animate-in fade-in zoom-in-95 duration-500">
+        <img src={logoIcon} alt="Cris Du Café" className="h-20 w-20 mx-auto" />
+        <div className="space-y-1">
+          <h2 className="font-serif text-2xl font-bold" data-testid="text-welcome-title">
+            {t("app.welcome.title")}
+          </h2>
+          <p className="text-muted-foreground" data-testid="text-welcome-name">{name}</p>
+        </div>
+        <p className="text-sm text-muted-foreground">{t("app.welcome.subtitle")}</p>
+      </div>
+    </div>
+  );
+}
+
 function AppContent() {
   const { user, isLoading } = useAuth();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [prevUser, setPrevUser] = useState<typeof user>(null);
+
+  useEffect(() => {
+    if (user && !prevUser && !isLoading) {
+      const hasSeenWelcome = sessionStorage.getItem("cris_welcome_shown");
+      if (!hasSeenWelcome) {
+        setShowWelcome(true);
+        sessionStorage.setItem("cris_welcome_shown", "1");
+      }
+    }
+    setPrevUser(user);
+  }, [user, isLoading]);
 
   if (isLoading) {
     return (
@@ -55,6 +92,10 @@ function AppContent() {
 
   if (!user) {
     return <LandingPage />;
+  }
+
+  if (showWelcome) {
+    return <WelcomeScreen name={user.firstName || user.email || ""} onDone={() => setShowWelcome(false)} />;
   }
 
   return <AuthenticatedLayout />;

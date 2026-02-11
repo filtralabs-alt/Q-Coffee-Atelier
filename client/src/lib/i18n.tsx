@@ -30,6 +30,10 @@ const translations: Record<string, Record<Lang, string>> = {
   "nav.admin": { fr: "Admin Spots", pt: "Admin Spots" },
   "nav.logout": { fr: "Déconnexion", pt: "Sair" },
   "nav.login": { fr: "Connexion", pt: "Entrar" },
+  "app.login.secure": { fr: "Connexion sécurisée via Replit", pt: "Login seguro via Replit" },
+  "app.login.redirect": { fr: "Vous serez redirigé vers une page de connexion sécurisée", pt: "Você será redirecionado para uma página de login segura" },
+  "app.welcome.title": { fr: "Bienvenue !", pt: "Bem-vindo(a)!" },
+  "app.welcome.subtitle": { fr: "Votre espace café est prêt", pt: "Seu espaço café está pronto" },
 
   "journal.title": { fr: "Mon Journal de Dégustation", pt: "Meu Diário de Degustação" },
   "journal.empty": { fr: "Aucune dégustation enregistrée. Ajoutez votre première !", pt: "Nenhuma degustação registrada. Adicione a primeira!" },
