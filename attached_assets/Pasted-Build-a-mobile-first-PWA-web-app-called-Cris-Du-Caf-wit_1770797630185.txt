@@ -1,0 +1,45 @@
+Build a mobile-first PWA web app called “Cris Du Café” with bilingual support (FR / PT-BR).
+Default language: French. Add a top toggle FR | PT and store preference.
+
+Core concept:
+Users attend a coffee tasting workshop and use the app to write tasting notes. After that, they can evaluate the coffee on Q Coffee Go via an external link.
+
+AUTH + DASHBOARD (members area):
+- Users can create an account with: name, email (required), WhatsApp number (required), and consent checkbox (RGPD).
+- Use passwordless email magic link login (MVP). WhatsApp is stored for contact, not for authentication in MVP.
+- After login, users access a personal dashboard with:
+  1) their tasting journal (all saved entries)
+  2) a “Summary of your experience” page that aggregates their latest tasting:
+     - favorite method
+     - common aroma tags
+     - average acidity/bitterness/sweetness
+     - a short personalized tip based on the data
+  3) “Atelier Content Library” (locked for members): modules about Chemex, V60, Brazilian origins & terroirs, specialty vs supermarket coffee, equipment basics, etc.
+
+TASTING JOURNAL:
+- Create a 3-step wizard to add a tasting entry:
+  Step 1 Coffee info: coffee name (required), origin/region, variety (optional), process (Natural/Washed/Honey/Pulped Natural/Other), roast date (optional)
+  Step 2 Method: V60, Chemex, Other (text)
+  Step 3 Sensory notes:
+    - aroma tags (multi-select)
+    - sliders 1–5: acidity, bitterness, sweetness
+    - free text notes
+    - preference: favorite method, would drink again (yes/no/maybe)
+- Save entries to database if logged in. If not logged in, save to local storage.
+- When a guest signs up/logs in, offer to import local tasting entries into their account.
+
+Q COFFEE GO LINK:
+- Add a persistent button “Évaluer sur Q Coffee Go / Avaliar no Q Coffee Go” that opens an external URL (configurable in one place).
+- Each tasting entry also shows the same button.
+- Use a placeholder Q Coffee Go URL for now; make it easy to replace later.
+
+COFFEE SPOTS DIRECTORY (Clermont-Ferrand + region, expandable):
+- Screen “Coffee Spots” with a searchable list of places:
+  fields: name, city, instagram link, website link optional, tags
+- Include an admin-only screen to add/edit coffee spots (simple form).
+- Store coffee spots in the database. Also allow optional “public suggestions” saved as pending (optional feature, can be stubbed).
+
+QUIZ:
+- Screen “Quiz” with 3 levels: Basique, Intermédiaire, Avancé.
+- Each level has 10 multiple-choice questions with immediate feedback (correct answer + short explanation) and a final score + badge.
+- Make all quiz content bilingual (FR/PT-BR) using i18n dictionaries.
