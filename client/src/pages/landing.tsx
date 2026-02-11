@@ -4,6 +4,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Coffee, BookOpen, Award, ExternalLink } from "lucide-react";
+import logoFull from "@assets/cris-du-cafe-logo.png";
+import logoIcon from "@assets/cris-du-cafe-icon.png";
 
 export default function LandingPage() {
   const { t } = useI18n();
@@ -13,7 +15,7 @@ export default function LandingPage() {
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-4 py-3">
           <div className="flex items-center gap-2">
-            <Coffee className="h-6 w-6 text-primary" />
+            <img src={logoIcon} alt="Cris Du Café" className="h-8 w-8" data-testid="img-logo-header" />
             <span className="font-serif text-lg font-bold tracking-tight">{t("app.name")}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -32,6 +34,14 @@ export default function LandingPage() {
           <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
+                <div className="flex justify-center lg:hidden mb-4">
+                  <img
+                    src={logoFull}
+                    alt="Cris Du Café"
+                    className="w-48"
+                    data-testid="img-logo-hero-mobile"
+                  />
+                </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
                   <Coffee className="h-3.5 w-3.5" />
                   <span>Atelier de Dégustation</span>
@@ -64,17 +74,13 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="hidden lg:block">
-                <div className="relative aspect-square max-w-md mx-auto">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10" />
-                  <div className="absolute inset-4 rounded-2xl bg-card border flex items-center justify-center">
-                    <div className="text-center space-y-4 p-8">
-                      <Coffee className="h-20 w-20 mx-auto text-primary opacity-80" />
-                      <p className="font-serif text-2xl font-bold text-foreground">Cris Du Café</p>
-                      <p className="text-sm text-muted-foreground">Journal de Dégustation</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="hidden lg:flex items-center justify-center">
+                <img
+                  src={logoFull}
+                  alt="Cris Du Café"
+                  className="max-w-xs w-full"
+                  data-testid="img-logo-hero"
+                />
               </div>
             </div>
           </div>
