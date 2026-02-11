@@ -1,0 +1,106 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useI18n } from "@/lib/i18n";
+import type { CoffeeSpot } from "@shared/schema";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, MapPin, Globe, Instagram } from "lucide-react";
+import { SiInstagram } from "react-icons/si";
+
+export default function SpotsPage() {
+  const { t } = useI18n();
+  const [search, setSearch] = useState("");
+
+  const { data: spots, isLoading } = useQuery<CoffeeSpot[]>({
+    queryKey: ["/api/coffee-spots"],
+  });
+
+  const filtered = spots?.filter(
+    (spot) =>
+      spot.name.toLowerCase().includes(search.toLowerCase()) ||
+      spot.city.toLowerCase().includes(search.toLowerCase()) ||
+      spot.tags?.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  return (
+    <div className="flex flex-col min-h-full pb-20">
+      <div className="px-4 pt-4 pb-1">
+        <h1 className="font-serif text-xl font-bold" data-testid="text-spots-title">{t("spots.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("spots.subtitle")}</p>
+      </div>
+
+      <div className="px-4 py-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder={t("spots.search")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+            data-testid="input-spots-search"
+          />
+        </div>
+      </div>
+
+      <div className="flex-1 px-4 space-y-3 pb-4">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-4 space-y-2">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+            </Card>
+          ))
+        ) : !filtered?.length ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <MapPin className="h-12 w-12 text-muted-foreground/40 mb-4" />
+            <p className="text-muted-foreground">{t("spots.noResults")}</p>
+          </div>
+        ) : (
+          filtered.map((spot) => (
+            <Card key={spot.id} className="p-4 hover-elevate" data-testid={`card-spot-${spot.id}`}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1 flex-1">
+                  <h3 className="font-semibold text-sm" data-testid={`text-spot-name-${spot.id}`}>{spot.name}</h3>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> {spot.city}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  {spot.instagram && (
+                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild data-testid={`button-instagram-${spot.id}`}>
+                      <a href={spot.instagram.startsWith("http") ? spot.instagram : `https://instagram.com/${spot.instagram.replace("@", "")}`} target="_blank" rel="noopener noreferrer">
+                        <SiInstagram className="h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                  )}
+                  {spot.website && (
+                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild data-testid={`button-website-${spot.id}`}>
+                      <a href={spot.website.startsWith("http") ? spot.website : `https://${spot.website}`} target="_blank" rel="noopener noreferrer">
+                        <Globe className="h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+              {spot.tags && spot.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {spot.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-[10px]">{tag}</Badge>
+                  ))}
+                </div>
+              )}
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}

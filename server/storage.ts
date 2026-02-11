@@ -1,38 +1,166 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import {
+  tastingEntries, type TastingEntry, type InsertTastingEntry,
+  coffeeSpots, type CoffeeSpot, type InsertCoffeeSpot,
+  quizResults, type QuizResult, type InsertQuizResult,
+  userProfiles, type UserProfile, type InsertUserProfile,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getTastingEntries(userId: string): Promise<TastingEntry[]>;
+  createTastingEntry(entry: InsertTastingEntry): Promise<TastingEntry>;
+  deleteTastingEntry(id: string, userId: string): Promise<void>;
+  getTastingSummary(userId: string): Promise<any>;
+
+  getCoffeeSpots(): Promise<CoffeeSpot[]>;
+  createCoffeeSpot(spot: InsertCoffeeSpot): Promise<CoffeeSpot>;
+  updateCoffeeSpot(id: string, spot: Partial<InsertCoffeeSpot>): Promise<CoffeeSpot>;
+  deleteCoffeeSpot(id: string): Promise<void>;
+
+  getQuizResults(userId: string): Promise<QuizResult[]>;
+  createQuizResult(result: InsertQuizResult): Promise<QuizResult>;
+
+  getUserProfile(userId: string): Promise<UserProfile | undefined>;
+  upsertUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getTastingEntries(userId: string): Promise<TastingEntry[]> {
+    return db.select().from(tastingEntries)
+      .where(eq(tastingEntries.userId, userId))
+      .orderBy(desc(tastingEntries.createdAt));
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async createTastingEntry(entry: InsertTastingEntry): Promise<TastingEntry> {
+    const [result] = await db.insert(tastingEntries).values(entry).returning();
+    return result;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async deleteTastingEntry(id: string, userId: string): Promise<void> {
+    await db.delete(tastingEntries)
+      .where(sql`${tastingEntries.id} = ${id} AND ${tastingEntries.userId} = ${userId}`);
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getTastingSummary(userId: string): Promise<any> {
+    const entries = await this.getTastingEntries(userId);
+    if (entries.length === 0) {
+      return { totalTastings: 0, favoriteMethod: null, commonAromas: [], avgAcidity: 0, avgBitterness: 0, avgSweetness: 0, tip: { fr: "", pt: "" } };
+    }
+
+    const methodCounts: Record<string, number> = {};
+    const aromaCounts: Record<string, number> = {};
+    let totalAcidity = 0, totalBitterness = 0, totalSweetness = 0;
+
+    for (const entry of entries) {
+      const m = entry.method === "Other" && entry.methodOther ? entry.methodOther : entry.method;
+      methodCounts[m] = (methodCounts[m] || 0) + 1;
+
+      if (entry.aromaTags) {
+        for (const tag of entry.aromaTags) {
+          aromaCounts[tag] = (aromaCounts[tag] || 0) + 1;
+        }
+      }
+
+      totalAcidity += entry.acidity || 0;
+      totalBitterness += entry.bitterness || 0;
+      totalSweetness += entry.sweetness || 0;
+    }
+
+    const favoriteMethod = Object.entries(methodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+    const commonAromas = Object.entries(aromaCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([k]) => k);
+
+    const n = entries.length;
+    const avgAcidity = totalAcidity / n;
+    const avgBitterness = totalBitterness / n;
+    const avgSweetness = totalSweetness / n;
+
+    let tip = { fr: "", pt: "" };
+    if (avgAcidity > 3.5) {
+      tip = {
+        fr: "Vous appréciez les cafés acides ! Essayez des cafés éthiopiens ou kenyans lavés pour des notes fruitées et vives.",
+        pt: "Você aprecia cafés ácidos! Experimente cafés etíopes ou quenianos lavados para notas frutadas e vivas.",
+      };
+    } else if (avgSweetness > 3.5) {
+      tip = {
+        fr: "Vous aimez la douceur ! Les cafés brésiliens naturels avec des notes de chocolat et caramel vous plairont.",
+        pt: "Você gosta de doçura! Cafés brasileiros naturais com notas de chocolate e caramelo vão agradar.",
+      };
+    } else if (avgBitterness > 3.5) {
+      tip = {
+        fr: "Vous tolérez bien l'amertume. Essayez une torréfaction moyenne-foncée ou un Robusta de qualité pour plus d'intensité.",
+        pt: "Você tolera bem o amargor. Experimente uma torra média-escura ou um Robusta de qualidade para mais intensidade.",
+      };
+    } else {
+      tip = {
+        fr: "Votre palais est équilibré ! Explorez des cafés de différentes origines pour affiner vos préférences.",
+        pt: "Seu paladar é equilibrado! Explore cafés de diferentes origens para refinar suas preferências.",
+      };
+    }
+
+    return {
+      totalTastings: n,
+      favoriteMethod,
+      commonAromas,
+      avgAcidity: Math.round(avgAcidity * 10) / 10,
+      avgBitterness: Math.round(avgBitterness * 10) / 10,
+      avgSweetness: Math.round(avgSweetness * 10) / 10,
+      tip,
+    };
+  }
+
+  async getCoffeeSpots(): Promise<CoffeeSpot[]> {
+    return db.select().from(coffeeSpots)
+      .where(eq(coffeeSpots.approved, true))
+      .orderBy(coffeeSpots.name);
+  }
+
+  async createCoffeeSpot(spot: InsertCoffeeSpot): Promise<CoffeeSpot> {
+    const [result] = await db.insert(coffeeSpots).values(spot).returning();
+    return result;
+  }
+
+  async updateCoffeeSpot(id: string, spot: Partial<InsertCoffeeSpot>): Promise<CoffeeSpot> {
+    const [result] = await db.update(coffeeSpots)
+      .set(spot)
+      .where(eq(coffeeSpots.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteCoffeeSpot(id: string): Promise<void> {
+    await db.delete(coffeeSpots).where(eq(coffeeSpots.id, id));
+  }
+
+  async getQuizResults(userId: string): Promise<QuizResult[]> {
+    return db.select().from(quizResults)
+      .where(eq(quizResults.userId, userId))
+      .orderBy(desc(quizResults.completedAt));
+  }
+
+  async createQuizResult(result: InsertQuizResult): Promise<QuizResult> {
+    const [row] = await db.insert(quizResults).values(result).returning();
+    return row;
+  }
+
+  async getUserProfile(userId: string): Promise<UserProfile | undefined> {
+    const [profile] = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId));
+    return profile;
+  }
+
+  async upsertUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile> {
+    const [result] = await db.insert(userProfiles)
+      .values({ ...profile, userId })
+      .onConflictDoUpdate({
+        target: userProfiles.userId,
+        set: profile,
+      })
+      .returning();
+    return result;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
