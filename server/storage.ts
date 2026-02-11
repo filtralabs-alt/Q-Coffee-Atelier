@@ -3,9 +3,10 @@ import {
   coffeeSpots, type CoffeeSpot, type InsertCoffeeSpot,
   quizResults, type QuizResult, type InsertQuizResult,
   userProfiles, type UserProfile, type InsertUserProfile,
+  users, type User,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, count } from "drizzle-orm";
 
 export interface IStorage {
   getTastingEntries(userId: string): Promise<TastingEntry[]>;
@@ -23,6 +24,11 @@ export interface IStorage {
 
   getUserProfile(userId: string): Promise<UserProfile | undefined>;
   upsertUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
+
+  getAdminStats(): Promise<{ totalUsers: number; totalTastings: number; totalSpots: number; totalQuizzes: number }>;
+  getAllUsers(): Promise<User[]>;
+  getAllTastings(): Promise<TastingEntry[]>;
+  getAllCoffeeSpots(): Promise<CoffeeSpot[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -160,6 +166,31 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return result;
+  }
+
+  async getAdminStats() {
+    const [usersCount] = await db.select({ value: count() }).from(users);
+    const [tastingsCount] = await db.select({ value: count() }).from(tastingEntries);
+    const [spotsCount] = await db.select({ value: count() }).from(coffeeSpots);
+    const [quizzesCount] = await db.select({ value: count() }).from(quizResults);
+    return {
+      totalUsers: usersCount.value,
+      totalTastings: tastingsCount.value,
+      totalSpots: spotsCount.value,
+      totalQuizzes: quizzesCount.value,
+    };
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async getAllTastings(): Promise<TastingEntry[]> {
+    return db.select().from(tastingEntries).orderBy(desc(tastingEntries.createdAt));
+  }
+
+  async getAllCoffeeSpots(): Promise<CoffeeSpot[]> {
+    return db.select().from(coffeeSpots).orderBy(coffeeSpots.name);
   }
 }
 

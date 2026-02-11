@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,6 +16,7 @@ import SpotsPage from "@/pages/spots";
 import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
 import AdminSpotsPage from "@/pages/admin-spots";
+import AdminDashboardPage from "@/pages/admin-dashboard";
 import NotFound from "@/pages/not-found";
 import logoIcon from "@assets/cris-du-cafe-icon.png";
 
@@ -63,7 +64,7 @@ function WelcomeScreen({ name, onDone }: { name: string; onDone: () => void }) {
   );
 }
 
-function AppContent() {
+function UserApp() {
   const { user, isLoading } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
   const [prevUser, setPrevUser] = useState<typeof user>(null);
@@ -99,6 +100,16 @@ function AppContent() {
   }
 
   return <AuthenticatedLayout />;
+}
+
+function AppContent() {
+  const [location] = useLocation();
+
+  if (location === "/admin-panel") {
+    return <AdminDashboardPage />;
+  }
+
+  return <UserApp />;
 }
 
 export default function App() {

@@ -40,3 +40,9 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_log_in_with_replit:2.0.0", "javascript_database:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+ADMIN_EMAIL = "hub@filtralabs.com"
+ADMIN_PASSWORD_HASH = "$2b$10$.kT7cgEJWFqdpDhOGpw1f.L3aTYD/j7TKM3yAQ2WthU0pKI66E16C"
