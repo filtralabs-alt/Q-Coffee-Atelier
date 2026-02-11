@@ -59,12 +59,29 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 import { seedDatabase } from "./seed";
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
 
 (async () => {
   try {
+    log("Starting server initialization...");
+
     await registerRoutes(httpServer, app);
+    log("Routes registered successfully");
+
     await seedDatabase().catch((err) => console.error("Seed error:", err));
+    log("Database seeded");
 
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -81,6 +98,7 @@ import { seedDatabase } from "./seed";
 
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
+      log("Static files configured for production");
     } else {
       const { setupVite } = await import("./vite");
       await setupVite(httpServer, app);
