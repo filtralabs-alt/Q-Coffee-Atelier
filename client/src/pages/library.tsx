@@ -4,7 +4,8 @@ import { useI18n } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Lock, ChevronRight, Coffee, Beaker, MapPin, Scale, Wrench } from "lucide-react";
+import { BookOpen, Lock, ChevronRight, Coffee, Beaker, MapPin, Scale, Wrench, ExternalLink, MessageCircle } from "lucide-react";
+import { GRAND_MAITRE_URL } from "@/lib/constants";
 
 export default function LibraryPage() {
   const { t, lang } = useI18n();
@@ -78,6 +79,27 @@ export default function LibraryPage() {
         <h1 className="font-serif text-xl font-bold" data-testid="text-library-title">{t("library.title")}</h1>
       </div>
       <div className="flex-1 px-4 space-y-3 pb-4">
+        <a
+          href={GRAND_MAITRE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+          data-testid="link-grand-maitre"
+        >
+          <Card className="p-4 hover-elevate bg-primary/5 border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-md bg-primary/15 flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm">{t("library.grandmaitre")}</h3>
+                <p className="text-xs text-muted-foreground truncate">{t("library.grandmaitre.desc")}</p>
+              </div>
+              <ExternalLink className="h-4 w-4 text-primary flex-shrink-0" />
+            </div>
+          </Card>
+        </a>
+
         {modules.map((mod) => (
           <div key={mod.key}>
             <Card
