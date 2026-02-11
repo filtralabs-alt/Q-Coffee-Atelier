@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
-import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema } from "@shared/schema";
+import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -57,6 +57,16 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching summary:", error);
       res.status(500).json({ message: "Failed to fetch summary" });
+    }
+  });
+
+  app.get("/api/library-modules", async (_req, res) => {
+    try {
+      const modules = await storage.getLibraryModules(true);
+      res.json(modules);
+    } catch (error) {
+      console.error("Error fetching library modules:", error);
+      res.status(500).json({ message: "Failed to fetch library modules" });
     }
   });
 
@@ -194,6 +204,55 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error updating spot:", error);
       res.status(500).json({ message: "Failed to update spot" });
+    }
+  });
+
+  app.get("/api/admin/library-modules", isAdmin, async (_req, res) => {
+    try {
+      const modules = await storage.getLibraryModules(false);
+      res.json(modules);
+    } catch (error) {
+      console.error("Error fetching library modules:", error);
+      res.status(500).json({ message: "Failed to fetch library modules" });
+    }
+  });
+
+  app.post("/api/admin/library-modules", isAdmin, async (req, res) => {
+    try {
+      const parsed = insertLibraryModuleSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const mod = await storage.createLibraryModule(parsed.data);
+      res.json(mod);
+    } catch (error) {
+      console.error("Error creating library module:", error);
+      res.status(500).json({ message: "Failed to create library module" });
+    }
+  });
+
+  app.patch("/api/admin/library-modules/:id", isAdmin, async (req, res) => {
+    try {
+      const allowedFields = ["key", "titleFr", "titlePt", "descFr", "descPt", "contentFr", "contentPt", "icon", "sortOrder", "isActive", "externalUrl"];
+      const filtered: Record<string, any> = {};
+      for (const k of allowedFields) {
+        if (k in req.body) filtered[k] = req.body[k];
+      }
+      const mod = await storage.updateLibraryModule(req.params.id, filtered);
+      res.json(mod);
+    } catch (error) {
+      console.error("Error updating library module:", error);
+      res.status(500).json({ message: "Failed to update library module" });
+    }
+  });
+
+  app.delete("/api/admin/library-modules/:id", isAdmin, async (req, res) => {
+    try {
+      await storage.deleteLibraryModule(req.params.id);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Error deleting library module:", error);
+      res.status(500).json({ message: "Failed to delete library module" });
     }
   });
 

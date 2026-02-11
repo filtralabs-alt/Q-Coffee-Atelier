@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { CoffeeSpot, TastingEntry } from "@shared/schema";
+import type { CoffeeSpot, TastingEntry, LibraryModule } from "@shared/schema";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Users, Coffee, MapPin, Award, LogOut, Eye, EyeOff,
-  Plus, Pencil, Trash2, Save, X,
+  Plus, Pencil, Trash2, Save, X, BookOpen,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -353,6 +355,223 @@ function SpotsTab() {
   );
 }
 
+interface ModuleForm {
+  key: string;
+  titleFr: string;
+  titlePt: string;
+  descFr: string;
+  descPt: string;
+  contentFr: string;
+  contentPt: string;
+  icon: string;
+  sortOrder: number;
+  isActive: boolean;
+  externalUrl: string;
+}
+
+const emptyModuleForm: ModuleForm = {
+  key: "", titleFr: "", titlePt: "", descFr: "", descPt: "",
+  contentFr: "", contentPt: "", icon: "book-open", sortOrder: 0,
+  isActive: true, externalUrl: "",
+};
+
+function LibraryTab() {
+  const { toast } = useToast();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<ModuleForm>(emptyModuleForm);
+  const [showForm, setShowForm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: modules, isLoading } = useQuery<LibraryModule[]>({ queryKey: ["/api/admin/library-modules"] });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const data = {
+        key: form.key,
+        titleFr: form.titleFr,
+        titlePt: form.titlePt,
+        descFr: form.descFr,
+        descPt: form.descPt,
+        contentFr: form.contentFr,
+        contentPt: form.contentPt,
+        icon: form.icon,
+        sortOrder: form.sortOrder,
+        isActive: form.isActive,
+        externalUrl: form.externalUrl || null,
+      };
+      if (editingId) {
+        await apiRequest("PATCH", `/api/admin/library-modules/${editingId}`, data);
+      } else {
+        await apiRequest("POST", "/api/admin/library-modules", data);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/library-modules"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/library-modules"] });
+      toast({ title: "Enregistré" });
+      closeForm();
+    },
+    onError: () => {
+      toast({ title: "Erreur", variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/library-modules/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/library-modules"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/library-modules"] });
+      toast({ title: "Supprimé" });
+      setDeleteId(null);
+    },
+  });
+
+  const openEdit = (mod: LibraryModule) => {
+    setEditingId(mod.id);
+    setForm({
+      key: mod.key,
+      titleFr: mod.titleFr,
+      titlePt: mod.titlePt,
+      descFr: mod.descFr,
+      descPt: mod.descPt,
+      contentFr: mod.contentFr,
+      contentPt: mod.contentPt,
+      icon: mod.icon,
+      sortOrder: mod.sortOrder,
+      isActive: mod.isActive,
+      externalUrl: mod.externalUrl || "",
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(emptyModuleForm);
+  };
+
+  if (isLoading) return <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>;
+
+  return (
+    <div className="space-y-3">
+      {!showForm && (
+        <Button onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyModuleForm); }} data-testid="button-admin-add-module">
+          <Plus className="h-4 w-4 mr-1.5" />
+          Ajouter un module
+        </Button>
+      )}
+
+      {showForm && (
+        <Card className="p-4 space-y-3" data-testid="card-admin-module-form">
+          <h3 className="font-semibold text-sm">{editingId ? "Modifier le module" : "Nouveau module"}</h3>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Clé unique *</Label>
+              <Input value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder="mon-module" disabled={!!editingId} data-testid="input-module-key" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Icône</Label>
+              <Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} placeholder="book-open" data-testid="input-module-icon" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Titre FR *</Label>
+              <Input value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} data-testid="input-module-title-fr" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Titre PT *</Label>
+              <Input value={form.titlePt} onChange={(e) => setForm({ ...form, titlePt: e.target.value })} data-testid="input-module-title-pt" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Description FR *</Label>
+              <Input value={form.descFr} onChange={(e) => setForm({ ...form, descFr: e.target.value })} data-testid="input-module-desc-fr" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Description PT *</Label>
+              <Input value={form.descPt} onChange={(e) => setForm({ ...form, descPt: e.target.value })} data-testid="input-module-desc-pt" />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Contenu FR</Label>
+            <Textarea value={form.contentFr} onChange={(e) => setForm({ ...form, contentFr: e.target.value })} className="min-h-[120px] text-sm" data-testid="input-module-content-fr" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Contenu PT</Label>
+            <Textarea value={form.contentPt} onChange={(e) => setForm({ ...form, contentPt: e.target.value })} className="min-h-[120px] text-sm" data-testid="input-module-content-pt" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>URL externe (optionnel)</Label>
+              <Input value={form.externalUrl} onChange={(e) => setForm({ ...form, externalUrl: e.target.value })} placeholder="https://..." data-testid="input-module-url" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Ordre</Label>
+              <Input type="number" value={form.sortOrder} onChange={(e) => setForm({ ...form, sortOrder: parseInt(e.target.value) || 0 })} data-testid="input-module-order" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Switch checked={form.isActive} onCheckedChange={(checked) => setForm({ ...form, isActive: checked })} data-testid="switch-module-active" />
+            <Label>Actif</Label>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <Button onClick={() => saveMutation.mutate()} disabled={!form.key.trim() || !form.titleFr.trim() || !form.titlePt.trim() || !form.descFr.trim() || !form.descPt.trim() || saveMutation.isPending} data-testid="button-admin-save-module">
+              <Save className="h-4 w-4 mr-1.5" />
+              Enregistrer
+            </Button>
+            <Button variant="outline" onClick={closeForm} data-testid="button-admin-cancel-module">
+              <X className="h-4 w-4 mr-1.5" />
+              Annuler
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {modules?.map((mod) => (
+        <Card key={mod.id} className={`p-3 flex items-center justify-between gap-2 ${!mod.isActive ? "opacity-50" : ""}`} data-testid={`card-admin-module-${mod.id}`}>
+          <div className="min-w-0">
+            <p className="font-medium text-sm truncate">{mod.titleFr}</p>
+            <p className="text-xs text-muted-foreground">{mod.key} · ordre {mod.sortOrder}{mod.externalUrl ? " · lien externe" : ""}</p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => openEdit(mod)} data-testid={`button-admin-edit-module-${mod.id}`}>
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeleteId(mod.id)} data-testid={`button-admin-delete-module-${mod.id}`}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </Card>
+      ))}
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce module ?</AlertDialogTitle>
+            <AlertDialogDescription>Cette action est irréversible.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && deleteMutation.mutate(deleteId)}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const { toast } = useToast();
@@ -422,7 +641,11 @@ export default function AdminDashboardPage() {
               </TabsTrigger>
               <TabsTrigger value="tastings" className="flex-1" data-testid="tab-admin-tastings">
                 <Coffee className="h-3.5 w-3.5 mr-1.5" />
-                Dégustations
+                Dégust.
+              </TabsTrigger>
+              <TabsTrigger value="library" className="flex-1" data-testid="tab-admin-library">
+                <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+                Biblio.
               </TabsTrigger>
             </TabsList>
             <TabsContent value="spots" className="mt-3">
@@ -433,6 +656,9 @@ export default function AdminDashboardPage() {
             </TabsContent>
             <TabsContent value="tastings" className="mt-3">
               <TastingsTab />
+            </TabsContent>
+            <TabsContent value="library" className="mt-3">
+              <LibraryTab />
             </TabsContent>
           </Tabs>
         </div>

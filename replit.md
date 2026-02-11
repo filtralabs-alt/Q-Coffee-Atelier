@@ -12,6 +12,9 @@ Built with Express + React + PostgreSQL + Drizzle ORM.
 - Mobile UX redesign: bottom nav, compact header, PWA support, welcome screen
 - Admin dashboard at /admin-panel with separate email/password auth (bcryptjs hashed)
 - Background color updated to #EDEFED
+- Library content moved from hardcoded to database (library_modules table) with admin CRUD
+- Admin dashboard now has "Biblio." tab for managing library content (titles, descriptions, content FR/PT, icons, order, active toggle, external URLs)
+- Deployment fixes: removed reusePort, catch-all route compatibility with Express v5+
 
 ## Architecture
 - **Frontend**: React + Wouter routing + TanStack Query + Tailwind + Shadcn UI
@@ -20,11 +23,11 @@ Built with Express + React + PostgreSQL + Drizzle ORM.
 - **i18n**: Custom context-based system in `client/src/lib/i18n.tsx`
 
 ### Key Files
-- `shared/schema.ts` — All Drizzle models (users, tastingEntries, coffeeSpots, quizResults, userProfiles)
+- `shared/schema.ts` — All Drizzle models (users, tastingEntries, coffeeSpots, quizResults, userProfiles, libraryModules)
 - `shared/models/auth.ts` — Auth-specific models (users, sessions)
 - `server/routes.ts` — All API endpoints
 - `server/storage.ts` — Database storage layer
-- `server/seed.ts` — Seed data for coffee spots
+- `server/seed.ts` — Seed data for coffee spots and library modules
 - `client/src/lib/i18n.tsx` — Bilingual translation system
 - `client/src/lib/quiz-data.ts` — Quiz questions (FR/PT-BR) for 3 levels
 - `client/src/lib/constants.ts` — Aroma tags, Q Coffee Go URL, processes, methods
@@ -43,8 +46,8 @@ Built with Express + React + PostgreSQL + Drizzle ORM.
 - `GET/POST /api/tastings` — User tasting entries
 - `DELETE /api/tastings/:id`
 - `GET /api/tastings/summary` — Aggregated summary
-- `GET/POST /api/coffee-spots`
-- `PATCH/DELETE /api/coffee-spots/:id`
+- `GET /api/coffee-spots` — Public coffee spots (read-only)
+- `GET /api/library-modules` — Public library modules (active only)
 - `GET/POST /api/quiz-results`
 
 ### Admin API Routes (protected by isAdmin session)
@@ -56,6 +59,8 @@ Built with Express + React + PostgreSQL + Drizzle ORM.
 - `GET /api/admin/tastings` — All tastings
 - `GET/POST /api/admin/coffee-spots` — Coffee spots management
 - `PATCH/DELETE /api/admin/coffee-spots/:id`
+- `GET/POST /api/admin/library-modules` — Library modules management
+- `PATCH/DELETE /api/admin/library-modules/:id`
 
 ### Q Coffee Go
 External link URL configured in `client/src/lib/constants.ts` as `Q_COFFEE_GO_URL`.

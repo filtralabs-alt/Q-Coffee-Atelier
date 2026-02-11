@@ -71,6 +71,25 @@ export const insertQuizResultSchema = createInsertSchema(quizResults).omit({ id:
 export type InsertQuizResult = z.infer<typeof insertQuizResultSchema>;
 export type QuizResult = typeof quizResults.$inferSelect;
 
+export const libraryModules = pgTable("library_modules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: varchar("key").notNull().unique(),
+  titleFr: varchar("title_fr").notNull(),
+  titlePt: varchar("title_pt").notNull(),
+  descFr: varchar("desc_fr").notNull(),
+  descPt: varchar("desc_pt").notNull(),
+  contentFr: text("content_fr").notNull(),
+  contentPt: text("content_pt").notNull(),
+  icon: varchar("icon").notNull().default("book-open"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  externalUrl: varchar("external_url"),
+});
+
+export const insertLibraryModuleSchema = createInsertSchema(libraryModules).omit({ id: true });
+export type InsertLibraryModule = z.infer<typeof insertLibraryModuleSchema>;
+export type LibraryModule = typeof libraryModules.$inferSelect;
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfiles, { fields: [users.id], references: [userProfiles.userId] }),
   tastingEntries: many(tastingEntries),

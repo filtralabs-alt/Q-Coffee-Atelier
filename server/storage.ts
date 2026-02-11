@@ -4,6 +4,7 @@ import {
   quizResults, type QuizResult, type InsertQuizResult,
   userProfiles, type UserProfile, type InsertUserProfile,
   users, type User,
+  libraryModules, type LibraryModule, type InsertLibraryModule,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, count } from "drizzle-orm";
@@ -24,6 +25,12 @@ export interface IStorage {
 
   getUserProfile(userId: string): Promise<UserProfile | undefined>;
   upsertUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
+
+  getLibraryModules(activeOnly?: boolean): Promise<LibraryModule[]>;
+  getLibraryModule(id: string): Promise<LibraryModule | undefined>;
+  createLibraryModule(mod: InsertLibraryModule): Promise<LibraryModule>;
+  updateLibraryModule(id: string, mod: Partial<InsertLibraryModule>): Promise<LibraryModule>;
+  deleteLibraryModule(id: string): Promise<void>;
 
   getAdminStats(): Promise<{ totalUsers: number; totalTastings: number; totalSpots: number; totalQuizzes: number }>;
   getAllUsers(): Promise<User[]>;
@@ -166,6 +173,37 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return result;
+  }
+
+  async getLibraryModules(activeOnly = false): Promise<LibraryModule[]> {
+    if (activeOnly) {
+      return db.select().from(libraryModules)
+        .where(eq(libraryModules.isActive, true))
+        .orderBy(libraryModules.sortOrder);
+    }
+    return db.select().from(libraryModules).orderBy(libraryModules.sortOrder);
+  }
+
+  async getLibraryModule(id: string): Promise<LibraryModule | undefined> {
+    const [mod] = await db.select().from(libraryModules).where(eq(libraryModules.id, id));
+    return mod;
+  }
+
+  async createLibraryModule(mod: InsertLibraryModule): Promise<LibraryModule> {
+    const [result] = await db.insert(libraryModules).values(mod).returning();
+    return result;
+  }
+
+  async updateLibraryModule(id: string, mod: Partial<InsertLibraryModule>): Promise<LibraryModule> {
+    const [result] = await db.update(libraryModules)
+      .set(mod)
+      .where(eq(libraryModules.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteLibraryModule(id: string): Promise<void> {
+    await db.delete(libraryModules).where(eq(libraryModules.id, id));
   }
 
   async getAdminStats() {
