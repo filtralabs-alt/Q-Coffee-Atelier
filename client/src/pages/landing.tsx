@@ -2,7 +2,7 @@ import { useI18n } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Coffee, BookOpen, Award, ExternalLink, ArrowRight } from "lucide-react";
+import { Coffee, BookOpen, Award, ExternalLink, ArrowRight, LogIn } from "lucide-react";
 import logoIcon from "@assets/cris-du-cafe-icon.png";
 
 export default function LandingPage() {
@@ -10,18 +10,23 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-2 px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <img src={logoIcon} alt="Cris Du Café" className="h-8 w-8" data-testid="img-logo-header" />
-            <span className="font-serif text-xl font-semibold tracking-tight">{t("app.name")}</span>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 px-5 py-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <img src={logoIcon} alt="Cris Du Café" className="h-7 w-7" data-testid="img-logo-header" />
+            <span className="font-serif text-base sm:text-lg font-semibold tracking-tight whitespace-nowrap">{t("app.name")}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <LangToggle />
             <ThemeToggle />
-            <Button asChild data-testid="button-login-header">
+            <Button size="sm" asChild className="hidden sm:inline-flex" data-testid="button-login-header">
               <a href="/api/login">
-                {t("app.login.secure")}
+                {t("nav.login")}
+              </a>
+            </Button>
+            <Button size="icon" asChild className="sm:hidden" data-testid="button-login-header-mobile">
+              <a href="/api/login">
+                <LogIn className="h-4 w-4" />
               </a>
             </Button>
           </div>
@@ -29,7 +34,7 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="pt-32 pb-20 sm:pt-40 sm:pb-28">
+        <section className="pt-28 pb-16 sm:pt-40 sm:pb-28">
           <div className="max-w-5xl mx-auto px-5">
             <div className="max-w-2xl mx-auto text-center space-y-8">
               <div className="flex justify-center">
