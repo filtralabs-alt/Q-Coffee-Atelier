@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
-import { Q_COFFEE_GO_URL, AROMA_TAGS } from "@/lib/constants";
+import { AROMA_TAGS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { TastingEntry } from "@shared/schema";
+import type { TastingEntry, CoffeeSpot } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ExternalLink, Trash2, Coffee, Droplets, Flame, Candy } from "lucide-react";
+import { Plus, Trash2, Coffee, Droplets, Flame, Candy, MapPin } from "lucide-react";
 import { TastingWizard } from "@/components/tasting-wizard";
 import {
   AlertDialog,
@@ -33,6 +33,21 @@ export default function JournalPage() {
   const { data: entries, isLoading } = useQuery<TastingEntry[]>({
     queryKey: ["/api/tastings"],
   });
+
+  const { data: spots = [] } = useQuery<CoffeeSpot[]>({
+    queryKey: ["/api/coffee-spots"],
+  });
+
+  const spotMap = useMemo(() => new Map(spots.map((s) => [s.id, s])), [spots]);
+
+  const visitCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    if (!entries) return counts;
+    for (const e of entries) {
+      if (e.spotId) counts.set(e.spotId, (counts.get(e.spotId) ?? 0) + 1);
+    }
+    return counts;
+  }, [entries]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -67,14 +82,6 @@ export default function JournalPage() {
         <Button onClick={() => setShowWizard(true)} data-testid="button-new-tasting">
           <Plus className="h-4 w-4 mr-1.5" />
           {t("journal.add")}
-        </Button>
-      </div>
-
-      <div className="px-5 pb-3">
-        <Button variant="outline" size="sm" asChild data-testid="button-qcoffee-global">
-          <a href={Q_COFFEE_GO_URL} target="_blank" rel="noopener noreferrer">
-            {t("journal.evaluate")} <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-          </a>
         </Button>
       </div>
 
@@ -137,15 +144,26 @@ export default function JournalPage() {
                 <p className="text-xs text-muted-foreground italic mb-2 line-clamp-2">{entry.notes}</p>
               )}
 
-              <div className="flex items-center justify-between gap-2 pt-1 border-t">
+              {entry.spotId && spotMap.get(entry.spotId) && (
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    {spotMap.get(entry.spotId)!.name}
+                  </span>
+                  <Badge variant="outline" className="text-[10px] h-5">
+                    {visitCounts.get(entry.spotId)}× {t("journal.visitCount")}
+                  </Badge>
+                </div>
+              )}
+
+              {entry.serviceNotes && (
+                <p className="text-xs text-muted-foreground italic mb-2 line-clamp-2">{entry.serviceNotes}</p>
+              )}
+
+              <div className="flex items-center pt-1 border-t">
                 <span className="text-xs text-muted-foreground">
                   {t("journal.drinkAgain")} <span className="font-medium text-foreground">{drinkAgainLabel(entry.wouldDrinkAgain)}</span>
                 </span>
-                <Button variant="ghost" size="sm" asChild className="h-7 text-xs" data-testid={`button-qcoffee-${entry.id}`}>
-                  <a href={Q_COFFEE_GO_URL} target="_blank" rel="noopener noreferrer">
-                    Q Coffee Go <ExternalLink className="ml-1 h-3 w-3" />
-                  </a>
-                </Button>
               </div>
 
               <div className="text-[10px] text-muted-foreground mt-1">

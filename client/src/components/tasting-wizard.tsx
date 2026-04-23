@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { AROMA_TAGS, PROCESSES, METHODS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { CoffeeSpot } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,8 +38,12 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
   const [bitterness, setBitterness] = useState(3);
   const [sweetness, setSweetness] = useState(3);
   const [notes, setNotes] = useState("");
+  const [spotId, setSpotId] = useState("");
+  const [serviceNotes, setServiceNotes] = useState("");
   const [favoriteMethod, setFavoriteMethod] = useState(false);
   const [wouldDrinkAgain, setWouldDrinkAgain] = useState("maybe");
+
+  const { data: spots = [] } = useQuery<CoffeeSpot[]>({ queryKey: ["/api/coffee-spots"] });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -55,6 +60,8 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         bitterness,
         sweetness,
         notes: notes || null,
+        spotId: spotId || null,
+        serviceNotes: serviceNotes || null,
         favoriteMethod,
         wouldDrinkAgain,
       });
@@ -254,6 +261,35 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
                 data-testid="textarea-notes"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label>{t("wizard.spot")}</Label>
+              <Select value={spotId} onValueChange={setSpotId}>
+                <SelectTrigger data-testid="select-spot">
+                  <SelectValue placeholder={t("wizard.spotNone")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{t("wizard.spotNone")}</SelectItem>
+                  {spots.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {spotId && (
+              <div className="space-y-2">
+                <Label htmlFor="serviceNotes">{t("wizard.serviceNotes")}</Label>
+                <Textarea
+                  id="serviceNotes"
+                  value={serviceNotes}
+                  onChange={(e) => setServiceNotes(e.target.value)}
+                  placeholder={lang === "fr" ? "Accueil, qualité du service..." : "Atendimento, qualidade do serviço..."}
+                  rows={2}
+                  data-testid="textarea-service-notes"
+                />
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <Checkbox

@@ -1,4 +1,3 @@
-export const Q_COFFEE_GO_URL = "https://qcoffeego.com";
 export const GRAND_MAITRE_URL = "https://chatgpt.com/g/g-695eef447f20819196b922de01c5cc7e-grand-maitre-du-cafe";
 
 export const AROMA_TAGS = [

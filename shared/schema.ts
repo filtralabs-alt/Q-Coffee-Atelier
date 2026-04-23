@@ -34,6 +34,8 @@ export const tastingEntries = pgTable("tasting_entries", {
   bitterness: integer("bitterness").default(3),
   sweetness: integer("sweetness").default(3),
   notes: text("notes"),
+  spotId: varchar("spot_id").references(() => coffeeSpots.id),
+  serviceNotes: text("service_notes"),
   favoriteMethod: boolean("favorite_method").default(false),
   wouldDrinkAgain: varchar("would_drink_again").default("maybe"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -98,6 +100,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 export const tastingEntriesRelations = relations(tastingEntries, ({ one }) => ({
   user: one(users, { fields: [tastingEntries.userId], references: [users.id] }),
+  spot: one(coffeeSpots, { fields: [tastingEntries.spotId], references: [coffeeSpots.id] }),
 }));
 
 export const quizResultsRelations = relations(quizResults, ({ one }) => ({
