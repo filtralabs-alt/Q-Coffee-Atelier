@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
-import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema } from "@shared/schema";
 
 export async function registerRoutes(
@@ -14,7 +14,7 @@ export async function registerRoutes(
 
   app.get("/api/tastings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const entries = await storage.getTastingEntries(userId);
       res.json(entries);
     } catch (error) {
@@ -25,7 +25,7 @@ export async function registerRoutes(
 
   app.post("/api/tastings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const parsed = insertTastingEntrySchema.safeParse({ ...req.body, userId });
       if (!parsed.success) {
         return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
@@ -40,7 +40,7 @@ export async function registerRoutes(
 
   app.delete("/api/tastings/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       await storage.deleteTastingEntry(req.params.id, userId);
       res.json({ ok: true });
     } catch (error) {
@@ -51,7 +51,7 @@ export async function registerRoutes(
 
   app.get("/api/tastings/summary", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const summary = await storage.getTastingSummary(userId);
       res.json(summary);
     } catch (error) {
@@ -83,7 +83,7 @@ export async function registerRoutes(
 
   app.post("/api/quiz-results", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const parsed = insertQuizResultSchema.safeParse({ ...req.body, userId });
       if (!parsed.success) {
         return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
@@ -98,7 +98,7 @@ export async function registerRoutes(
 
   app.get("/api/quiz-results", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const results = await storage.getQuizResults(userId);
       res.json(results);
     } catch (error) {

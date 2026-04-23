@@ -1,0 +1,13 @@
+[1G[0K⠙[1G[0K
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K⠙[1G[0K7:54:22 PM [express] Starting server initialization...
+7:54:22 PM [express] Routes registered successfully
+7:54:22 PM [express] Database seeded
+7:54:24 PM [express] serving on port 5000
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+7:54:44 PM [express] GET /api/auth/user 401 in 3ms :: {"message":"Unauthorized"}
+7:59:16 PM [express] GET /api/auth/user 401 in 0ms :: {"message":"Unauthorized"}
+8:00:59 PM [express] GET /api/login 302 in 45ms

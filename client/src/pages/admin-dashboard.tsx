@@ -20,7 +20,8 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import logoIcon from "@assets/cris-du-cafe-icon.png";
+import logoIcon from "@assets/baristech-icon.png";
+import logoIconWhite from "@assets/baristech-icon-white.png";
 
 interface AdminStats {
   totalUsers: number;
@@ -80,9 +81,10 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
     <div className="flex items-center justify-center h-[100dvh] bg-background px-4">
       <Card className="w-full max-w-sm p-6 space-y-6">
         <div className="text-center space-y-2">
-          <img src={logoIcon} alt="Cris Du Café" className="h-12 w-12 mx-auto" />
+          <img src={logoIcon} alt="O Baristech" className="h-12 w-12 mx-auto block dark:hidden" />
+          <img src={logoIconWhite} alt="O Baristech" className="h-12 w-12 mx-auto hidden dark:block" />
           <h1 className="font-serif text-xl font-semibold" data-testid="text-admin-login-title">Administration</h1>
-          <p className="text-sm text-muted-foreground">Panneau de gestion Cris Du Café</p>
+          <p className="text-sm text-muted-foreground">Panneau de gestion O Baristech</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -602,7 +604,8 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center h-[100dvh] bg-background">
         <div className="animate-pulse text-center space-y-3">
-          <img src={logoIcon} alt="Cris Du Café" className="h-12 w-12 mx-auto" />
+          <img src={logoIcon} alt="O Baristech" className="h-12 w-12 mx-auto block dark:hidden" />
+          <img src={logoIconWhite} alt="O Baristech" className="h-12 w-12 mx-auto hidden dark:block" />
           <p className="text-sm text-muted-foreground">Chargement...</p>
         </div>
       </div>
@@ -617,7 +620,8 @@ export default function AdminDashboardPage() {
     <div className="flex flex-col h-[100dvh] bg-background">
       <header className="flex items-center justify-between gap-2 px-5 py-3 border-b border-border/50 bg-background/80 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-2.5">
-          <img src={logoIcon} alt="" className="h-7 w-7" />
+          <img src={logoIcon} alt="" className="h-7 w-7 block dark:hidden" />
+          <img src={logoIconWhite} alt="" className="h-7 w-7 hidden dark:block" />
           <h1 className="font-serif text-lg font-semibold" data-testid="text-admin-dashboard-title">Administration</h1>
         </div>
         <Button variant="ghost" size="icon" onClick={handleLogout} data-testid="button-admin-logout">

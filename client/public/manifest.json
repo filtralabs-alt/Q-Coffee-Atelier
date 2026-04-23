@@ -1,11 +1,11 @@
 {
-  "name": "Cris Du Café",
-  "short_name": "Cris Du Café",
+  "name": "O Baristech",
+  "short_name": "Baristech",
   "description": "Journal de dégustation café & ateliers de spécialité",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f3efe7",
-  "theme_color": "#f3efe7",
+  "background_color": "#DADDD0",
+  "theme_color": "#364CE4",
   "orientation": "portrait",
   "icons": [
     {

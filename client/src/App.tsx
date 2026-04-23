@@ -16,8 +16,10 @@ import SpotsPage from "@/pages/spots";
 import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
 import AdminDashboardPage from "@/pages/admin-dashboard";
+import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
-import logoIcon from "@assets/cris-du-cafe-icon.png";
+import logoIcon from "@assets/baristech-icon.png";
+import logoIconWhite from "@assets/baristech-icon-white.png";
 
 function AuthenticatedLayout() {
   return (
@@ -30,6 +32,7 @@ function AuthenticatedLayout() {
           <Route path="/spots" component={SpotsPage} />
           <Route path="/quiz" component={QuizPage} />
           <Route path="/library" component={LibraryPage} />
+          <Route path="/profile" component={ProfilePage} />
           <Route component={NotFound} />
         </Switch>
       </main>
@@ -49,9 +52,10 @@ function WelcomeScreen({ name, onDone }: { name: string; onDone: () => void }) {
   return (
     <div className="flex items-center justify-center h-[100dvh] bg-background">
       <div className="text-center space-y-4 animate-in fade-in zoom-in-95 duration-500">
-        <img src={logoIcon} alt="Cris Du Café" className="h-20 w-20 mx-auto" />
+        <img src={logoIcon} alt="O Baristech" className="h-20 w-20 mx-auto block dark:hidden" />
+        <img src={logoIconWhite} alt="O Baristech" className="h-20 w-20 mx-auto hidden dark:block" />
         <div className="space-y-1">
-          <h2 className="font-serif text-2xl font-semibold" data-testid="text-welcome-title">
+          <h2 className="font-sans text-2xl font-semibold" data-testid="text-welcome-title">
             {t("app.welcome.title")}
           </h2>
           <p className="text-muted-foreground" data-testid="text-welcome-name">{name}</p>
@@ -69,10 +73,10 @@ function UserApp() {
 
   useEffect(() => {
     if (user && !prevUser && !isLoading) {
-      const hasSeenWelcome = sessionStorage.getItem("cris_welcome_shown");
+      const hasSeenWelcome = sessionStorage.getItem("baristech_welcome_shown");
       if (!hasSeenWelcome) {
         setShowWelcome(true);
-        sessionStorage.setItem("cris_welcome_shown", "1");
+        sessionStorage.setItem("baristech_welcome_shown", "1");
       }
     }
     setPrevUser(user);
@@ -82,8 +86,9 @@ function UserApp() {
     return (
       <div className="flex items-center justify-center h-[100dvh] bg-background">
         <div className="space-y-4 text-center animate-pulse">
-          <img src={logoIcon} alt="Cris Du Café" className="h-16 w-16 mx-auto" />
-          <p className="font-serif text-lg font-semibold text-foreground/70">Cris Du Café</p>
+          <img src={logoIcon} alt="O Baristech" className="h-16 w-16 mx-auto block dark:hidden" />
+          <img src={logoIconWhite} alt="O Baristech" className="h-16 w-16 mx-auto hidden dark:block" />
+          <p className="font-sans text-lg font-semibold text-foreground/70">O Baristech</p>
         </div>
       </div>
     );
