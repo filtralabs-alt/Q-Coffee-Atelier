@@ -269,7 +269,6 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
                   <SelectValue placeholder={t("wizard.spotNone")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t("wizard.spotNone")}</SelectItem>
                   {spots.map((s) => (
                     <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                   ))}
