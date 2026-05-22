@@ -9,7 +9,7 @@ interface I18nContextType {
 }
 
 const translations: Record<string, Record<Lang, string>> = {
-  "app.name": { fr: "O Baristech", pt: "O Baristech" },
+  "app.name": { fr: "Baristech", pt: "Baristech" },
   "app.tagline": { fr: "Votre journal de dégustation café", pt: "Seu diário de degustação de café" },
   "app.hero.title": { fr: "Explorez l'univers du café de spécialité", pt: "Explore o universo do café especial" },
   "app.hero.subtitle": { fr: "Participez à nos ateliers de dégustation, notez vos impressions et découvrez votre profil café unique.", pt: "Participe dos nossos workshops de degustação, anote suas impressões e descubra seu perfil de café único." },

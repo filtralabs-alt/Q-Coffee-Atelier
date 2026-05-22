@@ -169,7 +169,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-border/50">
         <div className="max-w-5xl mx-auto px-5 py-10 text-center text-sm text-muted-foreground space-y-2">
-          <p>&copy; {new Date().getFullYear()} O Baristech &middot; Clermont-Ferrand, France</p>
+          <p>&copy; {new Date().getFullYear()} Baristech &middot; Clermont-Ferrand, France</p>
           <p>
             <button
               onClick={() => setShowPrivacy(true)}

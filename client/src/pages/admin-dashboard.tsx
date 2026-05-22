@@ -84,7 +84,7 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
           <img src={logoIcon} alt="O Baristech" className="h-12 w-12 mx-auto block dark:hidden" />
           <img src={logoIconWhite} alt="O Baristech" className="h-12 w-12 mx-auto hidden dark:block" />
           <h1 className="font-serif text-xl font-semibold" data-testid="text-admin-login-title">Administration</h1>
-          <p className="text-sm text-muted-foreground">Panneau de gestion O Baristech</p>
+          <p className="text-sm text-muted-foreground">Panneau de gestion Baristech</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

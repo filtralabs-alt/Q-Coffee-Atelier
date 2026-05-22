@@ -26,8 +26,8 @@ export function AppHeader() {
       <div className="flex items-center justify-between gap-2 px-5 h-14">
         <Link href="/" data-testid="link-home">
           <div className="flex items-center gap-2.5">
-            <img src={logoIcon} alt="O Baristech" className="h-7 w-7 block dark:hidden" data-testid="img-header-logo" />
-            <img src={logoIconWhite} alt="O Baristech" className="h-7 w-7 hidden dark:block" data-testid="img-header-logo-dark" />
+            <img src={logoIcon} alt="Baristech" className="h-7 w-7 block dark:hidden" data-testid="img-header-logo" />
+            <img src={logoIconWhite} alt="Baristech" className="h-7 w-7 hidden dark:block" data-testid="img-header-logo-dark" />
             <span className="font-sans text-lg font-semibold tracking-tight">{t("app.name")}</span>
           </div>
         </Link>
