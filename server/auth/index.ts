@@ -1,30 +1,27 @@
-import { createClient } from "@supabase/supabase-js";
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { users, type UpsertUser } from "@shared/models/auth";
+import { users } from "@shared/models/auth";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-export async function upsertUser(userData: UpsertUser) {
-  const [user] = await db
-    .insert(users)
-    .values(userData)
-    .onConflictDoUpdate({
-      target: users.id,
-      set: { ...userData, updatedAt: new Date() },
-    })
-    .returning();
+export async function getUser(id: string) {
+  const [user] = await db.select().from(users).where(eq(users.id, id));
   return user;
 }
 
-export async function getUser(id: string) {
-  const [user] = await db.select().from(users).where(eq(users.id, id));
+export async function findOrCreateUserByEmail(email: string, firstName: string) {
+  const [existing] = await db.select().from(users).where(eq(users.email, email));
+  if (existing) return existing;
+
+  const [user] = await db
+    .insert(users)
+    .values({ email, firstName })
+    .onConflictDoUpdate({
+      target: users.email,
+      set: { firstName, updatedAt: new Date() },
+    })
+    .returning();
   return user;
 }
 
@@ -48,29 +45,33 @@ export async function setupAuth(app: Express) {
       cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 365 * 24 * 60 * 60 * 1000,
       },
     })
   );
 }
 
 export function registerAuthRoutes(app: Express) {
+  app.post("/api/auth/identify", async (req: any, res) => {
+    try {
+      const name = String(req.body?.name ?? "").trim();
+      const email = String(req.body?.email ?? "").trim().toLowerCase();
+      if (!name || !email) {
+        return res.status(400).json({ message: "Name and email are required" });
+      }
+      const user = await findOrCreateUserByEmail(email, name);
+      req.session.userId = user.id;
+      res.json(user);
+    } catch (error) {
+      console.error("Error identifying user:", error);
+      res.status(500).json({ message: "Failed to identify user" });
+    }
+  });
+
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
-      const supabaseUser = req.supabaseUser;
-      const user = await upsertUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email ?? null,
-        firstName:
-          supabaseUser.user_metadata?.first_name ??
-          supabaseUser.user_metadata?.full_name?.split(" ")[0] ??
-          null,
-        lastName:
-          supabaseUser.user_metadata?.last_name ??
-          supabaseUser.user_metadata?.full_name?.split(" ").slice(1).join(" ") ??
-          null,
-        profileImageUrl: supabaseUser.user_metadata?.avatar_url ?? null,
-      });
+      const user = await getUser(req.user.id);
+      if (!user) return res.status(401).json({ message: "Unauthorized" });
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -93,30 +94,19 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  app.post("/api/logout", (_req, res) => {
+  app.post("/api/logout", (req: any, res) => {
+    req.session.userId = null;
     res.json({ ok: true });
   });
 
-  app.get("/api/logout", (_req, res) => {
+  app.get("/api/logout", (req: any, res) => {
+    req.session.userId = null;
     res.redirect("/");
   });
 }
 
-export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  const token = req.headers.authorization?.startsWith("Bearer ")
-    ? req.headers.authorization.slice(7)
-    : null;
-
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-  const {
-    data: { user },
-    error,
-  } = await supabaseAdmin.auth.getUser(token);
-
-  if (error || !user) return res.status(401).json({ message: "Unauthorized" });
-
-  req.supabaseUser = user;
-  req.user = { id: user.id };
+export const isAuthenticated: RequestHandler = (req: any, res, next) => {
+  if (!req.session?.userId) return res.status(401).json({ message: "Unauthorized" });
+  req.user = { id: req.session.userId };
   next();
 };

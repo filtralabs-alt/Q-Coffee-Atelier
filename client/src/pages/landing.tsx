@@ -5,17 +5,17 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Coffee, BookOpen, Award, Mail, CheckCircle } from "lucide-react";
+import { Coffee, BookOpen, Award } from "lucide-react";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
 import logoFull from "@assets/baristech-logo-full.png";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LandingPage() {
   const { t } = useI18n();
+  const { identify, isIdentifying } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [consentGiven, setConsentGiven] = useState(() =>
@@ -27,25 +27,16 @@ export default function LandingPage() {
     setConsentGiven(true);
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setIsSending(true);
+    if (!name.trim() || !email.trim()) return;
     setError("");
 
-    const { error: supabaseError } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: window.location.origin, shouldCreateUser: true },
-    });
-
-    if (supabaseError) {
-      setError(supabaseError.message);
-      setIsSending(false);
-      return;
+    try {
+      await identify({ name: name.trim(), email: email.trim() });
+    } catch (err: any) {
+      setError(err?.message ?? "Error");
     }
-
-    setSent(true);
-    setIsSending(false);
   };
 
   return (
@@ -85,49 +76,28 @@ export default function LandingPage() {
 
               {/* Login form */}
               <div className="max-w-sm mx-auto pt-2">
-                {sent ? (
-                  <div className="flex flex-col items-center gap-3 p-6 rounded-md border border-border/60 bg-card">
-                    <CheckCircle className="h-10 w-10 text-primary" />
-                    <p className="font-semibold">
-                      {t("lang") === "pt" ? "Verifique seu e-mail!" : "Vérifiez votre e-mail !"}
-                    </p>
-                    <p className="text-sm text-muted-foreground text-center">
-                      {t("lang") === "pt"
-                        ? `Enviamos um link de acesso para ${email}`
-                        : `Nous avons envoyé un lien d'accès à ${email}`}
-                    </p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleMagicLink} className="flex flex-col gap-3">
-                    <div className="flex gap-2">
-                      <Input
-                        type="email"
-                        placeholder="votre@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="flex-1"
-                        data-testid="input-email"
-                      />
-                      <Button type="submit" disabled={isSending} data-testid="button-hero-cta">
-                        {isSending ? (
-                          <span className="animate-spin">⏳</span>
-                        ) : (
-                          <>
-                            <Mail className="h-4 w-4 mr-1.5" />
-                            {t("app.hero.cta")}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    {error && <p className="text-sm text-destructive text-center">{error}</p>}
-                    <p className="text-xs text-muted-foreground text-center">
-                      {t("lang") === "pt"
-                        ? "Você receberá um link mágico no seu e-mail"
-                        : "Vous recevrez un lien magique par e-mail"}
-                    </p>
-                  </form>
-                )}
+                <form onSubmit={handleIdentify} className="flex flex-col gap-3">
+                  <Input
+                    type="text"
+                    placeholder={t("profile.firstName")}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    data-testid="input-name"
+                  />
+                  <Input
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    data-testid="input-email"
+                  />
+                  <Button type="submit" disabled={isIdentifying} data-testid="button-hero-cta">
+                    {isIdentifying ? <span className="animate-spin">⏳</span> : t("app.hero.cta")}
+                  </Button>
+                  {error && <p className="text-sm text-destructive text-center">{error}</p>}
+                </form>
               </div>
 
               <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground pt-2">

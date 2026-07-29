@@ -1,12 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/models/auth";
 
-async function fetchUser(token: string): Promise<User | null> {
-  const response = await fetch("/api/auth/user", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+async function fetchUser(): Promise<User | null> {
+  const response = await fetch("/api/auth/user", { credentials: "include" });
   if (response.status === 401) return null;
   if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
   return response.json();
@@ -14,43 +11,35 @@ async function fetchUser(token: string): Promise<User | null> {
 
 export function useAuth() {
   const queryClient = useQueryClient();
-  const [accessToken, setAccessToken] = useState<string | null | undefined>(undefined);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAccessToken(session?.access_token ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setAccessToken(session?.access_token ?? null);
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [queryClient]);
-
-  const { data: user, isLoading: userLoading } = useQuery<User | null>({
+  const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
-    queryFn: () => (accessToken ? fetchUser(accessToken) : Promise.resolve(null)),
-    enabled: accessToken !== undefined,
+    queryFn: fetchUser,
     retry: false,
     staleTime: 1000 * 60 * 5,
   });
 
-  const logoutMutation = useMutation({
-    mutationFn: () => supabase.auth.signOut(),
+  const identifyMutation = useMutation({
+    mutationFn: (data: { name: string; email: string }) =>
+      apiRequest("POST", "/api/auth/identify", data).then((res) => res.json()),
     onSuccess: () => {
-      setAccessToken(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/logout"),
+    onSuccess: () => {
       queryClient.setQueryData(["/api/auth/user"], null);
     },
   });
 
   return {
     user: user ?? null,
-    isLoading: accessToken === undefined || (!!accessToken && userLoading),
+    isLoading,
     isAuthenticated: !!user,
+    identify: identifyMutation.mutateAsync,
+    isIdentifying: identifyMutation.isPending,
     logout: logoutMutation.mutate,
     isLoggingOut: logoutMutation.isPending,
   };
