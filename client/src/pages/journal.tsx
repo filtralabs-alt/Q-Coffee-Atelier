@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Coffee, Droplets, Flame, Candy, MapPin } from "lucide-react";
+import { Plus, Trash2, Pencil, Coffee, Droplets, Flame, Candy, MapPin } from "lucide-react";
 import { TastingWizard } from "@/components/tasting-wizard";
 import {
   AlertDialog,
@@ -28,6 +28,7 @@ export default function JournalPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showWizard, setShowWizard] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<TastingEntry | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: entries, isLoading } = useQuery<TastingEntry[]>({
@@ -71,8 +72,16 @@ export default function JournalPage() {
     return t("journal.maybe");
   };
 
-  if (showWizard) {
-    return <TastingWizard onClose={() => setShowWizard(false)} />;
+  if (showWizard || editingEntry) {
+    return (
+      <TastingWizard
+        editEntry={editingEntry ?? undefined}
+        onClose={() => {
+          setShowWizard(false);
+          setEditingEntry(null);
+        }}
+      />
+    );
   }
 
   return (
@@ -114,6 +123,15 @@ export default function JournalPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground"
+                    onClick={() => setEditingEntry(entry)}
+                    data-testid={`button-edit-${entry.id}`}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

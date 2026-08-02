@@ -38,6 +38,24 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/tastings/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const parsed = insertTastingEntrySchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const entry = await storage.updateTastingEntry(req.params.id, userId, parsed.data);
+      if (!entry) {
+        return res.status(404).json({ message: "Tasting not found" });
+      }
+      res.json(entry);
+    } catch (error) {
+      console.error("Error updating tasting:", error);
+      res.status(500).json({ message: "Failed to update tasting" });
+    }
+  });
+
   app.delete("/api/tastings/:id", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;

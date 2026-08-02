@@ -12,6 +12,7 @@ import { eq, desc, sql, count } from "drizzle-orm";
 export interface IStorage {
   getTastingEntries(userId: string): Promise<TastingEntry[]>;
   createTastingEntry(entry: InsertTastingEntry): Promise<TastingEntry>;
+  updateTastingEntry(id: string, userId: string, entry: Partial<InsertTastingEntry>): Promise<TastingEntry | undefined>;
   deleteTastingEntry(id: string, userId: string): Promise<void>;
   getTastingSummary(userId: string): Promise<any>;
 
@@ -47,6 +48,14 @@ export class DatabaseStorage implements IStorage {
 
   async createTastingEntry(entry: InsertTastingEntry): Promise<TastingEntry> {
     const [result] = await db.insert(tastingEntries).values(entry).returning();
+    return result;
+  }
+
+  async updateTastingEntry(id: string, userId: string, entry: Partial<InsertTastingEntry>): Promise<TastingEntry | undefined> {
+    const [result] = await db.update(tastingEntries)
+      .set(entry)
+      .where(sql`${tastingEntries.id} = ${id} AND ${tastingEntries.userId} = ${userId}`)
+      .returning();
     return result;
   }
 

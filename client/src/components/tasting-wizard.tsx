@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { AROMA_TAGS, PROCESSES, METHODS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { CoffeeSpot } from "@shared/schema";
+import type { CoffeeSpot, TastingEntry } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,35 +19,37 @@ import { ArrowLeft, ArrowRight, Save, X, Check } from "lucide-react";
 
 interface TastingWizardProps {
   onClose: () => void;
+  editEntry?: TastingEntry;
 }
 
-export function TastingWizard({ onClose }: TastingWizardProps) {
+export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
+  const isEditing = !!editEntry;
   const [step, setStep] = useState(1);
 
-  const [coffeeName, setCoffeeName] = useState("");
-  const [origin, setOrigin] = useState("");
-  const [variety, setVariety] = useState("");
-  const [process, setProcess] = useState("");
-  const [roastDate, setRoastDate] = useState("");
-  const [method, setMethod] = useState("V60");
-  const [methodOther, setMethodOther] = useState("");
-  const [aromaTags, setAromaTags] = useState<string[]>([]);
-  const [acidity, setAcidity] = useState(3);
-  const [bitterness, setBitterness] = useState(3);
-  const [sweetness, setSweetness] = useState(3);
-  const [notes, setNotes] = useState("");
-  const [spotId, setSpotId] = useState("");
-  const [serviceNotes, setServiceNotes] = useState("");
-  const [favoriteMethod, setFavoriteMethod] = useState(false);
-  const [wouldDrinkAgain, setWouldDrinkAgain] = useState("maybe");
+  const [coffeeName, setCoffeeName] = useState(editEntry?.coffeeName ?? "");
+  const [origin, setOrigin] = useState(editEntry?.origin ?? "");
+  const [variety, setVariety] = useState(editEntry?.variety ?? "");
+  const [process, setProcess] = useState(editEntry?.process ?? "");
+  const [roastDate, setRoastDate] = useState(editEntry?.roastDate ?? "");
+  const [method, setMethod] = useState(editEntry?.method ?? "V60");
+  const [methodOther, setMethodOther] = useState(editEntry?.methodOther ?? "");
+  const [aromaTags, setAromaTags] = useState<string[]>(editEntry?.aromaTags ?? []);
+  const [acidity, setAcidity] = useState(editEntry?.acidity ?? 3);
+  const [bitterness, setBitterness] = useState(editEntry?.bitterness ?? 3);
+  const [sweetness, setSweetness] = useState(editEntry?.sweetness ?? 3);
+  const [notes, setNotes] = useState(editEntry?.notes ?? "");
+  const [spotId, setSpotId] = useState(editEntry?.spotId ?? "");
+  const [serviceNotes, setServiceNotes] = useState(editEntry?.serviceNotes ?? "");
+  const [favoriteMethod, setFavoriteMethod] = useState(editEntry?.favoriteMethod ?? false);
+  const [wouldDrinkAgain, setWouldDrinkAgain] = useState(editEntry?.wouldDrinkAgain ?? "maybe");
 
   const { data: spots = [] } = useQuery<CoffeeSpot[]>({ queryKey: ["/api/coffee-spots"] });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/tastings", {
+      const payload = {
         coffeeName,
         origin: origin || null,
         variety: variety || null,
@@ -64,12 +66,21 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
         serviceNotes: serviceNotes || null,
         favoriteMethod,
         wouldDrinkAgain,
-      });
+      };
+      if (isEditing) {
+        await apiRequest("PATCH", `/api/tastings/${editEntry.id}`, payload);
+      } else {
+        await apiRequest("POST", "/api/tastings", payload);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tastings"] });
       queryClient.invalidateQueries({ queryKey: ["/api/tastings/summary"] });
-      toast({ title: lang === "fr" ? "Dégustation enregistrée !" : "Degustação salva!" });
+      toast({
+        title: isEditing
+          ? (lang === "fr" ? "Dégustation mise à jour !" : "Degustação atualizada!")
+          : (lang === "fr" ? "Dégustation enregistrée !" : "Degustação salva!"),
+      });
       onClose();
     },
     onError: () => {
@@ -98,7 +109,9 @@ export function TastingWizard({ onClose }: TastingWizardProps) {
   return (
     <div className="flex flex-col min-h-full ">
       <div className="px-5 pt-5 pb-2 flex items-center justify-between gap-2">
-        <h1 className="font-serif text-xl font-semibold">{t("wizard.title")}</h1>
+        <h1 className="font-serif text-xl font-semibold">
+          {isEditing ? (lang === "fr" ? "Modifier la dégustation" : "Editar degustação") : t("wizard.title")}
+        </h1>
         <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-wizard">
           <X className="h-5 w-5" />
         </Button>
