@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { CoffeeSpot, TastingEntry, LibraryModule } from "@shared/schema";
+import type { CoffeeSpot, TastingEntry, LibraryModule, Atelier, AtelierTestimonial } from "@shared/schema";
+import { ATELIER_THEMES } from "@/lib/constants";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Users, Coffee, MapPin, Award, LogOut, Eye, EyeOff,
-  Plus, Pencil, Trash2, Save, X, BookOpen,
+  Plus, Pencil, Trash2, Save, X, BookOpen, Calendar, Star, Check,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -574,6 +578,340 @@ function LibraryTab() {
   );
 }
 
+interface AtelierForm {
+  theme: string;
+  descriptionFr: string;
+  descriptionPt: string;
+  coffees: string;
+  dateTime: string;
+  location: string;
+  price: string;
+  totalSeats: string;
+  seatsAvailable: string;
+}
+
+const emptyAtelierForm: AtelierForm = {
+  theme: ATELIER_THEMES[0].id,
+  descriptionFr: "",
+  descriptionPt: "",
+  coffees: "",
+  dateTime: "",
+  location: "",
+  price: "",
+  totalSeats: "",
+  seatsAvailable: "",
+};
+
+function toDateTimeLocal(iso: string | Date) {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function AteliersTab() {
+  const { toast } = useToast();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<AtelierForm>(emptyAtelierForm);
+  const [showForm, setShowForm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: items, isLoading } = useQuery<Atelier[]>({ queryKey: ["/api/admin/ateliers"] });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const data = {
+        theme: form.theme,
+        descriptionFr: form.descriptionFr || null,
+        descriptionPt: form.descriptionPt || null,
+        coffees: form.coffees ? form.coffees.split(",").map((c) => c.trim()).filter(Boolean) : [],
+        dateTime: new Date(form.dateTime).toISOString(),
+        location: form.location,
+        price: form.price || null,
+        totalSeats: form.totalSeats ? parseInt(form.totalSeats) : null,
+        seatsAvailable: form.seatsAvailable ? parseInt(form.seatsAvailable) : null,
+      };
+      if (editingId) {
+        await apiRequest("PATCH", `/api/admin/ateliers/${editingId}`, data);
+      } else {
+        await apiRequest("POST", "/api/admin/ateliers", data);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/ateliers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ateliers"] });
+      toast({ title: "Enregistré" });
+      closeForm();
+    },
+    onError: () => {
+      toast({ title: "Erreur", variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/ateliers/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/ateliers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ateliers"] });
+      toast({ title: "Supprimé" });
+      setDeleteId(null);
+    },
+  });
+
+  const openEdit = (item: Atelier) => {
+    setEditingId(item.id);
+    setForm({
+      theme: item.theme,
+      descriptionFr: item.descriptionFr || "",
+      descriptionPt: item.descriptionPt || "",
+      coffees: item.coffees?.join(", ") || "",
+      dateTime: toDateTimeLocal(item.dateTime),
+      location: item.location,
+      price: item.price || "",
+      totalSeats: item.totalSeats?.toString() || "",
+      seatsAvailable: item.seatsAvailable?.toString() || "",
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(emptyAtelierForm);
+  };
+
+  if (isLoading) return <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>;
+
+  return (
+    <div className="space-y-3">
+      {!showForm && (
+        <Button onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyAtelierForm); }} data-testid="button-admin-add-atelier">
+          <Plus className="h-4 w-4 mr-1.5" />
+          Ajouter un atelier
+        </Button>
+      )}
+
+      {showForm && (
+        <Card className="p-4 space-y-3" data-testid="card-admin-atelier-form">
+          <h3 className="font-semibold text-sm">{editingId ? "Modifier l'atelier" : "Nouvel atelier"}</h3>
+
+          <div className="space-y-1.5">
+            <Label>Thème *</Label>
+            <Select value={form.theme} onValueChange={(v) => setForm({ ...form, theme: v })}>
+              <SelectTrigger data-testid="select-admin-atelier-theme">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ATELIER_THEMES.map((th) => (
+                  <SelectItem key={th.id} value={th.id}>{th.fr}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Description FR</Label>
+              <Textarea value={form.descriptionFr} onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })} className="text-sm" data-testid="input-admin-atelier-desc-fr" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Description PT</Label>
+              <Textarea value={form.descriptionPt} onChange={(e) => setForm({ ...form, descriptionPt: e.target.value })} className="text-sm" data-testid="input-admin-atelier-desc-pt" />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Cafés / origines (séparés par des virgules)</Label>
+            <Input value={form.coffees} onChange={(e) => setForm({ ...form, coffees: e.target.value })} placeholder="Éthiopie Sidamo, Brésil Cerrado" data-testid="input-admin-atelier-coffees" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Date et heure *</Label>
+              <Input type="datetime-local" value={form.dateTime} onChange={(e) => setForm({ ...form, dateTime: e.target.value })} data-testid="input-admin-atelier-datetime" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Lieu *</Label>
+              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} data-testid="input-admin-atelier-location" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label>Prix</Label>
+              <Input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="35€" data-testid="input-admin-atelier-price" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Places totales</Label>
+              <Input type="number" value={form.totalSeats} onChange={(e) => setForm({ ...form, totalSeats: e.target.value })} data-testid="input-admin-atelier-total-seats" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Places disponibles</Label>
+              <Input type="number" value={form.seatsAvailable} onChange={(e) => setForm({ ...form, seatsAvailable: e.target.value })} data-testid="input-admin-atelier-seats-available" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <Button onClick={() => saveMutation.mutate()} disabled={!form.theme || !form.location.trim() || !form.dateTime || saveMutation.isPending} data-testid="button-admin-save-atelier">
+              <Save className="h-4 w-4 mr-1.5" />
+              Enregistrer
+            </Button>
+            <Button variant="outline" onClick={closeForm} data-testid="button-admin-cancel-atelier">
+              <X className="h-4 w-4 mr-1.5" />
+              Annuler
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {items?.map((item) => (
+        <Card key={item.id} className="p-3 flex items-center justify-between gap-2" data-testid={`card-admin-atelier-${item.id}`}>
+          <div className="min-w-0">
+            <p className="font-medium text-sm truncate">{ATELIER_THEMES.find((t) => t.id === item.theme)?.fr || item.theme}</p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(item.dateTime).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })} · {item.location}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => openEdit(item)} data-testid={`button-admin-edit-atelier-${item.id}`}>
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeleteId(item.id)} data-testid={`button-admin-delete-atelier-${item.id}`}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </Card>
+      ))}
+      {items?.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Aucun atelier</p>}
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer cet atelier ?</AlertDialogTitle>
+            <AlertDialogDescription>Cette action est irréversible.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && deleteMutation.mutate(deleteId)}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+function TestimonialsTab() {
+  const { toast } = useToast();
+  const [rejectId, setRejectId] = useState<string | null>(null);
+
+  const { data: items, isLoading } = useQuery<AtelierTestimonial[]>({ queryKey: ["/api/admin/testimonials"] });
+
+  const approveMutation = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      await apiRequest("PATCH", `/api/admin/testimonials/${id}`, { approved });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/testimonials"] });
+      toast({ title: "Mis à jour" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/testimonials/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/testimonials"] });
+      toast({ title: "Supprimé" });
+      setRejectId(null);
+    },
+  });
+
+  if (isLoading) return <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>;
+
+  const pending = items?.filter((i) => !i.approved) ?? [];
+  const approved = items?.filter((i) => i.approved) ?? [];
+
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">En attente ({pending.length})</h3>
+        {pending.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-2">Aucun avis en attente</p>
+        ) : (
+          <div className="space-y-2">
+            {pending.map((rev) => (
+              <Card key={rev.id} className="p-3 space-y-2" data-testid={`card-admin-testimonial-${rev.id}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{rev.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{rev.email}</p>
+                  </div>
+                  {rev.rating != null && (
+                    <span className="flex shrink-0">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < (rev.rating ?? 0) ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />
+                      ))}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground italic">"{rev.comment}"</p>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={() => approveMutation.mutate({ id: rev.id, approved: true })} data-testid={`button-approve-testimonial-${rev.id}`}>
+                    <Check className="h-3.5 w-3.5 mr-1.5" />
+                    Approuver
+                  </Button>
+                  <Button size="sm" variant="outline" className="text-destructive" onClick={() => setRejectId(rev.id)} data-testid={`button-reject-testimonial-${rev.id}`}>
+                    <X className="h-3.5 w-3.5 mr-1.5" />
+                    Rejeter
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Publiés ({approved.length})</h3>
+        {approved.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-2">Aucun avis publié</p>
+        ) : (
+          <div className="space-y-2">
+            {approved.map((rev) => (
+              <Card key={rev.id} className="p-3 flex items-center justify-between gap-2" data-testid={`card-admin-approved-testimonial-${rev.id}`}>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate">{rev.name}</p>
+                  <p className="text-xs text-muted-foreground italic truncate">"{rev.comment}"</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => approveMutation.mutate({ id: rev.id, approved: false })} data-testid={`button-unpublish-testimonial-${rev.id}`}>
+                  <EyeOff className="h-3.5 w-3.5" />
+                </Button>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <AlertDialog open={!!rejectId} onOpenChange={() => setRejectId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rejeter cet avis ?</AlertDialogTitle>
+            <AlertDialogDescription>Cette action est irréversible et supprimera l'avis.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => rejectId && deleteMutation.mutate(rejectId)}>Rejeter</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const { toast } = useToast();
@@ -651,6 +989,14 @@ export default function AdminDashboardPage() {
                 <BookOpen className="h-3.5 w-3.5 mr-1.5" />
                 Biblio.
               </TabsTrigger>
+              <TabsTrigger value="ateliers" className="flex-1" data-testid="tab-admin-ateliers">
+                <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                Ateliers
+              </TabsTrigger>
+              <TabsTrigger value="testimonials" className="flex-1" data-testid="tab-admin-testimonials">
+                <Star className="h-3.5 w-3.5 mr-1.5" />
+                Avis
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="spots" className="mt-3">
               <SpotsTab />
@@ -663,6 +1009,12 @@ export default function AdminDashboardPage() {
             </TabsContent>
             <TabsContent value="library" className="mt-3">
               <LibraryTab />
+            </TabsContent>
+            <TabsContent value="ateliers" className="mt-3">
+              <AteliersTab />
+            </TabsContent>
+            <TabsContent value="testimonials" className="mt-3">
+              <TestimonialsTab />
             </TabsContent>
           </Tabs>
         </div>

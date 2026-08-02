@@ -92,6 +92,47 @@ export const insertLibraryModuleSchema = createInsertSchema(libraryModules).omit
 export type InsertLibraryModule = z.infer<typeof insertLibraryModuleSchema>;
 export type LibraryModule = typeof libraryModules.$inferSelect;
 
+export const ateliers = pgTable("ateliers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  theme: varchar("theme").notNull(),
+  descriptionFr: text("description_fr"),
+  descriptionPt: text("description_pt"),
+  coffees: text("coffees").array(),
+  dateTime: timestamp("date_time").notNull(),
+  location: varchar("location").notNull(),
+  price: varchar("price"),
+  totalSeats: integer("total_seats"),
+  seatsAvailable: integer("seats_available"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAtelierSchema = createInsertSchema(ateliers).omit({ id: true, createdAt: true });
+export type InsertAtelier = z.infer<typeof insertAtelierSchema>;
+export type Atelier = typeof ateliers.$inferSelect;
+
+export const atelierTestimonials = pgTable("atelier_testimonials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  atelierId: varchar("atelier_id").notNull().references(() => ateliers.id),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  rating: integer("rating"),
+  comment: text("comment").notNull(),
+  approved: boolean("approved").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAtelierTestimonialSchema = createInsertSchema(atelierTestimonials).omit({ id: true, createdAt: true, approved: true });
+export type InsertAtelierTestimonial = z.infer<typeof insertAtelierTestimonialSchema>;
+export type AtelierTestimonial = typeof atelierTestimonials.$inferSelect;
+
+export const ateliersRelations = relations(ateliers, ({ many }) => ({
+  testimonials: many(atelierTestimonials),
+}));
+
+export const atelierTestimonialsRelations = relations(atelierTestimonials, ({ one }) => ({
+  atelier: one(ateliers, { fields: [atelierTestimonials.atelierId], references: [ateliers.id] }),
+}));
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfiles, { fields: [users.id], references: [userProfiles.userId] }),
   tastingEntries: many(tastingEntries),

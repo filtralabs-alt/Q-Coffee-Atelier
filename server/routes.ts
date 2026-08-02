@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
-import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema } from "@shared/schema";
+import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -95,6 +95,40 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching spots:", error);
       res.status(500).json({ message: "Failed to fetch spots" });
+    }
+  });
+
+  app.get("/api/ateliers", async (_req, res) => {
+    try {
+      const items = await storage.getAteliers();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching ateliers:", error);
+      res.status(500).json({ message: "Failed to fetch ateliers" });
+    }
+  });
+
+  app.get("/api/testimonials", async (_req, res) => {
+    try {
+      const items = await storage.getApprovedTestimonials();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+      res.status(500).json({ message: "Failed to fetch testimonials" });
+    }
+  });
+
+  app.post("/api/ateliers/:id/testimonials", async (req, res) => {
+    try {
+      const parsed = insertAtelierTestimonialSchema.safeParse({ ...req.body, atelierId: req.params.id });
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const testimonial = await storage.createTestimonial(parsed.data);
+      res.json(testimonial);
+    } catch (error) {
+      console.error("Error creating testimonial:", error);
+      res.status(500).json({ message: "Failed to create testimonial" });
     }
   });
 
@@ -281,6 +315,84 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting spot:", error);
       res.status(500).json({ message: "Failed to delete spot" });
+    }
+  });
+
+  app.get("/api/admin/ateliers", isAdmin, async (_req, res) => {
+    try {
+      const items = await storage.getAteliers();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching ateliers:", error);
+      res.status(500).json({ message: "Failed to fetch ateliers" });
+    }
+  });
+
+  app.post("/api/admin/ateliers", isAdmin, async (req, res) => {
+    try {
+      const parsed = insertAtelierSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const atelier = await storage.createAtelier(parsed.data);
+      res.json(atelier);
+    } catch (error) {
+      console.error("Error creating atelier:", error);
+      res.status(500).json({ message: "Failed to create atelier" });
+    }
+  });
+
+  app.patch("/api/admin/ateliers/:id", isAdmin, async (req, res) => {
+    try {
+      const parsed = insertAtelierSchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const atelier = await storage.updateAtelier(req.params.id, parsed.data);
+      res.json(atelier);
+    } catch (error) {
+      console.error("Error updating atelier:", error);
+      res.status(500).json({ message: "Failed to update atelier" });
+    }
+  });
+
+  app.delete("/api/admin/ateliers/:id", isAdmin, async (req, res) => {
+    try {
+      await storage.deleteAtelier(req.params.id);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Error deleting atelier:", error);
+      res.status(500).json({ message: "Failed to delete atelier" });
+    }
+  });
+
+  app.get("/api/admin/testimonials", isAdmin, async (_req, res) => {
+    try {
+      const items = await storage.getAllTestimonials();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+      res.status(500).json({ message: "Failed to fetch testimonials" });
+    }
+  });
+
+  app.patch("/api/admin/testimonials/:id", isAdmin, async (req, res) => {
+    try {
+      const testimonial = await storage.setTestimonialApproval(req.params.id, !!req.body.approved);
+      res.json(testimonial);
+    } catch (error) {
+      console.error("Error updating testimonial:", error);
+      res.status(500).json({ message: "Failed to update testimonial" });
+    }
+  });
+
+  app.delete("/api/admin/testimonials/:id", isAdmin, async (req, res) => {
+    try {
+      await storage.deleteTestimonial(req.params.id);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Error deleting testimonial:", error);
+      res.status(500).json({ message: "Failed to delete testimonial" });
     }
   });
 

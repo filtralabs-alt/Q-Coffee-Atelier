@@ -21,3 +21,11 @@ export const AROMA_TAGS = [
 
 export const PROCESSES = ["natural", "washed", "honey", "pulped", "other"] as const;
 export const METHODS = ["V60", "Chemex", "Other"] as const;
+
+export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string }[] = [
+  { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio" },
+  { id: "chocolat", fr: "Atelier café & chocolat", pt: "Workshop café & chocolate" },
+  { id: "team-building", fr: "Atelier café pour team building", pt: "Workshop café para team building" },
+  { id: "espace-prive", fr: "Atelier café en espace privé", pt: "Workshop café em espaço privado" },
+  { id: "peinture-enfants", fr: "Atelier peinture café enfants", pt: "Workshop pintura com café para crianças" },
+];

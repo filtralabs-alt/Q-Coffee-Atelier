@@ -1,6 +1,6 @@
 import { useLocation, Link } from "wouter";
 import { useI18n } from "@/lib/i18n";
-import { Coffee, BookOpen, Map, HelpCircle, BarChart3 } from "lucide-react";
+import { Coffee, BookOpen, Map, HelpCircle, BarChart3, Calendar } from "lucide-react";
 
 export function MobileNav() {
   const { t } = useI18n();
@@ -12,6 +12,7 @@ export function MobileNav() {
     { href: "/spots", icon: Map, label: t("nav.spots") },
     { href: "/quiz", icon: HelpCircle, label: t("nav.quiz") },
     { href: "/library", icon: BookOpen, label: t("nav.library") },
+    { href: "/ateliers", icon: Calendar, label: t("nav.ateliers") },
   ];
 
   return (

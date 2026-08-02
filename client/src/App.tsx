@@ -15,6 +15,7 @@ import SummaryPage from "@/pages/summary";
 import SpotsPage from "@/pages/spots";
 import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
+import AteliersPage from "@/pages/ateliers";
 import AdminDashboardPage from "@/pages/admin-dashboard";
 import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
@@ -32,6 +33,7 @@ function AuthenticatedLayout() {
           <Route path="/spots" component={SpotsPage} />
           <Route path="/quiz" component={QuizPage} />
           <Route path="/library" component={LibraryPage} />
+          <Route path="/ateliers" component={AteliersPage} />
           <Route path="/profile" component={ProfilePage} />
           <Route component={NotFound} />
         </Switch>

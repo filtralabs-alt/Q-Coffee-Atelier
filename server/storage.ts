@@ -5,6 +5,8 @@ import {
   userProfiles, type UserProfile, type InsertUserProfile,
   users, type User,
   libraryModules, type LibraryModule, type InsertLibraryModule,
+  ateliers, type Atelier, type InsertAtelier,
+  atelierTestimonials, type AtelierTestimonial, type InsertAtelierTestimonial,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, count } from "drizzle-orm";
@@ -37,6 +39,17 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   getAllTastings(): Promise<TastingEntry[]>;
   getAllCoffeeSpots(): Promise<CoffeeSpot[]>;
+
+  getAteliers(): Promise<Atelier[]>;
+  createAtelier(atelier: InsertAtelier): Promise<Atelier>;
+  updateAtelier(id: string, atelier: Partial<InsertAtelier>): Promise<Atelier>;
+  deleteAtelier(id: string): Promise<void>;
+
+  getApprovedTestimonials(): Promise<AtelierTestimonial[]>;
+  getAllTestimonials(): Promise<AtelierTestimonial[]>;
+  createTestimonial(testimonial: InsertAtelierTestimonial): Promise<AtelierTestimonial>;
+  setTestimonialApproval(id: string, approved: boolean): Promise<AtelierTestimonial>;
+  deleteTestimonial(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -238,6 +251,54 @@ export class DatabaseStorage implements IStorage {
 
   async getAllCoffeeSpots(): Promise<CoffeeSpot[]> {
     return db.select().from(coffeeSpots).orderBy(coffeeSpots.name);
+  }
+
+  async getAteliers(): Promise<Atelier[]> {
+    return db.select().from(ateliers).orderBy(ateliers.dateTime);
+  }
+
+  async createAtelier(atelier: InsertAtelier): Promise<Atelier> {
+    const [result] = await db.insert(ateliers).values(atelier).returning();
+    return result;
+  }
+
+  async updateAtelier(id: string, atelier: Partial<InsertAtelier>): Promise<Atelier> {
+    const [result] = await db.update(ateliers)
+      .set(atelier)
+      .where(eq(ateliers.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteAtelier(id: string): Promise<void> {
+    await db.delete(ateliers).where(eq(ateliers.id, id));
+  }
+
+  async getApprovedTestimonials(): Promise<AtelierTestimonial[]> {
+    return db.select().from(atelierTestimonials)
+      .where(eq(atelierTestimonials.approved, true))
+      .orderBy(desc(atelierTestimonials.createdAt));
+  }
+
+  async getAllTestimonials(): Promise<AtelierTestimonial[]> {
+    return db.select().from(atelierTestimonials).orderBy(desc(atelierTestimonials.createdAt));
+  }
+
+  async createTestimonial(testimonial: InsertAtelierTestimonial): Promise<AtelierTestimonial> {
+    const [result] = await db.insert(atelierTestimonials).values(testimonial).returning();
+    return result;
+  }
+
+  async setTestimonialApproval(id: string, approved: boolean): Promise<AtelierTestimonial> {
+    const [result] = await db.update(atelierTestimonials)
+      .set({ approved })
+      .where(eq(atelierTestimonials.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteTestimonial(id: string): Promise<void> {
+    await db.delete(atelierTestimonials).where(eq(atelierTestimonials.id, id));
   }
 }
 
