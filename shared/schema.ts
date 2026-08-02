@@ -106,7 +106,9 @@ export const ateliers = pgTable("ateliers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertAtelierSchema = createInsertSchema(ateliers).omit({ id: true, createdAt: true });
+export const insertAtelierSchema = createInsertSchema(ateliers, {
+  dateTime: z.coerce.date(),
+}).omit({ id: true, createdAt: true });
 export type InsertAtelier = z.infer<typeof insertAtelierSchema>;
 export type Atelier = typeof ateliers.$inferSelect;
 
