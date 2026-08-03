@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { HelpCircle, CheckCircle, XCircle, Trophy, ArrowRight, RotateCcw, ArrowLeft, Star, Sparkles } from "lucide-react";
+import { HelpCircle, CheckCircle, XCircle, Trophy, ArrowRight, RotateCcw, ArrowLeft, Star, Sparkles, Award } from "lucide-react";
 
 type Level = "basic" | "intermediate" | "advanced";
 
@@ -123,6 +123,7 @@ export default function QuizPage() {
     const scorePct = (score / questions.length) * 100;
     const badge = getBadge(scorePct);
     const bonusText = { basic: t("quiz.bonus.basic"), intermediate: t("quiz.bonus.intermediate"), advanced: t("quiz.bonus.advanced") }[selectedLevel!];
+    const bonus2Text = { basic: t("quiz.bonus2.basic"), intermediate: t("quiz.bonus2.intermediate"), advanced: t("quiz.bonus2.advanced") }[selectedLevel!];
     return (
       <div className="flex flex-col min-h-full">
         <div className="px-5 pt-4 pb-2">
@@ -151,6 +152,16 @@ export default function QuizPage() {
             <h3 className="font-serif text-sm font-semibold mb-1.5">{t("quiz.bonus.title")}</h3>
             <p className="text-xs text-muted-foreground leading-relaxed" data-testid="text-quiz-bonus">{bonusText}</p>
             <p className="text-[10px] text-muted-foreground/70 mt-2">{t("quiz.bonus.source")}</p>
+          </Card>
+
+          <Card className="p-5 max-w-sm mx-auto w-full" data-testid="card-quiz-bonus2">
+            <div className="flex items-center gap-2 mb-2">
+              <Award className="h-4 w-4 text-primary" />
+              <Badge variant="secondary" className="text-[10px]">{t("quiz.bonus2.label")}</Badge>
+            </div>
+            <h3 className="font-serif text-sm font-semibold mb-1.5">{t("quiz.bonus2.title")}</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed" data-testid="text-quiz-bonus2">{bonus2Text}</p>
+            <p className="text-[10px] text-muted-foreground/70 mt-2">{t("quiz.bonus2.source")}</p>
           </Card>
         </div>
       </div>

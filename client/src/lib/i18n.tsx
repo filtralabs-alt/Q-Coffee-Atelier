@@ -138,6 +138,21 @@ const translations: Record<string, Record<Lang, string>> = {
     pt: "Com apenas 0,8 coffee shop para cada 100 mil habitantes no país, a França ainda está bem atrás dos mercados anglo-saxões — um potencial enorme, impulsionado por conceitos híbridos que unem café especial, refeições leves e coworking.",
   },
   "quiz.bonus.source": { fr: "Source : snacking.fr", pt: "Fonte: snacking.fr" },
+  "quiz.bonus2.label": { fr: "Focus SCA", pt: "Foco SCA" },
+  "quiz.bonus2.title": { fr: "Qui fixe les règles du café de spécialité ?", pt: "Quem define as regras do café especial?" },
+  "quiz.bonus2.basic": {
+    fr: "La SCA (Specialty Coffee Association) est l'organisation de référence mondiale du café de spécialité, née en 2017 de la fusion de l'américaine SCAA (fondée en 1982) et de l'européenne SCAE. Elle est aujourd'hui présente dans plus de 70 pays.",
+    pt: "A SCA (Specialty Coffee Association) é a organização de referência mundial do café especial, nascida em 2017 da fusão entre a americana SCAA (fundada em 1982) e a europeia SCAE. Hoje está presente em mais de 70 países.",
+  },
+  "quiz.bonus2.intermediate": {
+    fr: "C'est la SCA qui fixe la barre à 80 points sur 100 au-delà de laquelle un café est reconnu 'de spécialité' — une évaluation réalisée selon des protocoles standardisés par des Q-Graders certifiés.",
+    pt: "É a SCA que fixa a marca de 80 pontos em 100 acima da qual um café é reconhecido como 'especial' — uma avaliação feita segundo protocolos padronizados por Q-Graders certificados.",
+  },
+  "quiz.bonus2.advanced": {
+    fr: "En France, SCA France a été fondée en 2005. C'est elle qui organise chaque année les championnats nationaux (Barista, Latte Art, Coffee in Good Spirits...) — les mêmes qui envoient des Français comme Brice Robin représenter le pays sur la scène mondiale.",
+    pt: "Na França, a SCA France foi fundada em 2005. É ela quem organiza todo ano os campeonatos nacionais (Barista, Latte Art, Coffee in Good Spirits...) — os mesmos que levam franceses como Brice Robin a representar o país no cenário mundial.",
+  },
+  "quiz.bonus2.source": { fr: "Source : coffee-spirit.maxicoffee.com", pt: "Fonte: coffee-spirit.maxicoffee.com" },
 
   "library.title": { fr: "Bibliothèque de l'Atelier", pt: "Biblioteca do Workshop" },
   "library.locked": { fr: "Contenu réservé aux membres", pt: "Conteúdo exclusivo para membros" },
