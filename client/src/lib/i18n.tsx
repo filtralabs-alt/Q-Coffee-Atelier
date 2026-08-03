@@ -123,6 +123,21 @@ const translations: Record<string, Record<Lang, string>> = {
   "quiz.badge.amateur": { fr: "Amateur Éclairé", pt: "Amador Esclarecido" },
   "quiz.badge.expert": { fr: "Expert Barista", pt: "Barista Expert" },
   "quiz.badge.master": { fr: "Maître du Café", pt: "Mestre do Café" },
+  "quiz.bonus.label": { fr: "Bonus", pt: "Bônus" },
+  "quiz.bonus.title": { fr: "Le saviez-vous ?", pt: "Você sabia?" },
+  "quiz.bonus.basic": {
+    fr: "Le marché des coffee shops est en pleine explosion en France : +61% d'établissements entre 2024 et 2025, l'un des segments les plus dynamiques de la restauration organisée du pays.",
+    pt: "O mercado de coffee shops está em plena explosão na França: +61% de estabelecimentos entre 2024 e 2025, um dos segmentos mais dinâmicos da restauração organizada do país.",
+  },
+  "quiz.bonus.intermediate": {
+    fr: "Cette croissance est portée par les grandes villes : Bordeaux (+36%), Lyon et Montpellier (+150% chacune !) ou encore Lille (+75%) voient leur nombre de coffee shops grimper en flèche depuis 2024.",
+    pt: "Esse crescimento é puxado pelas grandes cidades: Bordeaux (+36%), Lyon e Montpellier (+150% cada!) e também Lille (+75%) viram seu número de coffee shops disparar desde 2024.",
+  },
+  "quiz.bonus.advanced": {
+    fr: "Avec seulement 0,8 coffee shop pour 100 000 habitants au niveau national, la France reste bien en retard sur les marchés anglo-saxons — un immense potentiel, porté par des concepts hybrides mêlant café de spécialité, restauration légère et coworking.",
+    pt: "Com apenas 0,8 coffee shop para cada 100 mil habitantes no país, a França ainda está bem atrás dos mercados anglo-saxões — um potencial enorme, impulsionado por conceitos híbridos que unem café especial, refeições leves e coworking.",
+  },
+  "quiz.bonus.source": { fr: "Source : snacking.fr", pt: "Fonte: snacking.fr" },
 
   "library.title": { fr: "Bibliothèque de l'Atelier", pt: "Biblioteca do Workshop" },
   "library.locked": { fr: "Contenu réservé aux membres", pt: "Conteúdo exclusivo para membros" },
