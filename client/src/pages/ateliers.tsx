@@ -132,9 +132,9 @@ function AboutHost() {
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">{t("ateliers.about.bio")}</p>
       <div className="flex flex-wrap gap-1.5 pt-1">
-        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.polygone")}</Badge>
-        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.worldOfCoffee")}</Badge>
-        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.clermontWeek")}</Badge>
+        <Badge variant="secondary" className="text-[10px] font-normal whitespace-normal text-left max-w-full">{t("ateliers.about.polygone")}</Badge>
+        <Badge variant="secondary" className="text-[10px] font-normal whitespace-normal text-left max-w-full">{t("ateliers.about.worldOfCoffee")}</Badge>
+        <Badge variant="secondary" className="text-[10px] font-normal whitespace-normal text-left max-w-full">{t("ateliers.about.clermontWeek")}</Badge>
       </div>
     </Card>
   );
