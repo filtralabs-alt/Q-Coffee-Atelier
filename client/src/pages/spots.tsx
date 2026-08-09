@@ -7,37 +7,42 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, MapPin, Globe, Instagram } from "lucide-react";
+import { Search, MapPin, Globe, Instagram, ChevronRight } from "lucide-react";
 import { SiInstagram } from "react-icons/si";
 
 function FeaturedCarousel({ spots }: { spots: CoffeeSpot[] }) {
   const { t } = useI18n();
   return (
-    <div className="px-5 pt-2 pb-1 space-y-2">
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("spots.featured.title")}</h2>
-      <div className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 pb-1">
-        {spots.map((spot) => (
-          <a
-            key={spot.id}
-            href={`/api/coffee-spots/${spot.id}/click`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 w-[47%] sm:w-40 snap-start rounded-2xl overflow-hidden block group"
-            data-testid={`link-featured-spot-${spot.id}`}
-          >
-            {spot.featuredImageUrl ? (
-              <img src={spot.featuredImageUrl} alt={spot.name} className="w-full aspect-square object-cover rounded-2xl transition-transform group-hover:scale-[1.02]" />
-            ) : (
-              <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground text-xs px-3 text-center rounded-2xl">
-                {spot.name}
+    <div className="pt-2 pb-1 space-y-2">
+      <h2 className="px-5 text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("spots.featured.title")}</h2>
+      <div className="relative">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pl-5 pr-8 pb-1">
+          {spots.map((spot) => (
+            <a
+              key={spot.id}
+              href={`/api/coffee-spots/${spot.id}/click`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 w-[47%] sm:w-40 snap-start rounded-2xl overflow-hidden block group"
+              data-testid={`link-featured-spot-${spot.id}`}
+            >
+              {spot.featuredImageUrl ? (
+                <img src={spot.featuredImageUrl} alt={spot.name} className="w-full aspect-square object-cover rounded-2xl transition-transform group-hover:scale-[1.02]" />
+              ) : (
+                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground text-xs px-3 text-center rounded-2xl">
+                  {spot.name}
+                </div>
+              )}
+              <div className="pt-2">
+                <p className="text-xs font-medium truncate">{spot.name}</p>
+                <p className="text-[10px] text-muted-foreground">{t("spots.featured.cta")}</p>
               </div>
-            )}
-            <div className="pt-2">
-              <p className="text-xs font-medium truncate">{spot.name}</p>
-              <p className="text-[10px] text-muted-foreground">{t("spots.featured.cta")}</p>
-            </div>
-          </a>
-        ))}
+            </a>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute right-0 top-0 bottom-6 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end">
+          <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+        </div>
       </div>
     </div>
   );
