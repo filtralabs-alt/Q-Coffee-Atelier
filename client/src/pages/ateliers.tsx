@@ -20,6 +20,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { Calendar, Clock, MapPin, Coffee, Star, MessageSquarePlus, ChevronLeft, ChevronRight, Euro, CalendarCheck } from "lucide-react";
+import crisPhoto from "@assets/cris-duarte-bio.png";
 
 function formatPrice(price: string): { value: string; hasIcon: boolean } {
   const match = price.match(/[\d]+(?:[.,]\d+)?/);
@@ -120,7 +121,15 @@ function AboutHost() {
   const { t } = useI18n();
   return (
     <Card className="p-5 space-y-3" data-testid="card-about-host">
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("ateliers.about.title")}</h2>
+      <div className="flex items-center gap-3">
+        <img
+          src={crisPhoto}
+          alt="Cris Duarte"
+          className="h-14 w-14 rounded-full object-cover shrink-0"
+          data-testid="img-about-host"
+        />
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("ateliers.about.title")}</h2>
+      </div>
       <p className="text-sm leading-relaxed text-muted-foreground">{t("ateliers.about.bio")}</p>
       <div className="flex flex-wrap gap-1.5 pt-1">
         <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.polygone")}</Badge>
