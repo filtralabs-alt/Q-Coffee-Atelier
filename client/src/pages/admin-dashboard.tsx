@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { CoffeeSpot, TastingEntry, LibraryModule, Atelier, AtelierTestimonial, AtelierReservation } from "@shared/schema";
-import { ATELIER_THEMES } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS } from "@/lib/constants";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -663,7 +663,25 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
+                {(r.coffeeKnowledge || r.homeBrewMethod) && (
+                  <div className="flex flex-wrap gap-1">
+                    {r.coffeeKnowledge && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                        {COFFEE_KNOWLEDGE_LEVELS.find((l) => l.id === r.coffeeKnowledge)?.fr || r.coffeeKnowledge}
+                      </span>
+                    )}
+                    {r.homeBrewMethod && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                        {HOME_BREW_METHODS.find((m) => m.id === r.homeBrewMethod)?.fr || r.homeBrewMethod}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {r.message && <p className="text-xs text-muted-foreground italic">"{r.message}"</p>}
+                <p className={`text-[10px] flex items-center gap-1 ${r.policyAccepted ? "text-muted-foreground" : "text-destructive"}`}>
+                  {r.policyAccepted ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                  {r.policyAccepted ? "Politique de paiement/annulation acceptée" : "Politique non acceptée"}
+                </p>
               </Card>
             ))}
           </div>

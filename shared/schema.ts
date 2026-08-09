@@ -134,12 +134,16 @@ export const atelierReservations = pgTable("atelier_reservations", {
   email: varchar("email").notNull(),
   phone: varchar("phone"),
   seats: integer("seats").notNull().default(1),
+  coffeeKnowledge: varchar("coffee_knowledge"),
+  homeBrewMethod: varchar("home_brew_method"),
   message: text("message"),
+  policyAccepted: boolean("policy_accepted").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertAtelierReservationSchema = createInsertSchema(atelierReservations, {
   seats: z.coerce.number().int().min(1).max(20),
+  policyAccepted: z.boolean().refine((v) => v === true, { message: "Vous devez accepter la politique d'annulation" }),
 }).omit({ id: true, createdAt: true });
 export type InsertAtelierReservation = z.infer<typeof insertAtelierReservationSchema>;
 export type AtelierReservation = typeof atelierReservations.$inferSelect;

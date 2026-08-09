@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ATELIER_THEMES } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Atelier, AtelierTestimonial } from "@shared/schema";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -206,13 +210,16 @@ function ReviewDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => v
 }
 
 function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [seats, setSeats] = useState("1");
+  const [coffeeKnowledge, setCoffeeKnowledge] = useState("");
+  const [homeBrewMethod, setHomeBrewMethod] = useState("");
   const [message, setMessage] = useState("");
+  const [policyAccepted, setPolicyAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const submitMutation = useMutation({
@@ -222,7 +229,10 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         email,
         phone: phone || undefined,
         seats,
+        coffeeKnowledge: coffeeKnowledge || undefined,
+        homeBrewMethod: homeBrewMethod || undefined,
         message: message || undefined,
+        policyAccepted,
       });
     },
     onSuccess: () => {
@@ -276,8 +286,45 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
               />
             </div>
             <div className="space-y-2">
+              <Label>{t("ateliers.reservation.coffeeKnowledge")}</Label>
+              <Select value={coffeeKnowledge} onValueChange={setCoffeeKnowledge}>
+                <SelectTrigger data-testid="select-reservation-coffee-knowledge">
+                  <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {COFFEE_KNOWLEDGE_LEVELS.map((level) => (
+                    <SelectItem key={level.id} value={level.id}>{level[lang]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>{t("ateliers.reservation.homeBrewMethod")}</Label>
+              <Select value={homeBrewMethod} onValueChange={setHomeBrewMethod}>
+                <SelectTrigger data-testid="select-reservation-brew-method">
+                  <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {HOME_BREW_METHODS.map((method) => (
+                    <SelectItem key={method.id} value={method.id}>{method[lang]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="reservation-message">{t("ateliers.reservation.message")}</Label>
               <Textarea id="reservation-message" rows={2} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-reservation-message" />
+            </div>
+            <div className="flex items-start gap-2 pt-1">
+              <Checkbox
+                id="reservation-policy"
+                checked={policyAccepted}
+                onCheckedChange={(v) => setPolicyAccepted(v === true)}
+                data-testid="checkbox-reservation-policy"
+              />
+              <Label htmlFor="reservation-policy" className="text-xs font-normal leading-snug text-muted-foreground">
+                {t("ateliers.reservation.policy")}
+              </Label>
             </div>
           </div>
         )}
@@ -292,7 +339,7 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
               </Button>
               <Button
                 onClick={() => submitMutation.mutate()}
-                disabled={!name.trim() || !email.trim() || !seats || submitMutation.isPending}
+                disabled={!name.trim() || !email.trim() || !seats || !policyAccepted || submitMutation.isPending}
                 data-testid="button-reservation-submit"
               >
                 {submitMutation.isPending ? t("ateliers.reservation.submitting") : t("ateliers.reservation.submit")}
