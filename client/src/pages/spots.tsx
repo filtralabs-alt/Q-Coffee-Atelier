@@ -22,7 +22,7 @@ function FeaturedCarousel({ spots }: { spots: CoffeeSpot[] }) {
             href={`/api/coffee-spots/${spot.id}/click`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 w-[47%] sm:w-[31%] snap-start rounded-2xl overflow-hidden block group"
+            className="shrink-0 w-[47%] sm:w-40 snap-start rounded-2xl overflow-hidden block group"
             data-testid={`link-featured-spot-${spot.id}`}
           >
             {spot.featuredImageUrl ? (
