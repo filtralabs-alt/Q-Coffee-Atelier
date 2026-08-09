@@ -38,6 +38,12 @@ export const HOME_BREW_METHODS: { id: string; fr: string; pt: string }[] = [
   { id: "other", fr: "Autre", pt: "Outro" },
 ];
 
+export const EVENT_GOALS: { id: string; fr: string; pt: string }[] = [
+  { id: "team-integration", fr: "Intégration d'équipe", pt: "Integração de equipe" },
+  { id: "celebration", fr: "Célébration", pt: "Celebração" },
+  { id: "other", fr: "Autre", pt: "Outro" },
+];
+
 export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string }[] = [
   { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio" },
   { id: "chocolat", fr: "Atelier café & chocolat", pt: "Workshop café & chocolate" },

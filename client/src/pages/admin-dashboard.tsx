@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { CoffeeSpot, TastingEntry, LibraryModule, Atelier, AtelierTestimonial, AtelierReservation } from "@shared/schema";
-import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -663,7 +663,7 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-                {(r.coffeeKnowledge || r.homeBrewMethod) && (
+                {(r.coffeeKnowledge || r.homeBrewMethod || r.companyName || r.eventGoal || r.childAge != null || r.parentAccompanying != null) && (
                   <div className="flex flex-wrap gap-1">
                     {r.coffeeKnowledge && (
                       <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
@@ -673,6 +673,22 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     {r.homeBrewMethod && (
                       <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
                         {HOME_BREW_METHODS.find((m) => m.id === r.homeBrewMethod)?.fr || r.homeBrewMethod}
+                      </span>
+                    )}
+                    {r.companyName && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">{r.companyName}</span>
+                    )}
+                    {r.eventGoal && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                        {EVENT_GOALS.find((g) => g.id === r.eventGoal)?.fr || r.eventGoal}
+                      </span>
+                    )}
+                    {r.childAge != null && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">{r.childAge} ans</span>
+                    )}
+                    {r.parentAccompanying != null && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                        {r.parentAccompanying ? "Avec parent" : "Sans parent"}
                       </span>
                     )}
                   </div>

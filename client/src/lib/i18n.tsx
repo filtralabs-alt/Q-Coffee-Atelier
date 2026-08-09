@@ -203,6 +203,12 @@ const translations: Record<string, Record<Lang, string>> = {
   "ateliers.reservation.coffeeKnowledge": { fr: "Quel est votre niveau de connaissance sur le café ?", pt: "Qual o seu conhecimento sobre o café?" },
   "ateliers.reservation.homeBrewMethod": { fr: "Quelle méthode d'extraction avez-vous chez vous ou au travail ?", pt: "Qual método de extração você possui em casa ou no trabalho?" },
   "ateliers.reservation.selectPlaceholder": { fr: "Choisissez une option", pt: "Escolha uma opção" },
+  "ateliers.reservation.companyName": { fr: "Nom de l'entreprise", pt: "Nome da empresa" },
+  "ateliers.reservation.eventGoal": { fr: "Objectif de l'événement", pt: "Objetivo do evento" },
+  "ateliers.reservation.childAge": { fr: "Âge de l'enfant", pt: "Idade da criança" },
+  "ateliers.reservation.parentAccompanying": { fr: "L'enfant sera-t-il accompagné d'un parent ?", pt: "A criança virá acompanhada de um adulto?" },
+  "ateliers.reservation.yes": { fr: "Oui", pt: "Sim" },
+  "ateliers.reservation.no": { fr: "Non", pt: "Não" },
   "ateliers.reservation.message": { fr: "Message (optionnel)", pt: "Mensagem (opcional)" },
   "ateliers.reservation.policy": {
     fr: "Le paiement se fait sur place, à la fin de l'atelier. En cochant cette case, je m'engage à honorer ma réservation. Annulation gratuite jusqu'à 48h avant l'atelier. En cas d'annulation sans explication ni proposition de nouvelle date, le montant total reste dû.",

@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Atelier, AtelierTestimonial } from "@shared/schema";
 import { Card } from "@/components/ui/card";
@@ -212,12 +212,18 @@ function ReviewDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => v
 function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
+  const questionsMode: "team" | "kids" | "coffee" =
+    atelier.theme === "team-building" ? "team" : atelier.theme === "peinture-enfants" ? "kids" : "coffee";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [seats, setSeats] = useState("1");
   const [coffeeKnowledge, setCoffeeKnowledge] = useState("");
   const [homeBrewMethod, setHomeBrewMethod] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [eventGoal, setEventGoal] = useState("");
+  const [childAge, setChildAge] = useState("");
+  const [parentAccompanying, setParentAccompanying] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [reservationId, setReservationId] = useState<string | null>(null);
@@ -230,8 +236,12 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         email,
         phone: phone || undefined,
         seats,
-        coffeeKnowledge: coffeeKnowledge || undefined,
-        homeBrewMethod: homeBrewMethod || undefined,
+        coffeeKnowledge: questionsMode === "coffee" ? coffeeKnowledge || undefined : undefined,
+        homeBrewMethod: questionsMode === "coffee" ? homeBrewMethod || undefined : undefined,
+        companyName: questionsMode === "team" ? companyName || undefined : undefined,
+        eventGoal: questionsMode === "team" ? eventGoal || undefined : undefined,
+        childAge: questionsMode === "kids" && childAge ? childAge : undefined,
+        parentAccompanying: questionsMode === "kids" && parentAccompanying ? parentAccompanying === "yes" : undefined,
         message: message || undefined,
       });
       return res.json();
@@ -307,32 +317,77 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
                 data-testid="input-reservation-seats"
               />
             </div>
-            <div className="space-y-2">
-              <Label>{t("ateliers.reservation.coffeeKnowledge")}</Label>
-              <Select value={coffeeKnowledge} onValueChange={setCoffeeKnowledge}>
-                <SelectTrigger data-testid="select-reservation-coffee-knowledge">
-                  <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {COFFEE_KNOWLEDGE_LEVELS.map((level) => (
-                    <SelectItem key={level.id} value={level.id}>{level[lang]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>{t("ateliers.reservation.homeBrewMethod")}</Label>
-              <Select value={homeBrewMethod} onValueChange={setHomeBrewMethod}>
-                <SelectTrigger data-testid="select-reservation-brew-method">
-                  <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {HOME_BREW_METHODS.map((method) => (
-                    <SelectItem key={method.id} value={method.id}>{method[lang]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {questionsMode === "coffee" && (
+              <>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.coffeeKnowledge")}</Label>
+                  <Select value={coffeeKnowledge} onValueChange={setCoffeeKnowledge}>
+                    <SelectTrigger data-testid="select-reservation-coffee-knowledge">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COFFEE_KNOWLEDGE_LEVELS.map((level) => (
+                        <SelectItem key={level.id} value={level.id}>{level[lang]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.homeBrewMethod")}</Label>
+                  <Select value={homeBrewMethod} onValueChange={setHomeBrewMethod}>
+                    <SelectTrigger data-testid="select-reservation-brew-method">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {HOME_BREW_METHODS.map((method) => (
+                        <SelectItem key={method.id} value={method.id}>{method[lang]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+            {questionsMode === "team" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="reservation-company">{t("ateliers.reservation.companyName")}</Label>
+                  <Input id="reservation-company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} data-testid="input-reservation-company" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.eventGoal")}</Label>
+                  <Select value={eventGoal} onValueChange={setEventGoal}>
+                    <SelectTrigger data-testid="select-reservation-event-goal">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EVENT_GOALS.map((goal) => (
+                        <SelectItem key={goal.id} value={goal.id}>{goal[lang]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+            {questionsMode === "kids" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="reservation-child-age">{t("ateliers.reservation.childAge")}</Label>
+                  <Input id="reservation-child-age" type="number" min={0} max={17} value={childAge} onChange={(e) => setChildAge(e.target.value)} data-testid="input-reservation-child-age" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.parentAccompanying")}</Label>
+                  <Select value={parentAccompanying} onValueChange={setParentAccompanying}>
+                    <SelectTrigger data-testid="select-reservation-parent-accompanying">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">{t("ateliers.reservation.yes")}</SelectItem>
+                      <SelectItem value="no">{t("ateliers.reservation.no")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="reservation-message">{t("ateliers.reservation.message")}</Label>
               <Textarea id="reservation-message" rows={2} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-reservation-message" />
