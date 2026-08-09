@@ -78,6 +78,10 @@ export async function sendReservationConfirmation(opts: {
           </a>
         </p>
         <p>À très bientôt !</p>
+        <p style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e0d8; font-size: 14px; color: #6b6558;">
+          Une question ? N'hésitez pas à m'écrire sur WhatsApp :
+          <a href="https://wa.me/33767046258" style="color: #1E39B0;">Cris Duarte, +33 7 67 04 62 58</a>
+        </p>
       </div>
     `,
   });
