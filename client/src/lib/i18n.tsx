@@ -102,6 +102,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "spots.search": { fr: "Rechercher un spot...", pt: "Buscar um spot..." },
   "spots.noResults": { fr: "Aucun spot trouvé", pt: "Nenhum spot encontrado" },
   "spots.suggest": { fr: "Suggérer un spot", pt: "Sugerir um spot" },
+  "spots.featured.title": { fr: "En vedette", pt: "Em destaque" },
+  "spots.featured.cta": { fr: "Voir l'offre →", pt: "Ver a oferta →" },
 
   "quiz.title": { fr: "Quiz Café", pt: "Quiz Café" },
   "quiz.subtitle": { fr: "Testez vos connaissances !", pt: "Teste seus conhecimentos!" },

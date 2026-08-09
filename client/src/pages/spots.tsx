@@ -10,6 +10,39 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, MapPin, Globe, Instagram } from "lucide-react";
 import { SiInstagram } from "react-icons/si";
 
+function FeaturedCarousel({ spots }: { spots: CoffeeSpot[] }) {
+  const { t } = useI18n();
+  return (
+    <div className="px-5 pt-2 pb-1 space-y-2">
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("spots.featured.title")}</h2>
+      <div className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 pb-1">
+        {spots.map((spot) => (
+          <a
+            key={spot.id}
+            href={`/api/coffee-spots/${spot.id}/click`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 w-[47%] sm:w-[31%] snap-start rounded-2xl overflow-hidden block group"
+            data-testid={`link-featured-spot-${spot.id}`}
+          >
+            {spot.featuredImageUrl ? (
+              <img src={spot.featuredImageUrl} alt={spot.name} className="w-full aspect-square object-cover rounded-2xl transition-transform group-hover:scale-[1.02]" />
+            ) : (
+              <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground text-xs px-3 text-center rounded-2xl">
+                {spot.name}
+              </div>
+            )}
+            <div className="pt-2">
+              <p className="text-xs font-medium truncate">{spot.name}</p>
+              <p className="text-[10px] text-muted-foreground">{t("spots.featured.cta")}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SpotsPage() {
   const { t } = useI18n();
   const [search, setSearch] = useState("");
@@ -17,6 +50,8 @@ export default function SpotsPage() {
   const { data: spots, isLoading } = useQuery<CoffeeSpot[]>({
     queryKey: ["/api/coffee-spots"],
   });
+
+  const featured = spots?.filter((spot) => spot.featured && spot.featuredLinkUrl) ?? [];
 
   const filtered = spots?.filter(
     (spot) =>
@@ -31,6 +66,8 @@ export default function SpotsPage() {
         <h1 className="font-serif text-xl font-semibold" data-testid="text-spots-title">{t("spots.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("spots.subtitle")}</p>
       </div>
+
+      {!isLoading && featured.length > 0 && <FeaturedCarousel spots={featured} />}
 
       <div className="px-5 py-3">
         <div className="relative">

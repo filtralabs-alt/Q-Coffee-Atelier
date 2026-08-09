@@ -99,6 +99,24 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/coffee-spots/:id/click", async (req, res) => {
+    try {
+      const spot = await storage.getCoffeeSpot(req.params.id);
+      if (!spot || !spot.featuredLinkUrl) {
+        return res.status(404).send("Not found");
+      }
+      await storage.incrementSpotClickCount(spot.id);
+      const url = new URL(spot.featuredLinkUrl);
+      url.searchParams.set("utm_source", "obaristech");
+      url.searchParams.set("utm_medium", "referral");
+      url.searchParams.set("utm_campaign", "coffee-spots");
+      res.redirect(302, url.toString());
+    } catch (error) {
+      console.error("Error redirecting spot click:", error);
+      res.status(500).send("Error");
+    }
+  });
+
   app.get("/api/ateliers", async (_req, res) => {
     try {
       const items = await storage.getAteliers();

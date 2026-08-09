@@ -51,9 +51,15 @@ interface SpotForm {
   instagram: string;
   website: string;
   tags: string;
+  featured: boolean;
+  featuredLinkUrl: string;
+  featuredImageUrl: string;
 }
 
-const emptyForm: SpotForm = { name: "", city: "", instagram: "", website: "", tags: "" };
+const emptyForm: SpotForm = {
+  name: "", city: "", instagram: "", website: "", tags: "",
+  featured: false, featuredLinkUrl: "", featuredImageUrl: "",
+};
 
 function AdminLogin({ onLogin }: { onLogin: () => void }) {
   const [email, setEmail] = useState("");
@@ -234,6 +240,9 @@ function SpotsTab() {
         website: form.website || null,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
         approved: true,
+        featured: form.featured,
+        featuredLinkUrl: form.featured ? form.featuredLinkUrl || null : null,
+        featuredImageUrl: form.featured ? form.featuredImageUrl || null : null,
       };
       if (editingId) {
         await apiRequest("PATCH", `/api/admin/coffee-spots/${editingId}`, data);
@@ -274,6 +283,9 @@ function SpotsTab() {
       instagram: spot.instagram || "",
       website: spot.website || "",
       tags: spot.tags?.join(", ") || "",
+      featured: spot.featured,
+      featuredLinkUrl: spot.featuredLinkUrl || "",
+      featuredImageUrl: spot.featuredImageUrl || "",
     });
     setShowForm(true);
   };
@@ -318,6 +330,35 @@ function SpotsTab() {
             <Label>Tags</Label>
             <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="torréfacteur, brunch, wifi" data-testid="input-admin-spot-tags" />
           </div>
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div>
+              <Label>Destaque (carrossel)</Label>
+              <p className="text-xs text-muted-foreground">Aparece no carrossel de destaques da página Spots</p>
+            </div>
+            <Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} data-testid="switch-admin-spot-featured" />
+          </div>
+          {form.featured && (
+            <>
+              <div className="space-y-2">
+                <Label>Link de destino (checkout, produto...)</Label>
+                <Input
+                  value={form.featuredLinkUrl}
+                  onChange={(e) => setForm({ ...form, featuredLinkUrl: e.target.value })}
+                  placeholder="https://exemple.com/produit"
+                  data-testid="input-admin-spot-featured-link"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Image du banner (URL)</Label>
+                <Input
+                  value={form.featuredImageUrl}
+                  onChange={(e) => setForm({ ...form, featuredImageUrl: e.target.value })}
+                  placeholder="https://exemple.com/image.jpg"
+                  data-testid="input-admin-spot-featured-image"
+                />
+              </div>
+            </>
+          )}
           <div className="flex items-center gap-2 pt-1">
             <Button onClick={() => saveMutation.mutate()} disabled={!form.name.trim() || !form.city.trim() || saveMutation.isPending} data-testid="button-admin-save-spot">
               <Save className="h-4 w-4 mr-1.5" />
@@ -334,8 +375,14 @@ function SpotsTab() {
       {spots?.map((spot) => (
         <Card key={spot.id} className="p-3 flex items-center justify-between gap-2" data-testid={`card-admin-spot-${spot.id}`}>
           <div className="min-w-0">
-            <p className="font-medium text-sm truncate">{spot.name}</p>
-            <p className="text-xs text-muted-foreground">{spot.city}</p>
+            <p className="font-medium text-sm truncate flex items-center gap-1.5">
+              {spot.name}
+              {spot.featured && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">Destaque</span>}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {spot.city}
+              {spot.featured && ` · ${spot.clickCount} clique(s)`}
+            </p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <Button variant="ghost" size="icon" onClick={() => openEdit(spot)} data-testid={`button-admin-edit-spot-${spot.id}`}>

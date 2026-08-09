@@ -53,6 +53,10 @@ export const coffeeSpots = pgTable("coffee_spots", {
   website: varchar("website"),
   tags: text("tags").array(),
   approved: boolean("approved").default(true),
+  featured: boolean("featured").notNull().default(false),
+  featuredLinkUrl: varchar("featured_link_url"),
+  featuredImageUrl: varchar("featured_image_url"),
+  clickCount: integer("click_count").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -23,6 +23,8 @@ export interface IStorage {
   createCoffeeSpot(spot: InsertCoffeeSpot): Promise<CoffeeSpot>;
   updateCoffeeSpot(id: string, spot: Partial<InsertCoffeeSpot>): Promise<CoffeeSpot>;
   deleteCoffeeSpot(id: string): Promise<void>;
+  getCoffeeSpot(id: string): Promise<CoffeeSpot | undefined>;
+  incrementSpotClickCount(id: string): Promise<void>;
 
   getQuizResults(userId: string): Promise<QuizResult[]>;
   createQuizResult(result: InsertQuizResult): Promise<QuizResult>;
@@ -176,6 +178,17 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCoffeeSpot(id: string): Promise<void> {
     await db.delete(coffeeSpots).where(eq(coffeeSpots.id, id));
+  }
+
+  async getCoffeeSpot(id: string): Promise<CoffeeSpot | undefined> {
+    const [spot] = await db.select().from(coffeeSpots).where(eq(coffeeSpots.id, id));
+    return spot;
+  }
+
+  async incrementSpotClickCount(id: string): Promise<void> {
+    await db.update(coffeeSpots)
+      .set({ clickCount: sql`${coffeeSpots.clickCount} + 1` })
+      .where(eq(coffeeSpots.id, id));
   }
 
   async getQuizResults(userId: string): Promise<QuizResult[]> {
