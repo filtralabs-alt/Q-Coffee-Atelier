@@ -154,6 +154,7 @@ export async function registerRoutes(
           seats: row.reservation.seats,
           coffeeKnowledge: row.reservation.coffeeKnowledge,
           homeBrewMethod: row.reservation.homeBrewMethod,
+          learningGoal: row.reservation.learningGoal,
           companyName: row.reservation.companyName,
           eventGoal: row.reservation.eventGoal,
           childAges: row.reservation.childAges,

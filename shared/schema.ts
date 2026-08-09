@@ -136,6 +136,7 @@ export const atelierReservations = pgTable("atelier_reservations", {
   seats: integer("seats").notNull().default(1),
   coffeeKnowledge: varchar("coffee_knowledge"),
   homeBrewMethod: varchar("home_brew_method"),
+  learningGoal: text("learning_goal"),
   companyName: varchar("company_name"),
   eventGoal: varchar("event_goal"),
   childAges: integer("child_ages").array(),

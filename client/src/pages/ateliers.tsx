@@ -244,6 +244,7 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   const [seats, setSeats] = useState("1");
   const [coffeeKnowledge, setCoffeeKnowledge] = useState("");
   const [homeBrewMethod, setHomeBrewMethod] = useState("");
+  const [learningGoal, setLearningGoal] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [eventGoal, setEventGoal] = useState("");
   const [childAges, setChildAges] = useState<string[]>([""]);
@@ -262,6 +263,7 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         seats,
         coffeeKnowledge: questionsMode === "coffee" ? coffeeKnowledge || undefined : undefined,
         homeBrewMethod: questionsMode === "coffee" ? homeBrewMethod || undefined : undefined,
+        learningGoal: questionsMode === "coffee" ? learningGoal || undefined : undefined,
         companyName: questionsMode === "team" ? companyName || undefined : undefined,
         eventGoal: questionsMode === "team" ? eventGoal || undefined : undefined,
         childAges: questionsMode === "kids"
@@ -370,6 +372,16 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reservation-learning-goal">{t("ateliers.reservation.learningGoal")}</Label>
+                  <Textarea
+                    id="reservation-learning-goal"
+                    rows={2}
+                    value={learningGoal}
+                    onChange={(e) => setLearningGoal(e.target.value)}
+                    data-testid="textarea-reservation-learning-goal"
+                  />
                 </div>
               </>
             )}

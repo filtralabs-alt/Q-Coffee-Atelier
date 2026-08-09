@@ -724,6 +724,9 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     )}
                   </div>
                 )}
+                {r.learningGoal && (
+                  <p className="text-xs text-muted-foreground"><span className="font-medium">Souhait :</span> {r.learningGoal}</p>
+                )}
                 {r.message && <p className="text-xs text-muted-foreground italic">"{r.message}"</p>}
                 <p className={`text-[10px] flex items-center gap-1 ${r.policyAccepted ? "text-muted-foreground" : "text-destructive"}`}>
                   {r.policyAccepted ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}

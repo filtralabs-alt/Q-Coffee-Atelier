@@ -211,6 +211,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "ateliers.reservation.seats": { fr: "Nombre de personnes", pt: "Número de pessoas" },
   "ateliers.reservation.coffeeKnowledge": { fr: "Quel est votre niveau de connaissance sur le café ?", pt: "Qual o seu conhecimento sobre o café?" },
   "ateliers.reservation.homeBrewMethod": { fr: "Quelle méthode d'extraction avez-vous chez vous ou au travail ?", pt: "Qual método de extração você possui em casa ou no trabalho?" },
+  "ateliers.reservation.learningGoal": { fr: "Qu'aimeriez-vous apprendre ou découvrir lors de cet atelier café ?", pt: "O que você gostaria de saber ou aprender neste atelier café?" },
   "ateliers.reservation.selectPlaceholder": { fr: "Choisissez une option", pt: "Escolha uma opção" },
   "ateliers.reservation.companyName": { fr: "Nom de l'entreprise", pt: "Nome da empresa" },
   "ateliers.reservation.eventGoal": { fr: "Objectif de l'événement", pt: "Objetivo do evento" },

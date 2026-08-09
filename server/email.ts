@@ -120,6 +120,7 @@ export async function sendNewReservationNotification(opts: {
   seats: number;
   coffeeKnowledge?: string | null;
   homeBrewMethod?: string | null;
+  learningGoal?: string | null;
   companyName?: string | null;
   eventGoal?: string | null;
   childAges?: number[] | null;
@@ -139,6 +140,7 @@ export async function sendNewReservationNotification(opts: {
   const details: string[] = [];
   if (opts.coffeeKnowledge) details.push(`Connaissance café : ${COFFEE_KNOWLEDGE_LABELS_FR[opts.coffeeKnowledge] || opts.coffeeKnowledge}`);
   if (opts.homeBrewMethod) details.push(`Méthode à la maison : ${HOME_BREW_METHOD_LABELS_FR[opts.homeBrewMethod] || opts.homeBrewMethod}`);
+  if (opts.learningGoal) details.push(`Souhait pour l'atelier : "${opts.learningGoal}"`);
   if (opts.companyName) details.push(`Entreprise : ${opts.companyName}`);
   if (opts.eventGoal) details.push(`Objectif : ${EVENT_GOAL_LABELS_FR[opts.eventGoal] || opts.eventGoal}`);
   if (opts.childAges && opts.childAges.length > 0) details.push(`Âge des enfants : ${opts.childAges.join(", ")} ans`);
