@@ -127,12 +127,34 @@ export const insertAtelierTestimonialSchema = createInsertSchema(atelierTestimon
 export type InsertAtelierTestimonial = z.infer<typeof insertAtelierTestimonialSchema>;
 export type AtelierTestimonial = typeof atelierTestimonials.$inferSelect;
 
+export const atelierReservations = pgTable("atelier_reservations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  atelierId: varchar("atelier_id").notNull().references(() => ateliers.id),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  phone: varchar("phone"),
+  seats: integer("seats").notNull().default(1),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAtelierReservationSchema = createInsertSchema(atelierReservations, {
+  seats: z.coerce.number().int().min(1).max(20),
+}).omit({ id: true, createdAt: true });
+export type InsertAtelierReservation = z.infer<typeof insertAtelierReservationSchema>;
+export type AtelierReservation = typeof atelierReservations.$inferSelect;
+
 export const ateliersRelations = relations(ateliers, ({ many }) => ({
   testimonials: many(atelierTestimonials),
+  reservations: many(atelierReservations),
 }));
 
 export const atelierTestimonialsRelations = relations(atelierTestimonials, ({ one }) => ({
   atelier: one(ateliers, { fields: [atelierTestimonials.atelierId], references: [ateliers.id] }),
+}));
+
+export const atelierReservationsRelations = relations(atelierReservations, ({ one }) => ({
+  atelier: one(ateliers, { fields: [atelierReservations.atelierId], references: [ateliers.id] }),
 }));
 
 export const usersRelations = relations(users, ({ one, many }) => ({

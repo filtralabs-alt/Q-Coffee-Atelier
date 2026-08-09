@@ -15,7 +15,12 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
-import { Calendar, Clock, MapPin, Coffee, Star, MessageSquarePlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Clock, MapPin, Coffee, Star, MessageSquarePlus, ChevronLeft, ChevronRight, Euro, CalendarCheck } from "lucide-react";
+
+function formatPrice(price: string): { value: string; hasIcon: boolean } {
+  const match = price.match(/[\d]+(?:[.,]\d+)?/);
+  return match ? { value: match[0], hasIcon: true } : { value: price, hasIcon: false };
+}
 
 function themeLabel(theme: string, lang: "fr" | "pt") {
   const found = ATELIER_THEMES.find((t) => t.id === theme);
@@ -200,11 +205,112 @@ function ReviewDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => v
   );
 }
 
-function AtelierCard({ atelier, testimonials, isPast, onReview }: {
+function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
+  const { t } = useI18n();
+  const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [seats, setSeats] = useState("1");
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/ateliers/${atelier.id}/reservations`, {
+        name,
+        email,
+        phone: phone || undefined,
+        seats,
+        message: message || undefined,
+      });
+    },
+    onSuccess: () => {
+      setSubmitted(true);
+      queryClient.invalidateQueries({ queryKey: ["/api/ateliers"] });
+    },
+    onError: (error: any) => {
+      const isFull = error?.message?.includes("409");
+      toast({
+        title: isFull ? t("ateliers.reservation.full") : t("ateliers.reservation.error"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent data-testid="dialog-reservation">
+        <DialogHeader>
+          <DialogTitle>{t("ateliers.reservation.title")}</DialogTitle>
+        </DialogHeader>
+
+        {submitted ? (
+          <div className="py-4 text-center text-sm text-muted-foreground" data-testid="text-reservation-success">
+            {t("ateliers.reservation.success")}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reservation-name">{t("ateliers.reservation.name")}</Label>
+              <Input id="reservation-name" value={name} onChange={(e) => setName(e.target.value)} data-testid="input-reservation-name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reservation-email">{t("ateliers.reservation.email")}</Label>
+              <Input id="reservation-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-reservation-email" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reservation-phone">{t("ateliers.reservation.phone")}</Label>
+              <Input id="reservation-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="input-reservation-phone" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reservation-seats">{t("ateliers.reservation.seats")}</Label>
+              <Input
+                id="reservation-seats"
+                type="number"
+                min={1}
+                max={atelier.seatsAvailable ?? 20}
+                value={seats}
+                onChange={(e) => setSeats(e.target.value)}
+                data-testid="input-reservation-seats"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reservation-message">{t("ateliers.reservation.message")}</Label>
+              <Textarea id="reservation-message" rows={2} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-reservation-message" />
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          {submitted ? (
+            <Button onClick={onClose} data-testid="button-reservation-done">{t("common.save")}</Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={onClose} data-testid="button-reservation-cancel">
+                {t("ateliers.reservation.cancel")}
+              </Button>
+              <Button
+                onClick={() => submitMutation.mutate()}
+                disabled={!name.trim() || !email.trim() || !seats || submitMutation.isPending}
+                data-testid="button-reservation-submit"
+              >
+                {submitMutation.isPending ? t("ateliers.reservation.submitting") : t("ateliers.reservation.submit")}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AtelierCard({ atelier, testimonials, isPast, onReview, onReserve }: {
   atelier: Atelier;
   testimonials: AtelierTestimonial[];
   isPast: boolean;
   onReview: () => void;
+  onReserve: () => void;
 }) {
   const { t, lang } = useI18n();
   const date = new Date(atelier.dateTime);
@@ -249,7 +355,15 @@ function AtelierCard({ atelier, testimonials, isPast, onReview }: {
       )}
 
       <div className="flex items-center justify-between pt-1 border-t text-xs">
-        {atelier.price && <span className="font-medium">{atelier.price}</span>}
+        {atelier.price && (() => {
+          const { value, hasIcon } = formatPrice(atelier.price);
+          return (
+            <span className="font-medium flex items-center gap-1">
+              {hasIcon && <Euro className="h-3.5 w-3.5" />}
+              {value}
+            </span>
+          );
+        })()}
         {!isPast && (
           <span className={full ? "text-destructive font-medium" : "text-muted-foreground"}>
             {full
@@ -260,6 +374,13 @@ function AtelierCard({ atelier, testimonials, isPast, onReview }: {
           </span>
         )}
       </div>
+
+      {!isPast && !full && (
+        <Button size="sm" className="w-full" onClick={onReserve} data-testid={`button-reserve-${atelier.id}`}>
+          <CalendarCheck className="h-3.5 w-3.5 mr-1.5" />
+          {t("ateliers.reserve")}
+        </Button>
+      )}
 
       {isPast && (
         <div className="pt-2 border-t space-y-2">
@@ -298,6 +419,7 @@ function AtelierCard({ atelier, testimonials, isPast, onReview }: {
 export default function AteliersPage() {
   const { t } = useI18n();
   const [reviewAtelier, setReviewAtelier] = useState<Atelier | null>(null);
+  const [reservationAtelier, setReservationAtelier] = useState<Atelier | null>(null);
 
   const { data: ateliers, isLoading } = useQuery<Atelier[]>({ queryKey: ["/api/ateliers"] });
   const { data: testimonials = [] } = useQuery<AtelierTestimonial[]>({ queryKey: ["/api/testimonials"] });
@@ -359,7 +481,14 @@ export default function AteliersPage() {
               ) : (
                 <div className="space-y-3">
                   {upcoming.map((a) => (
-                    <AtelierCard key={a.id} atelier={a} testimonials={[]} isPast={false} onReview={() => {}} />
+                    <AtelierCard
+                      key={a.id}
+                      atelier={a}
+                      testimonials={[]}
+                      isPast={false}
+                      onReview={() => {}}
+                      onReserve={() => setReservationAtelier(a)}
+                    />
                   ))}
                 </div>
               )}
@@ -378,6 +507,7 @@ export default function AteliersPage() {
                       testimonials={testimonialsByAtelier.get(a.id) ?? []}
                       isPast
                       onReview={() => setReviewAtelier(a)}
+                      onReserve={() => {}}
                     />
                   ))}
                 </div>
@@ -388,6 +518,9 @@ export default function AteliersPage() {
       </div>
 
       {reviewAtelier && <ReviewDialog atelier={reviewAtelier} onClose={closeReview} />}
+      {reservationAtelier && (
+        <ReservationDialog atelier={reservationAtelier} onClose={() => setReservationAtelier(null)} />
+      )}
     </div>
   );
 }

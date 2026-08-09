@@ -7,6 +7,7 @@ import {
   libraryModules, type LibraryModule, type InsertLibraryModule,
   ateliers, type Atelier, type InsertAtelier,
   atelierTestimonials, type AtelierTestimonial, type InsertAtelierTestimonial,
+  atelierReservations, type AtelierReservation, type InsertAtelierReservation,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, count } from "drizzle-orm";
@@ -50,6 +51,10 @@ export interface IStorage {
   createTestimonial(testimonial: InsertAtelierTestimonial): Promise<AtelierTestimonial>;
   setTestimonialApproval(id: string, approved: boolean): Promise<AtelierTestimonial>;
   deleteTestimonial(id: string): Promise<void>;
+
+  getReservationsByAtelier(atelierId: string): Promise<AtelierReservation[]>;
+  createReservation(reservation: InsertAtelierReservation): Promise<AtelierReservation>;
+  deleteReservation(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -299,6 +304,45 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTestimonial(id: string): Promise<void> {
     await db.delete(atelierTestimonials).where(eq(atelierTestimonials.id, id));
+  }
+
+  async getReservationsByAtelier(atelierId: string): Promise<AtelierReservation[]> {
+    return db.select().from(atelierReservations)
+      .where(eq(atelierReservations.atelierId, atelierId))
+      .orderBy(desc(atelierReservations.createdAt));
+  }
+
+  async createReservation(reservation: InsertAtelierReservation): Promise<AtelierReservation> {
+    return db.transaction(async (tx) => {
+      const [atelier] = await tx.select().from(ateliers).where(eq(ateliers.id, reservation.atelierId)).for("update");
+      if (!atelier) {
+        throw new Error("Atelier not found");
+      }
+      if (atelier.seatsAvailable !== null && atelier.seatsAvailable < reservation.seats) {
+        throw new Error("Not enough seats available");
+      }
+      if (atelier.seatsAvailable !== null) {
+        await tx.update(ateliers)
+          .set({ seatsAvailable: atelier.seatsAvailable - reservation.seats })
+          .where(eq(ateliers.id, reservation.atelierId));
+      }
+      const [result] = await tx.insert(atelierReservations).values(reservation).returning();
+      return result;
+    });
+  }
+
+  async deleteReservation(id: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      const [reservation] = await tx.select().from(atelierReservations).where(eq(atelierReservations.id, id));
+      if (!reservation) return;
+      await tx.delete(atelierReservations).where(eq(atelierReservations.id, id));
+      const [atelier] = await tx.select().from(ateliers).where(eq(ateliers.id, reservation.atelierId)).for("update");
+      if (atelier && atelier.seatsAvailable !== null) {
+        await tx.update(ateliers)
+          .set({ seatsAvailable: atelier.seatsAvailable + reservation.seats })
+          .where(eq(ateliers.id, reservation.atelierId));
+      }
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { CoffeeSpot, TastingEntry, LibraryModule, Atelier, AtelierTestimonial } from "@shared/schema";
+import type { CoffeeSpot, TastingEntry, LibraryModule, Atelier, AtelierTestimonial, AtelierReservation } from "@shared/schema";
 import { ATELIER_THEMES } from "@/lib/constants";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -24,6 +24,9 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
 
@@ -608,12 +611,75 @@ function toDateTimeLocal(iso: string | Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
+  const { toast } = useToast();
+  const { data: reservations, isLoading } = useQuery<AtelierReservation[]>({
+    queryKey: [`/api/admin/ateliers/${atelier.id}/reservations`],
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/reservations/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/ateliers/${atelier.id}/reservations`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/ateliers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ateliers"] });
+      toast({ title: "Réservation annulée" });
+    },
+  });
+
+  const totalSeats = reservations?.reduce((sum, r) => sum + r.seats, 0) ?? 0;
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent data-testid="dialog-admin-reservations">
+        <DialogHeader>
+          <DialogTitle>
+            Réservations · {ATELIER_THEMES.find((t) => t.id === atelier.theme)?.fr || atelier.theme}
+          </DialogTitle>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
+        ) : reservations?.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">Aucune réservation pour le moment</p>
+        ) : (
+          <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+            <p className="text-xs text-muted-foreground">{totalSeats} personne(s) inscrite(s)</p>
+            {reservations?.map((r) => (
+              <Card key={r.id} className="p-3 space-y-1" data-testid={`card-admin-reservation-${r.id}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{r.name} · {r.seats} pers.</p>
+                    <p className="text-xs text-muted-foreground truncate">{r.email}{r.phone ? ` · ${r.phone}` : ""}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive shrink-0"
+                    onClick={() => deleteMutation.mutate(r.id)}
+                    data-testid={`button-admin-cancel-reservation-${r.id}`}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                {r.message && <p className="text-xs text-muted-foreground italic">"{r.message}"</p>}
+              </Card>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function AteliersTab() {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<AtelierForm>(emptyAtelierForm);
   const [showForm, setShowForm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [reservationsAtelier, setReservationsAtelier] = useState<Atelier | null>(null);
 
   const { data: items, isLoading } = useQuery<Atelier[]>({ queryKey: ["/api/admin/ateliers"] });
 
@@ -774,6 +840,9 @@ function AteliersTab() {
             </p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => setReservationsAtelier(item)} data-testid={`button-admin-reservations-atelier-${item.id}`}>
+              <Users className="h-3.5 w-3.5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => openEdit(item)} data-testid={`button-admin-edit-atelier-${item.id}`}>
               <Pencil className="h-3.5 w-3.5" />
             </Button>
@@ -784,6 +853,10 @@ function AteliersTab() {
         </Card>
       ))}
       {items?.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Aucun atelier</p>}
+
+      {reservationsAtelier && (
+        <AtelierReservationsDialog atelier={reservationsAtelier} onClose={() => setReservationsAtelier(null)} />
+      )}
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

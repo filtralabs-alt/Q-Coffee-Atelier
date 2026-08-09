@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
-import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema } from "@shared/schema";
+import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -129,6 +129,26 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error creating testimonial:", error);
       res.status(500).json({ message: "Failed to create testimonial" });
+    }
+  });
+
+  app.post("/api/ateliers/:id/reservations", async (req, res) => {
+    try {
+      const parsed = insertAtelierReservationSchema.safeParse({ ...req.body, atelierId: req.params.id });
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const reservation = await storage.createReservation(parsed.data);
+      res.json(reservation);
+    } catch (error: any) {
+      if (error?.message === "Not enough seats available") {
+        return res.status(409).json({ message: "Not enough seats available" });
+      }
+      if (error?.message === "Atelier not found") {
+        return res.status(404).json({ message: "Atelier not found" });
+      }
+      console.error("Error creating reservation:", error);
+      res.status(500).json({ message: "Failed to create reservation" });
     }
   });
 
@@ -363,6 +383,26 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting atelier:", error);
       res.status(500).json({ message: "Failed to delete atelier" });
+    }
+  });
+
+  app.get("/api/admin/ateliers/:id/reservations", isAdmin, async (req, res) => {
+    try {
+      const items = await storage.getReservationsByAtelier(req.params.id);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+      res.status(500).json({ message: "Failed to fetch reservations" });
+    }
+  });
+
+  app.delete("/api/admin/reservations/:id", isAdmin, async (req, res) => {
+    try {
+      await storage.deleteReservation(req.params.id);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Error deleting reservation:", error);
+      res.status(500).json({ message: "Failed to delete reservation" });
     }
   });
 
