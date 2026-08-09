@@ -35,6 +35,9 @@ export async function setupAuth(app: Express) {
     ttl: 7 * 24 * 60 * 60,
     tableName: "sessions",
   });
+  sessionStore.on("error", (error) => {
+    console.error("Session store error:", error);
+  });
 
   app.use(
     session({
