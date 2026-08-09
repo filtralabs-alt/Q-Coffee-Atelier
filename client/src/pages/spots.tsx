@@ -16,7 +16,7 @@ function FeaturedCarousel({ spots }: { spots: CoffeeSpot[] }) {
     <div className="pt-2 pb-1 space-y-2">
       <h2 className="px-5 text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("spots.featured.title")}</h2>
       <div className="relative">
-        <div className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pl-6 pr-8 pb-1">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-pl-6 scroll-pr-8 pl-6 pr-8 pb-1">
           {spots.map((spot) => (
             <a
               key={spot.id}
