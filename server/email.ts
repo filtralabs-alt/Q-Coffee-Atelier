@@ -10,6 +10,28 @@ const ATELIER_LABELS_FR: Record<string, string> = {
   "peinture-enfants": "Atelier peinture café enfants",
 };
 
+const COFFEE_KNOWLEDGE_LABELS_FR: Record<string, string> = {
+  none: "Je n'y connais rien",
+  "buys-beans": "J'achète déjà du café en grain",
+  "coffee-lover": "Je suis passionné(e) et je veux approfondir",
+  "origin-curious": "Je veux en savoir plus sur l'origine",
+  "home-brewing": "Je veux juste apprendre à faire un bon café à la maison",
+};
+
+const HOME_BREW_METHOD_LABELS_FR: Record<string, string> = {
+  melita: "Melitta",
+  v60: "Hario V60",
+  chemex: "Chemex",
+  espresso: "Machine à espresso",
+  other: "Autre",
+};
+
+const EVENT_GOAL_LABELS_FR: Record<string, string> = {
+  "team-integration": "Intégration d'équipe",
+  celebration: "Célébration",
+  other: "Autre",
+};
+
 const DURATION_MINUTES_BY_THEME: Record<string, number> = {
   "team-building": 105,
   "peinture-enfants": 60,
@@ -82,6 +104,64 @@ export async function sendReservationConfirmation(opts: {
           Une question ? N'hésitez pas à m'écrire sur WhatsApp :
           <a href="https://wa.me/33767046258" style="color: #1E39B0;">Cris Duarte, +33 7 67 04 62 58</a>
         </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendNewReservationNotification(opts: {
+  atelierTheme: string;
+  dateTime: Date;
+  location: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  seats: number;
+  coffeeKnowledge?: string | null;
+  homeBrewMethod?: string | null;
+  companyName?: string | null;
+  eventGoal?: string | null;
+  childAge?: number | null;
+  parentAccompanying?: boolean | null;
+  message?: string | null;
+}) {
+  const notifyTo = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!resend || !notifyTo) {
+    if (!notifyTo) console.warn("ADMIN_NOTIFICATION_EMAIL not set, skipping new reservation notification");
+    return;
+  }
+
+  const title = ATELIER_LABELS_FR[opts.atelierTheme] || opts.atelierTheme;
+  const formattedDate = opts.dateTime.toLocaleDateString("fr-FR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const formattedTime = opts.dateTime.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+
+  const details: string[] = [];
+  if (opts.coffeeKnowledge) details.push(`Connaissance café : ${COFFEE_KNOWLEDGE_LABELS_FR[opts.coffeeKnowledge] || opts.coffeeKnowledge}`);
+  if (opts.homeBrewMethod) details.push(`Méthode à la maison : ${HOME_BREW_METHOD_LABELS_FR[opts.homeBrewMethod] || opts.homeBrewMethod}`);
+  if (opts.companyName) details.push(`Entreprise : ${opts.companyName}`);
+  if (opts.eventGoal) details.push(`Objectif : ${EVENT_GOAL_LABELS_FR[opts.eventGoal] || opts.eventGoal}`);
+  if (opts.childAge != null) details.push(`Âge de l'enfant : ${opts.childAge} ans`);
+  if (opts.parentAccompanying != null) details.push(`Accompagné d'un parent : ${opts.parentAccompanying ? "Oui" : "Non"}`);
+  if (opts.message) details.push(`Message : "${opts.message}"`);
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
+    to: notifyTo,
+    subject: `Nouvelle réservation : ${title} — ${opts.name}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #1C0F08;">
+        <h2>Nouvelle réservation ☕</h2>
+        <ul style="line-height: 1.8;">
+          <li><strong>Atelier :</strong> ${title}</li>
+          <li><strong>Date :</strong> ${formattedDate} à ${formattedTime}</li>
+          <li><strong>Lieu :</strong> ${opts.location}</li>
+          <li><strong>Nom :</strong> ${opts.name}</li>
+          <li><strong>E-mail :</strong> ${opts.email}</li>
+          ${opts.phone ? `<li><strong>Téléphone :</strong> ${opts.phone}</li>` : ""}
+          <li><strong>Personnes :</strong> ${opts.seats}</li>
+        </ul>
+        ${details.length > 0 ? `<p style="line-height: 1.8;">${details.join("<br/>")}</p>` : ""}
+        <p style="font-size: 13px; color: #6b6558;">Pense à l'autoriser depuis le panneau admin pour envoyer la confirmation.</p>
       </div>
     `,
   });

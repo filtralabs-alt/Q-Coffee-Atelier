@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
-import { sendReservationConfirmation } from "./email";
+import { sendReservationConfirmation, sendNewReservationNotification } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
 
@@ -141,6 +141,26 @@ export async function registerRoutes(
       }
       const reservation = await storage.createReservation(parsed.data);
       res.json(reservation);
+
+      const row = await storage.getReservationWithAtelier(reservation.id);
+      if (row) {
+        sendNewReservationNotification({
+          atelierTheme: row.atelier.theme,
+          dateTime: row.atelier.dateTime,
+          location: row.atelier.location,
+          name: row.reservation.name,
+          email: row.reservation.email,
+          phone: row.reservation.phone,
+          seats: row.reservation.seats,
+          coffeeKnowledge: row.reservation.coffeeKnowledge,
+          homeBrewMethod: row.reservation.homeBrewMethod,
+          companyName: row.reservation.companyName,
+          eventGoal: row.reservation.eventGoal,
+          childAge: row.reservation.childAge,
+          parentAccompanying: row.reservation.parentAccompanying,
+          message: row.reservation.message,
+        }).catch((error) => console.error("Error sending new reservation notification:", error));
+      }
     } catch (error: any) {
       if (error?.message === "Not enough seats available") {
         return res.status(409).json({ message: "Not enough seats available" });
