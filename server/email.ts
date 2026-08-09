@@ -121,7 +121,7 @@ export async function sendNewReservationNotification(opts: {
   homeBrewMethod?: string | null;
   companyName?: string | null;
   eventGoal?: string | null;
-  childAge?: number | null;
+  childAges?: number[] | null;
   parentAccompanying?: boolean | null;
   message?: string | null;
 }) {
@@ -140,7 +140,7 @@ export async function sendNewReservationNotification(opts: {
   if (opts.homeBrewMethod) details.push(`Méthode à la maison : ${HOME_BREW_METHOD_LABELS_FR[opts.homeBrewMethod] || opts.homeBrewMethod}`);
   if (opts.companyName) details.push(`Entreprise : ${opts.companyName}`);
   if (opts.eventGoal) details.push(`Objectif : ${EVENT_GOAL_LABELS_FR[opts.eventGoal] || opts.eventGoal}`);
-  if (opts.childAge != null) details.push(`Âge de l'enfant : ${opts.childAge} ans`);
+  if (opts.childAges && opts.childAges.length > 0) details.push(`Âge des enfants : ${opts.childAges.join(", ")} ans`);
   if (opts.parentAccompanying != null) details.push(`Accompagné d'un parent : ${opts.parentAccompanying ? "Oui" : "Non"}`);
   if (opts.message) details.push(`Message : "${opts.message}"`);
 

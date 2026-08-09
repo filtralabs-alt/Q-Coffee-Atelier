@@ -246,7 +246,7 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   const [homeBrewMethod, setHomeBrewMethod] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [eventGoal, setEventGoal] = useState("");
-  const [childAge, setChildAge] = useState("");
+  const [childAges, setChildAges] = useState<string[]>([""]);
   const [parentAccompanying, setParentAccompanying] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -264,7 +264,9 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         homeBrewMethod: questionsMode === "coffee" ? homeBrewMethod || undefined : undefined,
         companyName: questionsMode === "team" ? companyName || undefined : undefined,
         eventGoal: questionsMode === "team" ? eventGoal || undefined : undefined,
-        childAge: questionsMode === "kids" && childAge ? childAge : undefined,
+        childAges: questionsMode === "kids"
+          ? childAges.slice(0, Number(seats) || 1).map((a) => (a ? parseInt(a, 10) : null)).filter((a): a is number => a != null)
+          : undefined,
         parentAccompanying: questionsMode === "kids" && parentAccompanying ? parentAccompanying === "yes" : undefined,
         message: message || undefined,
       });
@@ -394,10 +396,26 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
             )}
             {questionsMode === "kids" && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="reservation-child-age">{t("ateliers.reservation.childAge")}</Label>
-                  <Input id="reservation-child-age" type="number" min={0} max={17} value={childAge} onChange={(e) => setChildAge(e.target.value)} data-testid="input-reservation-child-age" />
-                </div>
+                {Array.from({ length: Math.max(1, Number(seats) || 1) }).map((_, i) => (
+                  <div className="space-y-2" key={i}>
+                    <Label htmlFor={`reservation-child-age-${i}`}>
+                      {t("ateliers.reservation.childAge")}{Number(seats) > 1 ? ` #${i + 1}` : ""}
+                    </Label>
+                    <Input
+                      id={`reservation-child-age-${i}`}
+                      type="number"
+                      min={0}
+                      max={17}
+                      value={childAges[i] ?? ""}
+                      onChange={(e) => {
+                        const next = [...childAges];
+                        next[i] = e.target.value;
+                        setChildAges(next);
+                      }}
+                      data-testid={`input-reservation-child-age-${i}`}
+                    />
+                  </div>
+                ))}
                 <div className="space-y-2">
                   <Label>{t("ateliers.reservation.parentAccompanying")}</Label>
                   <Select value={parentAccompanying} onValueChange={setParentAccompanying}>

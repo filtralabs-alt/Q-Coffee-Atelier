@@ -694,7 +694,7 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     </Button>
                   </div>
                 </div>
-                {(r.coffeeKnowledge || r.homeBrewMethod || r.companyName || r.eventGoal || r.childAge != null || r.parentAccompanying != null) && (
+                {(r.coffeeKnowledge || r.homeBrewMethod || r.companyName || r.eventGoal || (r.childAges && r.childAges.length > 0) || r.parentAccompanying != null) && (
                   <div className="flex flex-wrap gap-1">
                     {r.coffeeKnowledge && (
                       <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
@@ -714,8 +714,8 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                         {EVENT_GOALS.find((g) => g.id === r.eventGoal)?.fr || r.eventGoal}
                       </span>
                     )}
-                    {r.childAge != null && (
-                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">{r.childAge} ans</span>
+                    {r.childAges && r.childAges.length > 0 && (
+                      <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">{r.childAges.join(", ")} ans</span>
                     )}
                     {r.parentAccompanying != null && (
                       <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">

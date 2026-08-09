@@ -156,7 +156,7 @@ export async function registerRoutes(
           homeBrewMethod: row.reservation.homeBrewMethod,
           companyName: row.reservation.companyName,
           eventGoal: row.reservation.eventGoal,
-          childAge: row.reservation.childAge,
+          childAges: row.reservation.childAges,
           parentAccompanying: row.reservation.parentAccompanying,
           message: row.reservation.message,
         }).catch((error) => console.error("Error sending new reservation notification:", error));
