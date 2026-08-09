@@ -490,10 +490,16 @@ function AtelierCard({ atelier, testimonials, isPast, onReview, onReserve }: {
           <Clock className="h-3.5 w-3.5" />
           {date.toLocaleTimeString(lang === "fr" ? "fr-FR" : "pt-BR", { hour: "2-digit", minute: "2-digit" })}
         </span>
-        <span className="flex items-center gap-1">
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(atelier.location)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 underline decoration-dotted hover:text-foreground"
+          data-testid={`link-atelier-location-${atelier.id}`}
+        >
           <MapPin className="h-3.5 w-3.5" />
           {atelier.location}
-        </span>
+        </a>
       </div>
 
       {atelier.coffees && atelier.coffees.length > 0 && (

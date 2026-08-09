@@ -78,6 +78,7 @@ export async function sendReservationConfirmation(opts: {
   });
   const formattedDate = opts.dateTime.toLocaleDateString("fr-FR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const formattedTime = opts.dateTime.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(opts.location)}`;
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
@@ -91,7 +92,7 @@ export async function sendReservationConfirmation(opts: {
         <ul style="line-height: 1.8;">
           <li><strong>Date :</strong> ${formattedDate}</li>
           <li><strong>Heure :</strong> ${formattedTime}</li>
-          <li><strong>Lieu :</strong> ${opts.location}</li>
+          <li><strong>Lieu :</strong> <a href="${mapsLink}" style="color: #1E39B0;">${opts.location}</a></li>
           <li><strong>Personnes :</strong> ${opts.seats}</li>
         </ul>
         <p>
@@ -154,7 +155,7 @@ export async function sendNewReservationNotification(opts: {
         <ul style="line-height: 1.8;">
           <li><strong>Atelier :</strong> ${title}</li>
           <li><strong>Date :</strong> ${formattedDate} à ${formattedTime}</li>
-          <li><strong>Lieu :</strong> ${opts.location}</li>
+          <li><strong>Lieu :</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(opts.location)}" style="color: #1E39B0;">${opts.location}</a></li>
           <li><strong>Nom :</strong> ${opts.name}</li>
           <li><strong>E-mail :</strong> ${opts.email}</li>
           ${opts.phone ? `<li><strong>Téléphone :</strong> ${opts.phone}</li>` : ""}
