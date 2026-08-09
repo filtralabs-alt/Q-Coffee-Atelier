@@ -55,6 +55,7 @@ export interface IStorage {
   getReservationsByAtelier(atelierId: string): Promise<AtelierReservation[]>;
   createReservation(reservation: InsertAtelierReservation): Promise<AtelierReservation>;
   deleteReservation(id: string): Promise<void>;
+  acceptReservationPolicy(id: string): Promise<AtelierReservation | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -343,6 +344,14 @@ export class DatabaseStorage implements IStorage {
           .where(eq(ateliers.id, reservation.atelierId));
       }
     });
+  }
+
+  async acceptReservationPolicy(id: string): Promise<AtelierReservation | undefined> {
+    const [result] = await db.update(atelierReservations)
+      .set({ policyAccepted: true })
+      .where(eq(atelierReservations.id, id))
+      .returning();
+    return result;
   }
 }
 

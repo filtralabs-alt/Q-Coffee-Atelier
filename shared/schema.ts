@@ -143,8 +143,7 @@ export const atelierReservations = pgTable("atelier_reservations", {
 
 export const insertAtelierReservationSchema = createInsertSchema(atelierReservations, {
   seats: z.coerce.number().int().min(1).max(20),
-  policyAccepted: z.boolean().refine((v) => v === true, { message: "Vous devez accepter la politique d'annulation" }),
-}).omit({ id: true, createdAt: true });
+}).omit({ id: true, createdAt: true, policyAccepted: true });
 export type InsertAtelierReservation = z.infer<typeof insertAtelierReservationSchema>;
 export type AtelierReservation = typeof atelierReservations.$inferSelect;
 

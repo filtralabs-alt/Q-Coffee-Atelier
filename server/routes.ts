@@ -152,6 +152,19 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/reservations/:id/accept-policy", async (req, res) => {
+    try {
+      const reservation = await storage.acceptReservationPolicy(req.params.id);
+      if (!reservation) {
+        return res.status(404).json({ message: "Reservation not found" });
+      }
+      res.json(reservation);
+    } catch (error) {
+      console.error("Error accepting policy:", error);
+      res.status(500).json({ message: "Failed to accept policy" });
+    }
+  });
+
 
   app.post("/api/quiz-results", isAuthenticated, async (req: any, res) => {
     try {

@@ -219,12 +219,13 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   const [coffeeKnowledge, setCoffeeKnowledge] = useState("");
   const [homeBrewMethod, setHomeBrewMethod] = useState("");
   const [message, setMessage] = useState("");
-  const [policyAccepted, setPolicyAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [reservationId, setReservationId] = useState<string | null>(null);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", `/api/ateliers/${atelier.id}/reservations`, {
+      const res = await apiRequest("POST", `/api/ateliers/${atelier.id}/reservations`, {
         name,
         email,
         phone: phone || undefined,
@@ -232,11 +233,12 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         coffeeKnowledge: coffeeKnowledge || undefined,
         homeBrewMethod: homeBrewMethod || undefined,
         message: message || undefined,
-        policyAccepted,
       });
+      return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (created: { id: string }) => {
       setSubmitted(true);
+      setReservationId(created.id);
       queryClient.invalidateQueries({ queryKey: ["/api/ateliers"] });
     },
     onError: (error: any) => {
@@ -248,6 +250,14 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
     },
   });
 
+  const acceptPolicyMutation = useMutation({
+    mutationFn: async () => {
+      if (!reservationId) return;
+      await apiRequest("PATCH", `/api/reservations/${reservationId}/accept-policy`);
+    },
+    onSuccess: () => setPolicyAccepted(true),
+  });
+
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent data-testid="dialog-reservation">
@@ -256,8 +266,20 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
         </DialogHeader>
 
         {submitted ? (
-          <div className="py-4 text-center text-sm text-muted-foreground" data-testid="text-reservation-success">
-            {t("ateliers.reservation.success")}
+          <div className="py-2 space-y-4" data-testid="text-reservation-success">
+            <p className="text-center text-sm text-muted-foreground">{t("ateliers.reservation.success")}</p>
+            <div className="flex items-start gap-2 rounded-md border p-3">
+              <Checkbox
+                id="reservation-policy"
+                checked={policyAccepted}
+                onCheckedChange={(v) => v === true && acceptPolicyMutation.mutate()}
+                disabled={policyAccepted || acceptPolicyMutation.isPending}
+                data-testid="checkbox-reservation-policy"
+              />
+              <Label htmlFor="reservation-policy" className="text-xs font-normal leading-snug text-muted-foreground">
+                {t("ateliers.reservation.policy")}
+              </Label>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -315,17 +337,6 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
               <Label htmlFor="reservation-message">{t("ateliers.reservation.message")}</Label>
               <Textarea id="reservation-message" rows={2} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-reservation-message" />
             </div>
-            <div className="flex items-start gap-2 pt-1">
-              <Checkbox
-                id="reservation-policy"
-                checked={policyAccepted}
-                onCheckedChange={(v) => setPolicyAccepted(v === true)}
-                data-testid="checkbox-reservation-policy"
-              />
-              <Label htmlFor="reservation-policy" className="text-xs font-normal leading-snug text-muted-foreground">
-                {t("ateliers.reservation.policy")}
-              </Label>
-            </div>
           </div>
         )}
 
@@ -339,7 +350,7 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
               </Button>
               <Button
                 onClick={() => submitMutation.mutate()}
-                disabled={!name.trim() || !email.trim() || !seats || !policyAccepted || submitMutation.isPending}
+                disabled={!name.trim() || !email.trim() || !seats || submitMutation.isPending}
                 data-testid="button-reservation-submit"
               >
                 {submitMutation.isPending ? t("ateliers.reservation.submitting") : t("ateliers.reservation.submit")}
