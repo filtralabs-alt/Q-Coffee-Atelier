@@ -116,6 +116,21 @@ function ThemeBanners() {
   );
 }
 
+function AboutHost() {
+  const { t } = useI18n();
+  return (
+    <Card className="p-5 space-y-3" data-testid="card-about-host">
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("ateliers.about.title")}</h2>
+      <p className="text-sm leading-relaxed text-muted-foreground">{t("ateliers.about.bio")}</p>
+      <div className="flex flex-wrap gap-1.5 pt-1">
+        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.polygone")}</Badge>
+        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.worldOfCoffee")}</Badge>
+        <Badge variant="secondary" className="text-[10px] font-normal">{t("ateliers.about.clermontWeek")}</Badge>
+      </div>
+    </Card>
+  );
+}
+
 function ReviewDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
@@ -573,6 +588,10 @@ export default function AteliersPage() {
 
       <div className="px-5 pt-2">
         <ThemeBanners />
+      </div>
+
+      <div className="px-5 pt-4">
+        <AboutHost />
       </div>
 
       <div className="flex-1 px-5 pb-4 space-y-6">

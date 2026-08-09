@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
+import { sendReservationConfirmation } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
 
@@ -416,6 +417,28 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting reservation:", error);
       res.status(500).json({ message: "Failed to delete reservation" });
+    }
+  });
+
+  app.post("/api/admin/reservations/:id/confirm", isAdmin, async (req, res) => {
+    try {
+      const row = await storage.getReservationWithAtelier(req.params.id);
+      if (!row) {
+        return res.status(404).json({ message: "Reservation not found" });
+      }
+      await sendReservationConfirmation({
+        to: row.reservation.email,
+        name: row.reservation.name,
+        atelierTheme: row.atelier.theme,
+        dateTime: row.atelier.dateTime,
+        location: row.atelier.location,
+        seats: row.reservation.seats,
+      });
+      const updated = await storage.markReservationConfirmed(req.params.id);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error confirming reservation:", error);
+      res.status(500).json({ message: "Failed to confirm reservation" });
     }
   });
 

@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Users, Coffee, MapPin, Award, LogOut, Eye, EyeOff,
-  Plus, Pencil, Trash2, Save, X, BookOpen, Calendar, Star, Check,
+  Plus, Pencil, Trash2, Save, X, BookOpen, Calendar, Star, Check, Mail,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -629,6 +629,19 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
     },
   });
 
+  const confirmMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("POST", `/api/admin/reservations/${id}/confirm`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/ateliers/${atelier.id}/reservations`] });
+      toast({ title: "Confirmation envoyée par e-mail" });
+    },
+    onError: () => {
+      toast({ title: "Échec de l'envoi de la confirmation", variant: "destructive" });
+    },
+  });
+
   const totalSeats = reservations?.reduce((sum, r) => sum + r.seats, 0) ?? 0;
 
   return (
@@ -653,15 +666,33 @@ function AtelierReservationsDialog({ atelier, onClose }: { atelier: Atelier; onC
                     <p className="font-medium text-sm truncate">{r.name} · {r.seats} pers.</p>
                     <p className="text-xs text-muted-foreground truncate">{r.email}{r.phone ? ` · ${r.phone}` : ""}</p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive shrink-0"
-                    onClick={() => deleteMutation.mutate(r.id)}
-                    data-testid={`button-admin-cancel-reservation-${r.id}`}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {r.status === "confirmed" ? (
+                      <span className="text-[10px] text-primary flex items-center gap-1 whitespace-nowrap">
+                        <Check className="h-3 w-3" /> Autorisé
+                      </span>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => confirmMutation.mutate(r.id)}
+                        disabled={confirmMutation.isPending}
+                        data-testid={`button-admin-confirm-reservation-${r.id}`}
+                        title="Autoriser et envoyer la confirmation par e-mail"
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                      onClick={() => deleteMutation.mutate(r.id)}
+                      data-testid={`button-admin-cancel-reservation-${r.id}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 {(r.coffeeKnowledge || r.homeBrewMethod || r.companyName || r.eventGoal || r.childAge != null || r.parentAccompanying != null) && (
                   <div className="flex flex-wrap gap-1">

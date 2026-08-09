@@ -56,6 +56,8 @@ export interface IStorage {
   createReservation(reservation: InsertAtelierReservation): Promise<AtelierReservation>;
   deleteReservation(id: string): Promise<void>;
   acceptReservationPolicy(id: string): Promise<AtelierReservation | undefined>;
+  getReservationWithAtelier(id: string): Promise<{ reservation: AtelierReservation; atelier: Atelier } | undefined>;
+  markReservationConfirmed(id: string): Promise<AtelierReservation>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -349,6 +351,22 @@ export class DatabaseStorage implements IStorage {
   async acceptReservationPolicy(id: string): Promise<AtelierReservation | undefined> {
     const [result] = await db.update(atelierReservations)
       .set({ policyAccepted: true })
+      .where(eq(atelierReservations.id, id))
+      .returning();
+    return result;
+  }
+
+  async getReservationWithAtelier(id: string): Promise<{ reservation: AtelierReservation; atelier: Atelier } | undefined> {
+    const [row] = await db.select({ reservation: atelierReservations, atelier: ateliers })
+      .from(atelierReservations)
+      .innerJoin(ateliers, eq(atelierReservations.atelierId, ateliers.id))
+      .where(eq(atelierReservations.id, id));
+    return row;
+  }
+
+  async markReservationConfirmed(id: string): Promise<AtelierReservation> {
+    const [result] = await db.update(atelierReservations)
+      .set({ status: "confirmed", confirmationEmailSentAt: new Date() })
       .where(eq(atelierReservations.id, id))
       .returning();
     return result;

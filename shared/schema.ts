@@ -142,12 +142,14 @@ export const atelierReservations = pgTable("atelier_reservations", {
   parentAccompanying: boolean("parent_accompanying"),
   message: text("message"),
   policyAccepted: boolean("policy_accepted").notNull().default(false),
+  status: varchar("status").notNull().default("pending"),
+  confirmationEmailSentAt: timestamp("confirmation_email_sent_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertAtelierReservationSchema = createInsertSchema(atelierReservations, {
   seats: z.coerce.number().int().min(1).max(20),
-}).omit({ id: true, createdAt: true, policyAccepted: true });
+}).omit({ id: true, createdAt: true, policyAccepted: true, status: true, confirmationEmailSentAt: true });
 export type InsertAtelierReservation = z.infer<typeof insertAtelierReservationSchema>;
 export type AtelierReservation = typeof atelierReservations.$inferSelect;
 
