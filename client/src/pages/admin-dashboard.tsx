@@ -332,7 +332,7 @@ function SpotsTab() {
           </div>
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
-              <Label>Destaque (carrossel)</Label>
+              <Label>Loja online (carrossel)</Label>
               <p className="text-xs text-muted-foreground">Aparece no carrossel de destaques da página Spots</p>
             </div>
             <Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} data-testid="switch-admin-spot-featured" />
@@ -377,7 +377,7 @@ function SpotsTab() {
           <div className="min-w-0">
             <p className="font-medium text-sm truncate flex items-center gap-1.5">
               {spot.name}
-              {spot.featured && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">Destaque</span>}
+              {spot.featured && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">Loja online</span>}
             </p>
             <p className="text-xs text-muted-foreground">
               {spot.city}
