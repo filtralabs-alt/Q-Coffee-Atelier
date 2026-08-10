@@ -38,6 +38,7 @@ export const tastingEntries = pgTable("tasting_entries", {
   spotId: varchar("spot_id").references(() => coffeeSpots.id),
   tastingLocation: varchar("tasting_location"),
   tastingLocationOther: varchar("tasting_location_other"),
+  atelierType: varchar("atelier_type"),
   serviceNotes: text("service_notes"),
   favoriteMethod: boolean("favorite_method").default(false),
   wouldDrinkAgain: varchar("would_drink_again").default("maybe"),

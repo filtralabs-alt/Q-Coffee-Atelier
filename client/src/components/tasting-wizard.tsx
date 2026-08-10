@@ -44,6 +44,10 @@ export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
   const [spotId, setSpotId] = useState(editEntry?.spotId ?? "");
   const [tastingLocation, setTastingLocation] = useState(editEntry?.tastingLocation ?? "");
   const [tastingLocationOther, setTastingLocationOther] = useState(editEntry?.tastingLocationOther ?? "");
+  const [atelierType, setAtelierType] = useState(editEntry?.atelierType ?? "");
+  const [spotIsOther, setSpotIsOther] = useState(
+    editEntry?.tastingLocation === "coffeeshop" && !editEntry?.spotId && !!editEntry?.tastingLocationOther
+  );
   const [serviceNotes, setServiceNotes] = useState(editEntry?.serviceNotes ?? "");
   const [favoriteMethod, setFavoriteMethod] = useState(editEntry?.favoriteMethod ?? false);
   const [wouldDrinkAgain, setWouldDrinkAgain] = useState(editEntry?.wouldDrinkAgain ?? "maybe");
@@ -66,9 +70,13 @@ export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
         bitterness,
         sweetness,
         notes: notes || null,
-        spotId: spotId || null,
+        spotId: tastingLocation === "coffeeshop" && !spotIsOther ? (spotId || null) : null,
         tastingLocation: tastingLocation || null,
-        tastingLocationOther: tastingLocation === "other" ? tastingLocationOther : null,
+        tastingLocationOther:
+          tastingLocation === "other" || (tastingLocation === "coffeeshop" && spotIsOther)
+            ? tastingLocationOther
+            : null,
+        atelierType: tastingLocation === "atelier" ? atelierType || null : null,
         serviceNotes: serviceNotes || null,
         favoriteMethod,
         wouldDrinkAgain,
@@ -299,7 +307,10 @@ export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
                 value={tastingLocation}
                 onValueChange={(v) => {
                   setTastingLocation(v);
-                  if (v !== "atelier") setSpotId("");
+                  setSpotId("");
+                  setSpotIsOther(false);
+                  setAtelierType("");
+                  setTastingLocationOther("");
                 }}
               >
                 <SelectTrigger data-testid="select-tasting-location">
@@ -309,9 +320,11 @@ export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
                   <SelectItem value="home">{t("wizard.location.home")}</SelectItem>
                   <SelectItem value="work">{t("wizard.location.work")}</SelectItem>
                   <SelectItem value="atelier">{t("wizard.location.atelier")}</SelectItem>
+                  <SelectItem value="coffeeshop">{t("wizard.location.coffeeshop")}</SelectItem>
                   <SelectItem value="other">{t("wizard.location.other")}</SelectItem>
                 </SelectContent>
               </Select>
+
               {tastingLocation === "other" && (
                 <Input
                   value={tastingLocationOther}
@@ -320,17 +333,51 @@ export function TastingWizard({ onClose, editEntry }: TastingWizardProps) {
                   data-testid="input-tasting-location-other"
                 />
               )}
+
               {tastingLocation === "atelier" && (
-                <Select value={spotId} onValueChange={setSpotId}>
+                <Select value={atelierType} onValueChange={setAtelierType}>
+                  <SelectTrigger data-testid="select-atelier-type">
+                    <SelectValue placeholder={t("wizard.atelierType.select")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="degustation">{t("wizard.atelierType.degustation")}</SelectItem>
+                    <SelectItem value="team-building">{t("wizard.atelierType.teamBuilding")}</SelectItem>
+                    <SelectItem value="peinture-enfants">{t("wizard.atelierType.painting")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
+              {tastingLocation === "coffeeshop" && (
+                <Select
+                  value={spotIsOther ? "__other__" : spotId}
+                  onValueChange={(v) => {
+                    if (v === "__other__") {
+                      setSpotIsOther(true);
+                      setSpotId("");
+                    } else {
+                      setSpotIsOther(false);
+                      setSpotId(v);
+                    }
+                  }}
+                >
                   <SelectTrigger data-testid="select-spot">
-                    <SelectValue placeholder={lang === "fr" ? "Quel atelier / café ?" : "Qual atelier / café?"} />
+                    <SelectValue placeholder={t("wizard.coffeeshop.select")} />
                   </SelectTrigger>
                   <SelectContent>
                     {spots.map((s) => (
                       <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                     ))}
+                    <SelectItem value="__other__">{t("wizard.coffeeshop.other")}</SelectItem>
                   </SelectContent>
                 </Select>
+              )}
+              {tastingLocation === "coffeeshop" && spotIsOther && (
+                <Input
+                  value={tastingLocationOther}
+                  onChange={(e) => setTastingLocationOther(e.target.value)}
+                  placeholder={t("wizard.coffeeshopOther")}
+                  data-testid="input-coffeeshop-other"
+                />
               )}
             </div>
 
