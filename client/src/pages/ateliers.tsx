@@ -19,7 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
-import { Calendar, Clock, MapPin, Coffee, Star, MessageSquarePlus, ChevronLeft, ChevronRight, Euro, CalendarCheck } from "lucide-react";
+import { Calendar, Clock, MapPin, Coffee, Star, MessageSquarePlus, ChevronLeft, ChevronRight, Euro, CalendarCheck, Linkedin } from "lucide-react";
+import { SiInstagram } from "react-icons/si";
 import crisPhoto from "@assets/cris-duarte-bio.png";
 
 function formatPrice(price: string): { value: string; hasIcon: boolean } {
@@ -131,6 +132,26 @@ function AboutHost() {
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t("ateliers.about.title")}</h2>
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">{t("ateliers.about.bio")}</p>
+      <div className="flex items-center gap-3">
+        <a
+          href="https://www.linkedin.com/in/cris-chal-duarte/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground"
+          data-testid="link-about-linkedin"
+        >
+          <Linkedin className="h-4 w-4" />
+        </a>
+        <a
+          href="https://www.instagram.com/obaristech/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground"
+          data-testid="link-about-instagram"
+        >
+          <SiInstagram className="h-4 w-4" />
+        </a>
+      </div>
       <div className="flex flex-wrap gap-1.5 pt-1">
         <Badge variant="secondary" className="text-[10px] font-normal whitespace-normal text-left max-w-full">{t("ateliers.about.polygone")}</Badge>
         <Badge variant="secondary" className="text-[10px] font-normal whitespace-normal text-left max-w-full">{t("ateliers.about.worldOfCoffee")}</Badge>
