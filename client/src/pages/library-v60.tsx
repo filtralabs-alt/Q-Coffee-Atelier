@@ -20,11 +20,11 @@ const POURS: Pour[] = [
   {
     start: 0,
     end: 45,
-    cumulative: 48,
+    cumulative: 40,
     label: { fr: "Bloom", pt: "Bloom" },
     text: {
-      fr: "Floraison (bloom) — le CO₂ s'échappe, prépare le grain pour une extraction homogène.",
-      pt: "Floração (bloom) — o CO₂ escapa, preparando o grão para uma extração uniforme.",
+      fr: "Versez environ 40 ml d'eau (≈2× le poids du café) en mouvement circulaire et attendez 30 à 45 s : le café libère son CO₂.",
+      pt: "Despeje cerca de 40ml de água (≈2× o peso do café) em movimento circular e espere 30 a 45s para o café liberar CO₂.",
     },
   },
   {
