@@ -105,11 +105,20 @@ const KETTLE_INK = "#956052";
 function Kettle({ pouring }: { pouring: boolean }) {
   return (
     <motion.div
-      animate={{ rotate: pouring ? -4 : 0 }}
-      transition={{ duration: 0.4, ease: easeOut }}
+      animate={{
+        rotate: pouring ? -4 : 0,
+        x: pouring ? [0, 3, 0, -3, 0] : 0,
+        y: pouring ? [0, 2, 4, 2, 0] : 0,
+      }}
+      transition={{
+        rotate: { duration: 0.4, ease: easeOut },
+        x: { duration: 1.4, repeat: pouring ? Infinity : 0, ease: "easeInOut" },
+        y: { duration: 1.4, repeat: pouring ? Infinity : 0, ease: "easeInOut" },
+      }}
       style={{ transformOrigin: "50% 30%" }}
+      className="relative"
     >
-      <svg width="90" height="117" viewBox="10 18 100 130" fill="none">
+      <svg width="95" height="90" viewBox="8 16 102 96" fill="none">
         {/* steam / decorative flourish off the lid */}
         <path
           d="M71.8,38.3c-3.3-3.5-3.1-9,.4-12.3s9-3.1,12.3.4,1.2,1.5,1.6,2.3c0,0,6.3-3.2,11.2,3,0,0,5.6-.8,9.1,2.8"
@@ -117,29 +126,22 @@ function Kettle({ pouring }: { pouring: boolean }) {
         />
         {/* spout tip accent */}
         <path
-          d="M52.8,37.7l-3.3,3.1c-.2.2-.2.5,0,.7l6.3,5,2.3-2.2-4.7-6.6c-.2-.2-.5-.3-.7,0Z"
+          d="M52.8,37.7l-3.3,3.1c-.2.2-.2.5,0,.7l6.3,5,2.3-2.2-4.7-6.6c-.2-.2-.5-.3-.7,0h.1Z"
           fill={KETTLE_INK}
         />
         {/* kettle body */}
         <path
-          d="M57,45.4l9.3-8.8c.4-.3.8-.5,1.3-.5,6.9.6,10.3,6.8,10.3,6.8,6.4,0,11,8.1,11,8.1,8.9,2.3,11,9.1,11,9.1,7.4,1.2,10.6,7,12,10.7.6,1.7.2,3.6-1.2,4.9l-13.4,12.6-13.4,12.6c-1.3,1.2-3.3,1.6-4.9.9-3.5-1.6-9.2-5.2-9.9-12.6,0,0-6.7-2.6-8.4-11.6,0,0-7.8-5.1-7.4-11.4,0,0-6-3.7-6.1-10.6,0-.5.2-.9.6-1.3l9.3-8.8Z"
+          d="M57,45.4l9.3-8.8c.4-.3.8-.5,1.3-.5,6.9.6,10.3,6.8,10.3,6.8,6.4,0,11,8.1,11,8.1,8.9,2.3,11,9.1,11,9.1,7.4,1.2,10.6,7,12,10.7.6,1.7.2,3.6-1.2,4.9l-13.4,12.6-13.4,12.6c-1.3,1.2-3.3,1.6-4.9.9-3.5-1.6-9.2-5.2-9.9-12.6,0,0-6.7-2.6-8.4-11.6,0,0-7.8-5.1-7.4-11.4,0,0-6-3.7-6.1-10.6,0-.5.2-.9.6-1.3l9.3-8.8h-.1Z"
           fill="#ccbaa6" stroke={KETTLE_INK} strokeWidth=".8"
         />
         {/* diagonal body sheen lines */}
-        {[
-          "M47.3,57.1 69.3,36.4",
-          "M53.3,66.1 77.9,42.9",
-          "M60.7,77.5 88.8,51.1",
-          "M69.1,89.1 99.9,60.1",
-        ].map((pts) => {
-          const [a, b] = pts.split(" ");
-          const [x1, y1] = a.split(",");
-          const [x2, y2] = b.split(",");
-          return <line key={pts} x1={x1} y1={y1} x2={x2} y2={y2} stroke={KETTLE_INK} strokeWidth=".8" />;
-        })}
-        {/* gooseneck spout sweep */}
+        <line x1="47.3" y1="57.1" x2="69.3" y2="36.4" stroke={KETTLE_INK} strokeWidth=".8" />
+        <line x1="53.3" y1="66.1" x2="77.9" y2="42.9" stroke={KETTLE_INK} strokeWidth=".8" />
+        <line x1="60.7" y1="77.5" x2="88.8" y2="51.1" stroke={KETTLE_INK} strokeWidth=".8" />
+        <line x1="69.1" y1="89.1" x2="99.9" y2="60.1" stroke={KETTLE_INK} strokeWidth=".8" />
+        {/* handle sweep, curling down to the spout opening */}
         <path
-          d="M17.1,88.5c0-.5.3-1,.7-1.3,3.8-2.9,12.4-7.3,24.4,0,.2,0,3.8,2.4,9.7,8.5h0c0,0,0,.1,0,.1,0,0,3.4,4,8.8,4.2,4,.2,8.2-1.8,12.4-5.9.3-.3.7-.3,1,0l2,2c.3.3.2.7,0,.9-5.1,5-10.4,7.4-15.6,7.1-6.8-.3-11-5-11.6-5.6-5.5-5.7-8.9-7.8-8.9-7.9-13.3-8.1-20.9.7-21.3,1l-3.4,3.2c-.2.2-.5,0-.4-.3.7-1.4,1.8-3.8,2.1-6.3Z"
+          d="M17.8,87.2c3.8-2.9,12.4-7.3,24.4,0,.2,0,3.8,2.4,9.7,8.5h0s3.4,4.1,8.8,4.3c4,.2,8.2-1.8,12.4-5.9.3-.3.7-.3,1,0l2,2c.3.3.2.7,0,.9-5.1,5-10.4,7.4-15.6,7.1-6.8-.3-11-5-11.6-5.6-5.5-5.7-8.9-7.8-8.9-7.9-13.3-8.1-20.9.7-21.3,1l-3.4,3.2c-.2.2-.5,0-.4-.3.7-1.4,1.8-3.8,2.1-6.3,0,0,.4-.7.8-1Z"
           fill="#ccbaa6" stroke={KETTLE_INK} strokeWidth=".8"
         />
         {/* spout inner contour */}
@@ -148,20 +150,25 @@ function Kettle({ pouring }: { pouring: boolean }) {
           fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" strokeLinejoin="round"
         />
         {/* small highlight marks */}
-        <path d="M55.1,67.6c0-.3,0-.6,0-.9" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
-        <path d="M61.6,76.1c0,0-4.8-3.2-6.2-7.2" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
+        <path d="M55.1,67.6v-.9" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
+        <path d="M61.6,76.1s-4.8-3.2-6.2-7.2" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
         <path d="M103.2,62.9c3.9,1.9,6,5.4,7.1,8.4" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
-        <path d="M100.8,62.1c.4.1.8.2,1.2.4" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
-
-        {/* water stream — the only piece that toggles */}
-        <motion.path
-          d="M14,98c0,18.8-.4,25.4-.4,44.3s2.3,3.6,2.3,1.7c0-18.8,0-33.3,0-52.2s-1.9,3.1-1.9,5.1v1.1Z"
-          fill="#b4d5d8"
-          initial={false}
-          animate={{ opacity: pouring ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        />
+        <path d="M100.8,62.1c.4,0,.8.2,1.2.4" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
       </svg>
+
+      {/* water stream — falls from the spout opening toward the dripper below */}
+      <AnimatePresence>
+        {pouring && (
+          <motion.div
+            initial={{ opacity: 0, scaleY: 0.3 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0.3 }}
+            transition={{ duration: 0.2 }}
+            style={{ transformOrigin: "top" }}
+            className="absolute left-[9px] top-[65px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -393,7 +400,7 @@ export default function LibraryV60Page() {
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-col items-center">
-          <div style={{ transform: "translateX(41px)" }}>
+          <div style={{ transform: "translateX(38px)" }}>
             <Kettle pouring={display.pouring} />
           </div>
           <Dripper weight={display.weight} />
