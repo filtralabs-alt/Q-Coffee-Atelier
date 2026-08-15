@@ -103,7 +103,7 @@ function getPourIndex(t: number) {
 function Kettle({ pouring }: { pouring: boolean }) {
   return (
     <motion.div
-      animate={{ rotate: pouring ? -34 : 0 }}
+      animate={{ rotate: pouring ? -20 : 0 }}
       transition={{ duration: 0.45, ease: easeOut }}
       style={{ transformOrigin: "16% 90%" }}
       className="relative"
@@ -157,7 +157,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
             exit={{ opacity: 0, scaleY: 0.3 }}
             transition={{ duration: 0.2 }}
             style={{ transformOrigin: "top" }}
-            className="absolute left-[69px] top-[42px] h-16 w-[3px] rounded-full bg-gradient-to-b from-[hsl(var(--chart-1))] to-[hsl(var(--chart-1)/0.2)]"
+            className="absolute left-[69px] top-[42px] h-12 w-[3px] rounded-full bg-gradient-to-b from-[hsl(var(--chart-1))] to-[hsl(var(--chart-1)/0.2)]"
           />
         )}
       </AnimatePresence>
@@ -393,8 +393,8 @@ export default function LibraryV60Page() {
         transition={{ duration: 0.5, delay: 0.15, ease: easeOut }}
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
-        <div className="flex items-start justify-center gap-3">
-          <div className="pt-1">
+        <div className="flex flex-col items-center">
+          <div style={{ transform: "translateX(-26px)" }}>
             <Kettle pouring={display.pouring} />
           </div>
           <Dripper weight={display.weight} />
