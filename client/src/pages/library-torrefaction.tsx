@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { Link } from "wouter";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, HelpCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, HelpCircle, Sparkles, Hand } from "lucide-react";
 
 type Lang = "fr" | "pt";
 
@@ -209,6 +210,218 @@ function Callout({
         <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">{title}</h3>
       </div>
       <div className="text-sm leading-relaxed text-muted-foreground">{children}</div>
+    </motion.div>
+  );
+}
+
+const CRACK_1 = 0.4;
+const CRACK_2 = 0.72;
+
+const roastColorStops: { p: number; hex: string }[] = [
+  { p: 0, hex: "#8FA35E" },
+  { p: 0.15, hex: "#C7B355" },
+  { p: CRACK_1, hex: "#A9743A" },
+  { p: 0.56, hex: "#7C4A26" },
+  { p: CRACK_2, hex: "#4A2E1C" },
+  { p: 1, hex: "#221410" },
+];
+
+function hexToRgb(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function roastColor(p: number) {
+  for (let i = 0; i < roastColorStops.length - 1; i++) {
+    const a = roastColorStops[i];
+    const b = roastColorStops[i + 1];
+    if (p >= a.p && p <= b.p) {
+      const t = (p - a.p) / (b.p - a.p || 1);
+      const ca = hexToRgb(a.hex);
+      const cb = hexToRgb(b.hex);
+      const r = Math.round(lerp(ca.r, cb.r, t));
+      const g = Math.round(lerp(ca.g, cb.g, t));
+      const bl = Math.round(lerp(ca.b, cb.b, t));
+      return `rgb(${r}, ${g}, ${bl})`;
+    }
+  }
+  return roastColorStops[roastColorStops.length - 1].hex;
+}
+
+interface RoastZone {
+  id: string;
+  max: number;
+  title: { fr: string; pt: string };
+  text: { fr: string; pt: string };
+}
+
+const roastZones: RoastZone[] = [
+  {
+    id: "green",
+    max: 0.1,
+    title: { fr: "Grain vert", pt: "Grão verde" },
+    text: {
+      fr: "Pas encore torréfié — aucun arôme de café développé.",
+      pt: "Ainda não torrado — nenhum aroma de café se desenvolveu.",
+    },
+  },
+  {
+    id: "light",
+    max: CRACK_1,
+    title: { fr: "Torréfaction claire", pt: "Torra clara" },
+    text: {
+      fr: "Potentiel qualitatif maximal : acidité vive, arômes floraux et fruités du terroir intacts.",
+      pt: "Potencial qualitativo máximo: acidez viva, aromas florais e frutados do terroir intactos.",
+    },
+  },
+  {
+    id: "specialty",
+    max: CRACK_2,
+    title: { fr: "Zone du café de spécialité", pt: "Zona do café especial" },
+    text: {
+      fr: "Équilibre entre acidité, arômes et corps — c'est ici que la richesse du terroir s'exprime le mieux.",
+      pt: "Equilíbrio entre acidez, aroma e corpo — é aqui que a riqueza do terroir se expressa melhor.",
+    },
+  },
+  {
+    id: "tipping",
+    max: 0.85,
+    title: { fr: "Point de bascule", pt: "Ponto de virada" },
+    text: {
+      fr: "L'acidité chute, les arômes d'origine s'effacent au profit de notes de fumée et d'amertume.",
+      pt: "A acidez cai, os aromas de origem dão lugar a notas de fumaça e amargor.",
+    },
+  },
+  {
+    id: "industrial",
+    max: 1.01,
+    title: { fr: "Torréfaction industrielle", pt: "Torra industrial" },
+    text: {
+      fr: "Le goût du terroir a disparu. N'importe quel grain — même médiocre — donne ce résultat : c'est ainsi qu'on masque les défauts d'un café bas de gamme.",
+      pt: "O sabor do terroir desapareceu. Qualquer grão — até um medíocre — chega nesse resultado: é assim que se mascaram os defeitos de um café de baixa qualidade.",
+    },
+  },
+];
+
+function getRoastZone(p: number) {
+  return roastZones.find((z) => p <= z.max) ?? roastZones[roastZones.length - 1];
+}
+
+function clamp01(n: number) {
+  return Math.max(0, Math.min(1, n));
+}
+
+function RoastSlider({ lang }: { lang: Lang }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
+  const [trackWidth, setTrackWidth] = useState(0);
+  const [progress, setProgress] = useState(0.18);
+  const x = useMotionValue(0);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const measure = () => setTrackWidth(el.offsetWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!trackWidth || initialized.current) return;
+    initialized.current = true;
+    x.set(progress * trackWidth);
+  }, [trackWidth, progress, x]);
+
+  const color = roastColor(progress);
+  const zone = getRoastZone(progress);
+  const glow = clamp01((progress - 0.8) / 0.2);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.5, ease: easeOut }}
+      className="mx-5 rounded-xl border bg-card p-5"
+    >
+      <div className="mb-1 flex items-center gap-2">
+        <Hand className="h-3.5 w-3.5 text-primary" />
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">
+          {lang === "pt" ? "Experimente você mesmo" : "Essayez vous-même"}
+        </h3>
+      </div>
+      <p className="mb-6 text-xs text-muted-foreground">
+        {lang === "pt"
+          ? "Arraste o grão ao longo da linha de torrefação."
+          : "Faites glisser le grain le long de la ligne de torréfaction."}
+      </p>
+
+      <div ref={trackRef} className="relative mx-2 mt-4 h-1.5 rounded-full bg-gradient-to-r from-[#8FA35E] via-[#A9743A] to-[#221410]">
+        <div
+          className="absolute top-1/2 h-4 w-px -translate-y-1/2 bg-foreground/30"
+          style={{ left: `${CRACK_1 * 100}%` }}
+        />
+        <span
+          className="absolute -top-5 -translate-x-1/2 whitespace-nowrap text-[9px] text-muted-foreground"
+          style={{ left: `${CRACK_1 * 100}%` }}
+        >
+          1er crack
+        </span>
+        <div
+          className="absolute top-1/2 h-4 w-px -translate-y-1/2 bg-foreground/30"
+          style={{ left: `${CRACK_2 * 100}%` }}
+        />
+        <span
+          className="absolute -top-5 -translate-x-1/2 whitespace-nowrap text-[9px] text-muted-foreground"
+          style={{ left: `${CRACK_2 * 100}%` }}
+        >
+          2e crack
+        </span>
+
+        <motion.div
+          drag="x"
+          dragConstraints={{ left: 0, right: trackWidth }}
+          dragElastic={0}
+          dragMomentum={false}
+          style={{ x }}
+          onDrag={() => setProgress(clamp01(trackWidth ? x.get() / trackWidth : 0))}
+          whileTap={{ scale: 1.08 }}
+          className="absolute top-1/2 left-0 -translate-y-1/2 cursor-grab touch-none active:cursor-grabbing"
+        >
+          <div
+            className="rounded-full"
+            style={{
+              boxShadow: glow > 0 ? `0 0 ${8 + glow * 14}px ${2 + glow * 4}px rgba(0,0,0,${0.15 + glow * 0.25})` : undefined,
+            }}
+          >
+            <Bean color={color} size={34} />
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="mt-7 min-h-[64px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={zone.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+              <h4 className="text-xs font-semibold text-foreground">{zone.title[lang]}</h4>
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{zone.text[lang]}</p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
@@ -489,6 +702,8 @@ export default function LibraryTorrefactionPage() {
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{copy.devCaption[lang]}</p>
         </motion.div>
+
+        <RoastSlider lang={lang} />
 
         <Callout icon={Sparkles} title={copy.acidTitle[lang]}>
           {copy.acidBody[lang]}
