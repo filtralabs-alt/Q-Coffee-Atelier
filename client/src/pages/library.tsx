@@ -122,6 +122,29 @@ export default function LibraryPage() {
           const desc = lang === "pt" ? mod.descPt : mod.descFr;
           const content = lang === "pt" ? mod.contentPt : mod.contentFr;
 
+          if (mod.key === "v60") {
+            return (
+              <motion.div key={mod.id} variants={itemVariants}>
+                <Link href="/library/v60" className="block" data-testid={`link-module-${mod.key}`}>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }}>
+                    <Card className="p-5 hover-elevate bg-primary/5 border-primary/20">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-md bg-primary/15 flex items-center justify-center flex-shrink-0">
+                          <IconComp className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm">{title}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{desc}</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
+                      </div>
+                    </Card>
+                  </motion.div>
+                </Link>
+              </motion.div>
+            );
+          }
+
           if (mod.externalUrl) {
             return (
               <motion.a
