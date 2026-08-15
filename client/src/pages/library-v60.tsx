@@ -105,16 +105,49 @@ function Kettle({ pouring }: { pouring: boolean }) {
     <motion.div
       animate={{ rotate: pouring ? -34 : 0 }}
       transition={{ duration: 0.45, ease: easeOut }}
-      style={{ transformOrigin: "20% 85%" }}
+      style={{ transformOrigin: "16% 90%" }}
       className="relative"
     >
-      <svg width="92" height="76" viewBox="0 0 92 76" fill="none">
+      <svg width="86" height="78" viewBox="0 0 110 100" fill="none">
+        {/* electric base plate */}
+        <rect x="4" y="88" width="102" height="9" rx="3" fill="#3F4D45" />
+        <circle cx="94" cy="92.5" r="2.6" fill="#5F7568" />
+
+        {/* gooseneck spout — long and slender, mirrored to pour rightward */}
         <path
-          d="M14 20 L58 20 C66 20 72 26 72 34 L86 38 C90 39 90 45 86 46 L72 46 L70 60 C69 66 64 70 58 70 L20 70 C13 70 8 65 8 58 L8 30 C8 24 10 20 14 20 Z"
-          fill="hsl(var(--foreground) / 0.92)"
+          d="M72 26 C92 18 110 22 108 40 C107 53 97 60 88 53"
+          stroke="#5F7568"
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          fill="none"
         />
-        <rect x="6" y="56" width="18" height="14" rx="3" fill="#7C4A26" />
-        <rect x="4" y="16" width="10" height="10" rx="3" fill="#7C4A26" />
+
+        {/* conical body */}
+        <path
+          d="M18 90
+             Q14 90 15 85
+             L40 28
+             Q42 22 48 22
+             L62 22
+             Q68 22 70 28
+             L95 85
+             Q96 90 92 90
+             Z"
+          fill="#5F7568"
+        />
+
+        {/* handle connector */}
+        <rect x="9" y="35" width="9" height="10" rx="2" fill="#54615F" />
+        {/* angular wood handle, mirrored to the left */}
+        <path
+          d="M9 37 L-3 30 L-11 35 L-15 53 L-5 63 L5 57 L9 43 Z"
+          fill="#D4B483"
+        />
+
+        {/* lid */}
+        <rect x="42" y="15" width="26" height="7" rx="3" fill="#5F7568" />
+        {/* wood knob */}
+        <ellipse cx="55" cy="12" rx="10" ry="4.5" fill="#D4B483" />
       </svg>
       <AnimatePresence>
         {pouring && (
@@ -124,7 +157,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
             exit={{ opacity: 0, scaleY: 0.3 }}
             transition={{ duration: 0.2 }}
             style={{ transformOrigin: "top" }}
-            className="absolute left-[84px] top-[38px] h-16 w-[3px] rounded-full bg-gradient-to-b from-[hsl(var(--chart-1))] to-[hsl(var(--chart-1)/0.2)]"
+            className="absolute left-[69px] top-[42px] h-16 w-[3px] rounded-full bg-gradient-to-b from-[hsl(var(--chart-1))] to-[hsl(var(--chart-1)/0.2)]"
           />
         )}
       </AnimatePresence>
@@ -149,38 +182,56 @@ const LAYERS: Layer[] = [
 function Dripper({ weight }: { weight: number }) {
   return (
     <div className="relative flex flex-col items-center">
-      <svg width="96" height="56" viewBox="0 0 96 56" fill="none">
+      <svg width="96" height="58" viewBox="0 0 96 58" fill="none">
+        {/* V60 cone body: ~60° taper, single drip hole at the tip */}
         <path
-          d="M6 4 L90 4 L58 50 C54 55 42 55 38 50 L6 4 Z"
+          d="M8 4 L88 4 L54 52 C51 56 45 56 42 52 L8 4 Z"
           fill="hsl(var(--card))"
           stroke="hsl(var(--border))"
           strokeWidth="1.5"
         />
-        {[14, 24, 34, 44, 54, 64, 74].map((x) => (
-          <line key={x} x1={x} y1={6} x2={48 + (x - 48) * 0.35} y2={40} stroke="hsl(var(--border))" strokeWidth="1" />
+        {/* rim lip */}
+        <rect x="6" y="2" width="84" height="4" rx="2" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="1.2" />
+        {/* spiral ribs curving toward the drip hole */}
+        {[
+          "M14 8 C 20 20, 32 34, 45 46",
+          "M26 8 C 30 20, 38 34, 46 44",
+          "M38 8 C 40 20, 44 32, 47 42",
+          "M58 8 C 56 20, 52 32, 49 42",
+          "M70 8 C 66 20, 56 34, 50 44",
+          "M82 8 C 76 20, 60 34, 51 46",
+        ].map((d) => (
+          <path key={d} d={d} stroke="hsl(var(--border))" strokeWidth="1" fill="none" />
         ))}
+        {/* single drip hole */}
+        <circle cx="48" cy="53" r="2.2" fill="hsl(var(--background))" stroke="hsl(var(--border))" strokeWidth="1" />
       </svg>
-      <svg width="80" height="50" viewBox="0 0 80 50" fill="none" className="-mt-1">
+
+      <svg width="82" height="58" viewBox="0 0 82 58" fill="none" className="-mt-1">
+        {/* handle loop */}
+        <path d="M4 20 C -4 22 -4 34 4 36" stroke="hsl(var(--foreground) / 0.5)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        {/* glass server body with a pour spout flare on the right */}
         <path
-          d="M4 2 L76 2 L76 30 C76 40 68 48 58 48 L22 48 C12 48 4 40 4 30 Z"
+          d="M6 4 L64 4 C68 4 74 2 78 6 C80 8 78 12 74 12 L70 12
+             L70 32 C70 44 61 54 49 54 L27 54 C15 54 6 44 6 32 Z"
           fill="none"
-          stroke="hsl(var(--foreground) / 0.6)"
+          stroke="hsl(var(--foreground) / 0.55)"
           strokeWidth="2"
         />
         <clipPath id="mugClip">
-          <path d="M4 2 L76 2 L76 30 C76 40 68 48 58 48 L22 48 C12 48 4 40 4 30 Z" />
+          <path d="M6 5 L70 5 L70 32 C70 44 61 54 49 54 L27 54 C15 54 6 44 6 32 Z" />
         </clipPath>
         <g clipPath="url(#mugClip)">
           {LAYERS.map((layer) => {
             const filled = clamp01((Math.min(weight, layer.max) - layer.min) / (layer.max - layer.min));
-            const layerHeight = ((layer.max - layer.min) / 240) * 46;
-            const bottomOfLayer = 48 - (layer.min / 240) * 46;
+            const layerHeight = ((layer.max - layer.min) / 240) * 49;
+            const bottomOfLayer = 54 - (layer.min / 240) * 49;
             return (
               <motion.rect
                 key={layer.key}
                 x="0"
                 y={bottomOfLayer - filled * layerHeight}
-                width="80"
+                width="82"
                 height={filled * layerHeight}
                 fill={layer.color}
                 transition={{ duration: 0.15 }}
