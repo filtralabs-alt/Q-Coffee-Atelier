@@ -118,7 +118,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
       style={{ transformOrigin: "50% 30%" }}
       className="relative"
     >
-      <svg width="95" height="90" viewBox="8 16 102 96" fill="none">
+      <svg width="100" height="116" viewBox="0 0 136.4 158.7" fill="none">
         {/* steam / decorative flourish off the lid */}
         <path
           d="M71.8,38.3c-3.3-3.5-3.1-9,.4-12.3s9-3.1,12.3.4,1.2,1.5,1.6,2.3c0,0,6.3-3.2,11.2,3,0,0,5.6-.8,9.1,2.8"
@@ -165,7 +165,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
             exit={{ opacity: 0, scaleY: 0.3 }}
             transition={{ duration: 0.2 }}
             style={{ transformOrigin: "top" }}
-            className="absolute left-[9px] top-[65px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
+            className="absolute left-[15px] top-[70px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
           />
         )}
       </AnimatePresence>
@@ -400,7 +400,7 @@ export default function LibraryV60Page() {
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-col items-center">
-          <div style={{ transform: "translateX(38px)" }}>
+          <div style={{ transform: "translateX(35px)" }}>
             <Kettle pouring={display.pouring} />
           </div>
           <Dripper weight={display.weight} />
