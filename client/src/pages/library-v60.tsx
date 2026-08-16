@@ -165,7 +165,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
             exit={{ opacity: 0, scaleY: 0.3 }}
             transition={{ duration: 0.2 }}
             style={{ transformOrigin: "top" }}
-            className="absolute left-[15px] top-[70px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
+            className="absolute left-[13px] top-[62px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
           />
         )}
       </AnimatePresence>
@@ -400,7 +400,7 @@ export default function LibraryV60Page() {
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-col items-center">
-          <div style={{ transform: "translateX(35px)" }}>
+          <div style={{ transform: "translateX(29px)" }}>
             <Kettle pouring={display.pouring} />
           </div>
           <Dripper weight={display.weight} />
