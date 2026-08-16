@@ -102,6 +102,66 @@ function getPourIndex(t: number) {
 
 const KETTLE_INK = "#956052";
 
+// ---------------------------------------------------------------------------
+// Alignment — measured, not eyeballed.
+//
+// The kettle and the dripper are two separate hand-drawn SVGs, each with its
+// own viewBox and its own render size, so "put the spout over the funnel"
+// can't be done by guessing pixel offsets — it has to convert one fixed
+// point on each drawing into the same shared pixel space.
+//
+// SPOUT_TIP_VB is the exact `M` start point of the spout-curl path below
+// (`M17.8,87.2…`) — verified by rendering the Kettle SVG standalone and
+// confirming the point sits exactly on the tip of the curl.
+// FUNNEL_RIM_VB is the centre of the rim-band path in Dripper
+// (`M84.1,24.8h-49.3…`) — verified the same way against the cone opening.
+// If either SVG is ever redrawn, only these two points need updating.
+// ---------------------------------------------------------------------------
+
+const KETTLE_VB = { w: 136.4, h: 158.7 };
+const KETTLE_RENDER = { w: 100, h: 116 };
+const SPOUT_TIP_VB = { x: 17.8, y: 87.2 };
+
+const DRIPPER_VB = { x0: 24, y0: 18, w: 92, h: 104 }; // viewBox="24 18 92 104"
+const DRIPPER_RENDER = { w: 90, h: 102 };
+const FUNNEL_RIM_VB = { x: 59.45, y: 24.8 };
+
+const spoutTip = {
+  x: SPOUT_TIP_VB.x * (KETTLE_RENDER.w / KETTLE_VB.w),
+  y: SPOUT_TIP_VB.y * (KETTLE_RENDER.h / KETTLE_VB.h),
+};
+const funnelRim = {
+  x: (FUNNEL_RIM_VB.x - DRIPPER_VB.x0) * (DRIPPER_RENDER.w / DRIPPER_VB.w),
+  y: (FUNNEL_RIM_VB.y - DRIPPER_VB.y0) * (DRIPPER_RENDER.h / DRIPPER_VB.h),
+};
+
+const DRIPPER_LEFT = 0;
+const DRIPPER_TOP = KETTLE_RENDER.h; // stacked directly under the kettle, no gap
+const KETTLE_LEFT = funnelRim.x - spoutTip.x + DRIPPER_LEFT;
+const KETTLE_TOP = 0;
+
+const SCENE_W = Math.max(KETTLE_LEFT + KETTLE_RENDER.w, DRIPPER_RENDER.w);
+const SCENE_H = DRIPPER_TOP + DRIPPER_RENDER.h;
+
+// Where the stream should visually begin and end, in the shared scene space.
+const STREAM_END = { x: DRIPPER_LEFT + funnelRim.x, y: DRIPPER_TOP + funnelRim.y };
+// The kettle tilts -4° while pouring (see Kettle's `animate` below); that
+// rotation shifts the spout tip a couple of px from its resting position,
+// so the stream should start from the *tilted* spout, not the resting one.
+const POUR_TILT_DEG = -4;
+const KETTLE_ROTATE_ORIGIN = { x: KETTLE_RENDER.w * 0.5, y: KETTLE_RENDER.h * 0.3 };
+function rotatePoint(p: { x: number; y: number }, origin: { x: number; y: number }, deg: number) {
+  const rad = (deg * Math.PI) / 180;
+  const dx = p.x - origin.x;
+  const dy = p.y - origin.y;
+  return {
+    x: origin.x + dx * Math.cos(rad) - dy * Math.sin(rad),
+    y: origin.y + dx * Math.sin(rad) + dy * Math.cos(rad),
+  };
+}
+const tiltedSpoutTip = rotatePoint(spoutTip, KETTLE_ROTATE_ORIGIN, POUR_TILT_DEG);
+const STREAM_START = { x: KETTLE_LEFT + tiltedSpoutTip.x, y: KETTLE_TOP + tiltedSpoutTip.y };
+
 function Kettle({ pouring }: { pouring: boolean }) {
   return (
     <motion.div
@@ -155,22 +215,54 @@ function Kettle({ pouring }: { pouring: boolean }) {
         <path d="M103.2,62.9c3.9,1.9,6,5.4,7.1,8.4" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
         <path d="M100.8,62.1c.4,0,.8.2,1.2.4" fill="none" stroke={KETTLE_INK} strokeWidth=".5" strokeLinecap="round" />
       </svg>
-
-      {/* water stream — falls from the spout opening toward the dripper below */}
-      <AnimatePresence>
-        {pouring && (
-          <motion.div
-            initial={{ opacity: 0, scaleY: 0.3 }}
-            animate={{ opacity: 1, scaleY: 1 }}
-            exit={{ opacity: 0, scaleY: 0.3 }}
-            transition={{ duration: 0.2 }}
-            style={{ transformOrigin: "top" }}
-            className="absolute left-[13px] top-[62px] h-10 w-[3px] rounded-full bg-gradient-to-b from-[#b4d5d8] to-[#b4d5d8]/20"
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
+}
+
+// Water stream — a curved path from the (tilted) spout tip down to the
+// funnel's rim, redrawn every frame so its belly can drift side to side like
+// a real spiral pour ("en spirale, du centre vers les bords").
+function WaterStream({ pouring }: { pouring: boolean }) {
+  const drift = useMotionValue(0);
+  const [d, setD] = useState(() => streamPath(0));
+
+  useEffect(() => {
+    if (!pouring) return;
+    const controls = animate(drift, [0, 9, 0, -9, 0], {
+      duration: 1.4,
+      repeat: Infinity,
+      ease: "easeInOut",
+    });
+    return () => controls.stop();
+  }, [pouring, drift]);
+
+  useEffect(() => {
+    return drift.on("change", (dx) => setD(streamPath(dx)));
+  }, [drift]);
+
+  return (
+    <AnimatePresence>
+      {pouring && (
+        <motion.path
+          d={d}
+          fill="none"
+          stroke="url(#waterGradient)"
+          strokeWidth={3}
+          strokeLinecap="round"
+          initial={{ opacity: 0, pathLength: 0.3 }}
+          animate={{ opacity: 1, pathLength: 1 }}
+          exit={{ opacity: 0, pathLength: 0.3 }}
+          transition={{ pathLength: { duration: 0.25 }, opacity: { duration: 0.2 } }}
+        />
+      )}
+    </AnimatePresence>
+  );
+}
+
+function streamPath(driftX: number) {
+  const midY = (STREAM_START.y + STREAM_END.y) / 2;
+  const cx = (STREAM_START.x + STREAM_END.x) / 2 + driftX;
+  return `M ${STREAM_START.x} ${STREAM_START.y} Q ${cx} ${midY} ${STREAM_END.x} ${STREAM_END.y}`;
 }
 
 interface Layer {
@@ -247,6 +339,35 @@ function Dripper({ weight }: { weight: number }) {
       {/* glass shine highlight */}
       <path d="M34.6,116.5c-1.2,0-2.3-.5-3.1-1.5-.7-.9-1-2-.7-3.1l.4-1.8" fill="none" stroke="#d4ded5" strokeWidth=".5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+// Kettle + water stream + dripper, positioned in one shared coordinate
+// space so the pour actually lines up with the funnel (see the alignment
+// constants above `Kettle`).
+function PourScene({ pouring, weight }: { pouring: boolean; weight: number }) {
+  return (
+    <div className="relative" style={{ width: SCENE_W, height: SCENE_H }}>
+      <div style={{ position: "absolute", left: KETTLE_LEFT, top: KETTLE_TOP }}>
+        <Kettle pouring={pouring} />
+      </div>
+      <svg
+        className="pointer-events-none absolute inset-0 overflow-visible"
+        width={SCENE_W}
+        height={SCENE_H}
+      >
+        <defs>
+          <linearGradient id="waterGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#b4d5d8" />
+            <stop offset="100%" stopColor="#b4d5d8" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        <WaterStream pouring={pouring} />
+      </svg>
+      <div style={{ position: "absolute", left: DRIPPER_LEFT, top: DRIPPER_TOP }}>
+        <Dripper weight={weight} />
+      </div>
+    </div>
   );
 }
 
@@ -399,11 +520,8 @@ export default function LibraryV60Page() {
         transition={{ duration: 0.5, delay: 0.15, ease: easeOut }}
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
-        <div className="flex flex-col items-center">
-          <div style={{ transform: "translateX(29px)" }}>
-            <Kettle pouring={display.pouring} />
-          </div>
-          <Dripper weight={display.weight} />
+        <div className="flex justify-center">
+          <PourScene pouring={display.pouring} weight={display.weight} />
         </div>
 
         <div className="mt-6">
