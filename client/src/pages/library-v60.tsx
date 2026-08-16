@@ -160,7 +160,10 @@ function rotatePoint(p: { x: number; y: number }, origin: { x: number; y: number
   };
 }
 const tiltedSpoutTip = rotatePoint(spoutTip, KETTLE_ROTATE_ORIGIN, POUR_TILT_DEG);
-const STREAM_START = { x: KETTLE_LEFT + tiltedSpoutTip.x, y: KETTLE_TOP + tiltedSpoutTip.y };
+const STREAM_START = {
+  x: KETTLE_LEFT + tiltedSpoutTip.x,
+  y: KETTLE_TOP + tiltedSpoutTip.y + 10, // ajuste manual: bico visual fica abaixo do ponto medido na curva
+};
 
 function Kettle({ pouring }: { pouring: boolean }) {
   return (
