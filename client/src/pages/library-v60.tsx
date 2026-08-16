@@ -19,62 +19,43 @@ interface Pour {
 const POURS: Pour[] = [
   {
     start: 0,
-    end: 45,
-    cumulative: 40,
+    end: 8,
+    cumulative: 50,
     label: { fr: "Bloom", pt: "Bloom" },
     text: {
-      fr: "Versez environ 40 ml d'eau (≈2× le poids du café) en spirale, du centre vers les bords, et attendez 30 à 45 s : le café libère son CO₂.",
-      pt: "Despeje cerca de 40ml de água (≈2× o peso do café) em espiral, de dentro para as bordas, e espere 30 a 45s para o café liberar CO₂.",
+      fr: "Versez 50 ml d'eau (bloom) en spirale, du centre vers les bords, et attendez 30 s au total : le café libère son CO₂.",
+      pt: "Despeje 50ml de água (bloom) em espiral, de dentro para as bordas, e espere 30s no total para o café liberar CO₂.",
     },
   },
   {
-    start: 45,
-    end: 60,
-    cumulative: 96,
+    start: 30,
+    end: 40,
+    cumulative: 150,
     label: { fr: "Versement 2", pt: "Despejo 2" },
     text: {
-      fr: "Ces 2 premiers versements (40 %) contrôlent le goût : acidité et douceur.",
-      pt: "Esses 2 primeiros despejos (40%) controlam o sabor: acidez e doçura.",
+      fr: "Versez jusqu'à 150 ml — ce versement construit la douceur et l'acidité de la tasse.",
+      pt: "Despeje até 150ml — esse despejo constrói a doçura e a acidez da xícara.",
     },
   },
   {
-    start: 90,
-    end: 105,
-    cumulative: 144,
-    label: { fr: "Versement 3", pt: "Despejo 3" },
+    start: 75,
+    end: 85,
+    cumulative: 250,
+    label: { fr: "Versement final", pt: "Despejo final" },
     text: {
-      fr: "Début des 3 derniers versements (60 %) — ils construisent la force et le corps.",
-      pt: "Início dos 3 últimos despejos (60%) — eles constroem a força e o corpo.",
-    },
-  },
-  {
-    start: 135,
-    end: 145,
-    cumulative: 192,
-    label: { fr: "Versement 4", pt: "Despejo 4" },
-    text: {
-      fr: "La concentration augmente à chaque versement.",
-      pt: "A concentração aumenta a cada despejo.",
-    },
-  },
-  {
-    start: 165,
-    end: 175,
-    cumulative: 240,
-    label: { fr: "Versement 5", pt: "Despejo 5" },
-    text: {
-      fr: "Dernier versement — la force finale de la tasse se joue ici.",
-      pt: "Último despejo — a força final da xícara se define aqui.",
+      fr: "À 1:15, versez jusqu'à 250 ml — ce dernier versement construit le corps et la force.",
+      pt: "Em 1:15, despeje até 250ml — esse último despejo constrói o corpo e a força.",
     },
   },
 ];
 
-const TOTAL_S = 195;
-const PLAYBACK_S = 26;
+const TOTAL_WEIGHT = 250;
+const TOTAL_S = 120;
+const PLAYBACK_S = 16;
 
 const finishText = {
-  fr: "Extraction terminée. Ratio 1:16 — le goût vient des 2 premiers versements, la force des 3 derniers.",
-  pt: "Extração concluída. Proporção 1:16 — o sabor vem dos 2 primeiros despejos, a força dos 3 últimos.",
+  fr: "Extraction terminée. Ratio 1:15 — le bloom donne la douceur, le versement final donne le corps.",
+  pt: "Extração concluída. Proporção 1:15 — o bloom dá a doçura, o despejo final dá o corpo.",
 };
 
 function clamp01(n: number) {
@@ -277,9 +258,9 @@ interface Layer {
 }
 
 const LAYERS: Layer[] = [
-  { key: "acidity", min: 0, max: 48, color: "#D9A441", label: { fr: "Acidité", pt: "Acidez" } },
-  { key: "sugars", min: 48, max: 96, color: "#B5652E", label: { fr: "Sucres", pt: "Açúcares" } },
-  { key: "intensity", min: 96, max: 240, color: "#2A1B14", label: { fr: "Intensité", pt: "Intensidade" } },
+  { key: "acidity", min: 0, max: 50, color: "#D9A441", label: { fr: "Acidité", pt: "Acidez" } },
+  { key: "sugars", min: 50, max: 150, color: "#B5652E", label: { fr: "Sucres", pt: "Açúcares" } },
+  { key: "intensity", min: 150, max: 250, color: "#2A1B14", label: { fr: "Intensité", pt: "Intensidade" } },
 ];
 
 const SERVER_BODY_D =
@@ -313,8 +294,8 @@ function Dripper({ weight }: { weight: number }) {
       <g clipPath="url(#serverClip)">
         {LAYERS.map((layer) => {
           const filled = clamp01((Math.min(weight, layer.max) - layer.min) / (layer.max - layer.min));
-          const layerHeight = ((layer.max - layer.min) / 240) * 42.2;
-          const bottomOfLayer = 118.6 - (layer.min / 240) * 42.2;
+          const layerHeight = ((layer.max - layer.min) / TOTAL_WEIGHT) * 42.2;
+          const bottomOfLayer = 118.6 - (layer.min / TOTAL_WEIGHT) * 42.2;
           return (
             <motion.rect
               key={layer.key}
@@ -421,7 +402,7 @@ function ScaleDisplay({ time, weight }: { time: number; weight: number }) {
       <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-background/15">
         <motion.div
           className="h-full rounded-full bg-[hsl(var(--chart-1))]"
-          style={{ width: `${clamp01(weight / 240) * 100}%` }}
+          style={{ width: `${clamp01(weight / TOTAL_WEIGHT) * 100}%` }}
           transition={{ duration: 0.15 }}
         />
       </div>
@@ -451,7 +432,7 @@ export default function LibraryV60Page() {
         ? lerp(prevCumulative, pour.cumulative, clamp01((v - pour.start) / (pour.end - pour.start)))
         : pour.cumulative;
 
-      setDisplay({ t: v, weight: v >= TOTAL_S ? 240 : weight, pouring: v >= TOTAL_S ? false : pouring, idx });
+      setDisplay({ t: v, weight: v >= TOTAL_S ? TOTAL_WEIGHT : weight, pouring: v >= TOTAL_S ? false : pouring, idx });
     });
   }, [elapsed]);
 
@@ -466,7 +447,7 @@ export default function LibraryV60Page() {
       onComplete: () => {
         setPlaying(false);
         setFinished(true);
-        setDisplay({ t: TOTAL_S, weight: 240, pouring: false, idx: POURS.length - 1 });
+        setDisplay({ t: TOTAL_S, weight: TOTAL_WEIGHT, pouring: false, idx: POURS.length - 1 });
       },
     });
   };
@@ -475,12 +456,12 @@ export default function LibraryV60Page() {
     back: { fr: "Bibliothèque", pt: "Biblioteca" },
     title: { fr: "Filtrer en V60", pt: "Filtrar em V60" },
     subtitle: {
-      fr: "15 g de café pour 240 ml d'eau, en 5 versements — voyez l'extraction se jouer.",
-      pt: "15 g de café para 240 ml de água, em 5 despejos — veja a extração acontecer.",
+      fr: "15 g de café pour 250 ml d'eau, en 3 versements — voyez l'extraction se jouer.",
+      pt: "15 g de café para 250 ml de água, em 3 despejos — veja a extração acontecer.",
     },
     start: { fr: "Lancer l'extraction", pt: "Iniciar extração" },
     restart: { fr: "Recommencer", pt: "Recomeçar" },
-    ratio: { fr: "Ratio 1:16 · 90-94°C · mouture moyenne-fine", pt: "Proporção 1:16 · 90-94°C · moagem média-fina" },
+    ratio: { fr: "Ratio 1:15 · 92°C · mouture moyenne-fine", pt: "Proporção 1:15 · 92°C · moagem média-fina" },
   };
 
   const currentPour = POURS[display.idx];
