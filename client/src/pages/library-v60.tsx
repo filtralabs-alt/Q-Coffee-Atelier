@@ -271,7 +271,40 @@ const SERVER_LIQUID_COLOR = "#491e18";
 const SERVER_BODY_D =
   "M84.2,118.6h-49.6c-3.8,0-6.7-3.5-5.8-7.2l7.3-30.5c.6-2.6,3-4.5,5.8-4.5h35c2.8,0,5.2,1.9,5.8,4.5l7.3,30.5c.9,3.7-2,7.2-5.8,7.2Z";
 
-function Dripper({ level }: { level: number }) {
+// Drip start = right where the holder rim meets the glass (the collar
+// band spans y 67.8→76.4); drip end is just a point deep enough inside
+// the glass for the fade-out to read as the drop landing in the pool.
+const DRIP_START_Y = 77;
+const DRIP_END_Y = 100;
+
+function FilterDrip({ cx, delay }: { cx: number; delay: number }) {
+  return (
+    <motion.circle
+      cx={cx}
+      r={1.4}
+      fill={SERVER_LIQUID_COLOR}
+      initial={{ cy: DRIP_START_Y, opacity: 0 }}
+      animate={{ cy: [DRIP_START_Y, DRIP_START_Y, DRIP_END_Y], opacity: [0, 1, 0] }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.65, times: [0, 0.15, 1], ease: "easeIn", repeat: Infinity, repeatDelay: 0.2, delay }}
+    />
+  );
+}
+
+function FilterDrips({ pouring }: { pouring: boolean }) {
+  return (
+    <AnimatePresence>
+      {pouring && (
+        <>
+          <FilterDrip cx={54} delay={0} />
+          <FilterDrip cx={65} delay={0.4} />
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Dripper({ level, pouring }: { level: number; pouring: boolean }) {
   return (
     <svg width="90" height="102" viewBox="24 18 92 104" fill="none">
       {/* filter paper wavy top */}
@@ -305,6 +338,7 @@ function Dripper({ level }: { level: number }) {
           fill={SERVER_LIQUID_COLOR}
           transition={{ duration: 0.15 }}
         />
+        <FilterDrips pouring={pouring} />
       </g>
       <path d={SERVER_BODY_D} fill="none" stroke={KETTLE_INK} strokeWidth=".8" strokeLinecap="round" strokeLinejoin="round" />
 
@@ -346,7 +380,7 @@ function PourScene({ pouring, level }: { pouring: boolean; level: number }) {
         <WaterStream pouring={pouring} />
       </svg>
       <div style={{ position: "absolute", left: DRIPPER_LEFT, top: DRIPPER_TOP }}>
-        <Dripper level={level} />
+        <Dripper level={level} pouring={pouring} />
       </div>
     </div>
   );
