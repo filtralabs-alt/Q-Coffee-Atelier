@@ -132,7 +132,7 @@ export const cvCrisHtml = `
 
   .meta-item {
     font-size: 0.76rem;
-    color: rgba(245,237,224,0.65);
+    color: #ffffff;
     font-weight: 300;
     display: flex;
     align-items: center;
@@ -147,7 +147,7 @@ export const cvCrisHtml = `
     flex-shrink: 0;
   }
 
-  .meta-item a { color: rgba(245,237,224,0.65); text-decoration: none; }
+  .meta-item a { color: #ffffff; text-decoration: none; }
   .meta-item a:hover { color: var(--caramel); }
 
   .header-right {
