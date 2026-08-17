@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocation, useSearch } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
@@ -65,27 +65,32 @@ function ThemeBanners() {
         className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
         data-testid="carousel-atelier-themes"
       >
-        {ATELIER_THEMES.map((theme) => (
-          <div
-            key={theme.id}
-            className="relative w-full shrink-0 snap-center flex items-center justify-center px-8"
-            style={{
-              height: 340,
-              backgroundColor: BANNER_BG,
-              backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.55), rgba(30,57,176,0.55)), url(${theme.image})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            data-testid={`banner-theme-${theme.id}`}
-          >
-            <h2
-              className="text-center text-4xl leading-tight italic"
-              style={{ fontFamily: "'Playfair Display', serif", color: BANNER_TEXT }}
+        {ATELIER_THEMES.map((theme) => {
+          const Wrapper = theme.href ? Link : "div";
+          const wrapperProps = theme.href ? { href: theme.href } : {};
+          return (
+            <Wrapper
+              key={theme.id}
+              {...(wrapperProps as any)}
+              className={`relative w-full shrink-0 snap-center flex items-center justify-center px-8 ${theme.href ? "cursor-pointer" : ""}`}
+              style={{
+                height: 340,
+                backgroundColor: BANNER_BG,
+                backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.55), rgba(30,57,176,0.55)), url(${theme.image})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+              data-testid={`banner-theme-${theme.id}`}
             >
-              {theme[lang]}
-            </h2>
-          </div>
-        ))}
+              <h2
+                className="text-center text-4xl leading-tight italic"
+                style={{ fontFamily: "'Playfair Display', serif", color: BANNER_TEXT }}
+              >
+                {theme[lang]}
+              </h2>
+            </Wrapper>
+          );
+        })}
       </div>
 
       <button
