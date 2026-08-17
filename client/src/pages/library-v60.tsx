@@ -425,8 +425,12 @@ export default function LibraryV60Page() {
       const pour = POURS[idx];
       const prevCumulative = idx === 0 ? 0 : POURS[idx - 1].cumulative;
       const pouring = v >= pour.start && v < pour.end;
-      const weight = v < pour.end
-        ? lerp(prevCumulative, pour.cumulative, clamp01((v - pour.start) / (pour.end - pour.start)))
+      // The final pour keeps draining through the filter after the kettle
+      // stops — the level in the server rises alongside the timer all the
+      // way to TOTAL_S instead of jumping full the moment the pour ends.
+      const fillEnd = idx === POURS.length - 1 ? TOTAL_S : pour.end;
+      const weight = v < fillEnd
+        ? lerp(prevCumulative, pour.cumulative, clamp01((v - pour.start) / (fillEnd - pour.start)))
         : pour.cumulative;
 
       setDisplay({ t: v, weight: v >= TOTAL_S ? TOTAL_WEIGHT : weight, pouring: v >= TOTAL_S ? false : pouring, idx });
