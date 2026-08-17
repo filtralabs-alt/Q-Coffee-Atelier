@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useSearch } from "wouter";
 import { useI18n } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -15,6 +16,8 @@ import { useAuth } from "@/hooks/use-auth";
 export default function LandingPage() {
   const { t } = useI18n();
   const { identify, isIdentifying } = useAuth();
+  const [, setLocation] = useLocation();
+  const search = useSearch();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -35,6 +38,8 @@ export default function LandingPage() {
 
     try {
       await identify({ name: name.trim(), email: email.trim() });
+      const next = new URLSearchParams(search).get("next");
+      if (next) setLocation(next);
     } catch (err: any) {
       setError(err?.message ?? "Error");
     }

@@ -1,6 +1,6 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
@@ -614,14 +614,17 @@ function AtelierCard({ atelier, testimonials, isPast, onReview, onReserve }: {
 
 export default function AteliersPage() {
   const { t } = useI18n();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const search = useSearch();
   const [reviewAtelier, setReviewAtelier] = useState<Atelier | null>(null);
   const [reservationAtelier, setReservationAtelier] = useState<Atelier | null>(null);
+  const deepLinkHandled = useRef(false);
 
   const handleReserve = (atelier: Atelier) => {
     if (!user) {
-      setLocation("/");
+      const next = `/ateliers?reservar=${atelier.theme}`;
+      setLocation(`/?next=${encodeURIComponent(next)}`);
       return;
     }
     setReservationAtelier(atelier);
@@ -629,6 +632,25 @@ export default function AteliersPage() {
 
   const { data: ateliers, isLoading } = useQuery<Atelier[]>({ queryKey: ["/api/ateliers"] });
   const { data: testimonials = [] } = useQuery<AtelierTestimonial[]>({ queryKey: ["/api/testimonials"] });
+
+  // Deep link from marketing pages, e.g. /ateliers?reservar=peinture-enfants
+  // opens the reservation form for the matching upcoming atelier straight away.
+  useEffect(() => {
+    if (deepLinkHandled.current) return;
+    if (authLoading) return;
+    if (!ateliers || ateliers.length === 0) return;
+    const theme = new URLSearchParams(search).get("reservar");
+    if (!theme) return;
+
+    const now = new Date();
+    const match = ateliers
+      .filter((a) => a.theme === theme && new Date(a.dateTime) >= now)
+      .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())[0];
+    if (!match) return;
+
+    deepLinkHandled.current = true;
+    handleReserve(match);
+  }, [ateliers, search, user, authLoading]);
 
   const testimonialsByAtelier = useMemo(() => {
     const map = new Map<string, AtelierTestimonial[]>();
