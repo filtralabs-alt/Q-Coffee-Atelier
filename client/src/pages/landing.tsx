@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MobileNav } from "@/components/mobile-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -137,7 +138,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border/50">
+      <footer className="border-t border-border/50 pb-[72px]">
         <div className="max-w-5xl mx-auto px-5 py-10 text-center text-sm text-muted-foreground space-y-2">
           <p>&copy; {new Date().getFullYear()} Baristech &middot; Clermont-Ferrand, France</p>
           <p>
@@ -152,7 +153,7 @@ export default function LandingPage() {
       </footer>
 
       {!consentGiven && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border/60 px-5 py-4">
+        <div className="fixed bottom-[72px] left-0 right-0 z-50 bg-background border-t border-border/60 px-5 py-4">
           <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-3 text-sm text-muted-foreground">
             <p className="text-center sm:text-left flex-1">
               {t("privacy.banner")}{" "}
@@ -170,6 +171,8 @@ export default function LandingPage() {
           </div>
         </div>
       )}
+
+      <MobileNav publicMode />
 
       <Dialog open={showPrivacy} onOpenChange={setShowPrivacy}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
