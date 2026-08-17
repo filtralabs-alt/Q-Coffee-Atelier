@@ -93,16 +93,6 @@ export const cvCrisHtml = `
     pointer-events: none;
   }
 
-  .header::after {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    border: 28px solid rgba(193,127,58,0.08);
-    pointer-events: none;
-  }
-
   .header-left { position: relative; z-index: 1; }
 
   .kicker {
@@ -161,14 +151,14 @@ export const cvCrisHtml = `
   .meta-item a:hover { color: var(--caramel); }
 
   .header-right {
-    position: relative;
-    z-index: 1;
-    align-self: center;
+    position: absolute;
+    top: -50px; right: -50px;
+    z-index: 0;
   }
 
   .header-logo {
-    width: 150px;
-    height: 150px;
+    width: 320px;
+    height: 320px;
     opacity: 0.16;
     filter:
       drop-shadow(1px 1px 1px rgba(0,0,0,0.55))
