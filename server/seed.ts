@@ -64,7 +64,7 @@ export async function seedDatabase() {
         contentFr: "",
         contentPt: "",
         icon: "message-circle",
-        sortOrder: 0,
+        sortOrder: 6,
         isActive: true,
         externalUrl: "https://chatgpt.com/g/g-695eef447f20819196b922de01c5cc7e-grand-maitre-du-cafe",
       },
