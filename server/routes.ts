@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { sendReservationConfirmation, sendNewReservationNotification } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
+import { cvCrisHtml } from "./cv-cris";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -12,6 +13,10 @@ export async function registerRoutes(
 ): Promise<Server> {
   await setupAuth(app);
   registerAuthRoutes(app);
+
+  app.get("/cvcris", (_req, res) => {
+    res.type("html").send(cvCrisHtml);
+  });
 
   app.get("/api/tastings", isAuthenticated, async (req: any, res) => {
     try {
