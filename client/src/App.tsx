@@ -17,6 +17,7 @@ import QuizPage from "@/pages/quiz";
 import LibraryPage from "@/pages/library";
 import LibraryTorrefactionPage from "@/pages/library-torrefaction";
 import LibraryV60Page from "@/pages/library-v60";
+import LibraryChemexPage from "@/pages/library-chemex";
 import AteliersPage from "@/pages/ateliers";
 import AdminDashboardPage from "@/pages/admin-dashboard";
 import ProfilePage from "@/pages/profile";
@@ -37,6 +38,7 @@ function AuthenticatedLayout() {
           <Route path="/library" component={LibraryPage} />
           <Route path="/library/torrefaction" component={LibraryTorrefactionPage} />
           <Route path="/library/v60" component={LibraryV60Page} />
+          <Route path="/library/chemex" component={LibraryChemexPage} />
           <Route path="/ateliers" component={AteliersPage} />
           <Route path="/profile" component={ProfilePage} />
           <Route component={NotFound} />

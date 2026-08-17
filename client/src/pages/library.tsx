@@ -122,10 +122,11 @@ export default function LibraryPage() {
           const desc = lang === "pt" ? mod.descPt : mod.descFr;
           const content = lang === "pt" ? mod.contentPt : mod.contentFr;
 
-          if (mod.key === "v60") {
+          if (mod.key === "v60" || mod.key === "chemex") {
+            const href = mod.key === "v60" ? "/library/v60" : "/library/chemex";
             return (
               <motion.div key={mod.id} variants={itemVariants}>
-                <Link href="/library/v60" className="block" data-testid={`link-module-${mod.key}`}>
+                <Link href={href} className="block" data-testid={`link-module-${mod.key}`}>
                   <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }}>
                     <Card className="p-5 hover-elevate bg-primary/5 border-primary/20">
                       <div className="flex items-center gap-3">
