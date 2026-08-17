@@ -100,7 +100,7 @@ const KETTLE_INK = "#956052";
 // ---------------------------------------------------------------------------
 
 const KETTLE_VB = { w: 136.4, h: 158.7 };
-const KETTLE_RENDER = { w: 100, h: 116 };
+const KETTLE_RENDER = { w: 140, h: 163 };
 const SPOUT_TIP_VB = { x: 17.8, y: 87.2 };
 
 const DRIPPER_VB = { x0: 24, y0: 18, w: 92, h: 104 }; // viewBox="24 18 92 104"
@@ -162,7 +162,7 @@ function Kettle({ pouring }: { pouring: boolean }) {
       style={{ transformOrigin: "50% 30%" }}
       className="relative"
     >
-      <svg width="100" height="116" viewBox="0 0 136.4 158.7" fill="none">
+      <svg width={KETTLE_RENDER.w} height={KETTLE_RENDER.h} viewBox="0 0 136.4 158.7" fill="none">
         {/* steam / decorative flourish off the lid */}
         <path
           d="M71.8,38.3c-3.3-3.5-3.1-9,.4-12.3s9-3.1,12.3.4,1.2,1.5,1.6,2.3c0,0,6.3-3.2,11.2,3,0,0,5.6-.8,9.1,2.8"
