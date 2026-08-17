@@ -296,8 +296,8 @@ function FilterDrips({ pouring }: { pouring: boolean }) {
     <AnimatePresence>
       {pouring && (
         <>
-          <FilterDrip cx={54} delay={0} />
-          <FilterDrip cx={65} delay={0.4} />
+          <FilterDrip cx={59} delay={0} />
+          <FilterDrip cx={59} delay={0.4} />
         </>
       )}
     </AnimatePresence>
