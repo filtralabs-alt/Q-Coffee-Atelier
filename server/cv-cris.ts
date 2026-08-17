@@ -416,8 +416,9 @@ export const cvCrisHtml = `
       <div class="header-meta">
         <p class="meta-item"><span class="dot"></span>Chamalières (63400) · Clermont-Ferrand</p>
         <p class="meta-item"><span class="dot"></span><a href="mailto:cris@obaristech.com">cris@obaristech.com</a></p>
-        <p class="meta-item"><span class="dot"></span><a href="https://obaristech.com" target="_blank">obaristech.com</a></p>
-        <p class="meta-item"><span class="dot"></span>Brésilien · installé en France depuis 2018</p>
+        <p class="meta-item"><span class="dot"></span>Directeur artistique — 2005–2018</p>
+        <p class="meta-item"><span class="dot"></span>Auto-entrepreneur — 2012–2026</p>
+        <p class="meta-item"><span class="dot"></span>Charpentier · Siegrist SAS — Juin–Août 2026</p>
       </div>
     </div>
     <div class="header-right">
