@@ -271,7 +271,7 @@ const SERVER_LIQUID_COLOR = "#491e18";
 const SERVER_BODY_D =
   "M84.2,118.6h-49.6c-3.8,0-6.7-3.5-5.8-7.2l7.3-30.5c.6-2.6,3-4.5,5.8-4.5h35c2.8,0,5.2,1.9,5.8,4.5l7.3,30.5c.9,3.7-2,7.2-5.8,7.2Z";
 
-function Dripper({ weight }: { weight: number }) {
+function Dripper({ level }: { level: number }) {
   return (
     <svg width="90" height="102" viewBox="24 18 92 104" fill="none">
       {/* filter paper wavy top */}
@@ -299,9 +299,9 @@ function Dripper({ weight }: { weight: number }) {
       <g clipPath="url(#serverClip)">
         <motion.rect
           x="24"
-          y={118.6 - clamp01(weight / TOTAL_WEIGHT) * 42.2}
+          y={118.6 - clamp01(level / TOTAL_WEIGHT) * 42.2}
           width="92"
-          height={clamp01(weight / TOTAL_WEIGHT) * 42.2}
+          height={clamp01(level / TOTAL_WEIGHT) * 42.2}
           fill={SERVER_LIQUID_COLOR}
           transition={{ duration: 0.15 }}
         />
@@ -326,7 +326,7 @@ function Dripper({ weight }: { weight: number }) {
 // Kettle + water stream + dripper, positioned in one shared coordinate
 // space so the pour actually lines up with the funnel (see the alignment
 // constants above `Kettle`).
-function PourScene({ pouring, weight }: { pouring: boolean; weight: number }) {
+function PourScene({ pouring, level }: { pouring: boolean; level: number }) {
   return (
     <div className="relative" style={{ width: SCENE_W, height: SCENE_H }}>
       <div style={{ position: "absolute", left: KETTLE_LEFT, top: KETTLE_TOP }}>
@@ -346,7 +346,7 @@ function PourScene({ pouring, weight }: { pouring: boolean; weight: number }) {
         <WaterStream pouring={pouring} />
       </svg>
       <div style={{ position: "absolute", left: DRIPPER_LEFT, top: DRIPPER_TOP }}>
-        <Dripper weight={weight} />
+        <Dripper level={level} />
       </div>
     </div>
   );
@@ -412,7 +412,7 @@ export default function LibraryV60Page() {
   const elapsed = useMotionValue(0);
   const [playing, setPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [display, setDisplay] = useState({ t: 0, weight: 0, pouring: false, idx: 0 });
+  const [display, setDisplay] = useState({ t: 0, weight: 0, serverLevel: 0, pouring: false, idx: 0 });
   const lastUpdate = useRef(0);
 
   useEffect(() => {
@@ -425,15 +425,27 @@ export default function LibraryV60Page() {
       const pour = POURS[idx];
       const prevCumulative = idx === 0 ? 0 : POURS[idx - 1].cumulative;
       const pouring = v >= pour.start && v < pour.end;
-      // The final pour keeps draining through the filter after the kettle
-      // stops — the level in the server rises alongside the timer all the
-      // way to TOTAL_S instead of jumping full the moment the pour ends.
+      // Scale weight jumps the moment a pour finishes — that water is
+      // already on the filter, sitting on the scale, same as bloom/pour 2.
+      const weight = v < pour.end
+        ? lerp(prevCumulative, pour.cumulative, clamp01((v - pour.start) / (pour.end - pour.start)))
+        : pour.cumulative;
+      // The server's liquid level lags behind: the final pour keeps
+      // draining through the filter after the kettle stops, so it rises
+      // alongside the timer all the way to TOTAL_S instead of jumping
+      // full the moment the pour ends.
       const fillEnd = idx === POURS.length - 1 ? TOTAL_S : pour.end;
-      const weight = v < fillEnd
+      const serverLevel = v < fillEnd
         ? lerp(prevCumulative, pour.cumulative, clamp01((v - pour.start) / (fillEnd - pour.start)))
         : pour.cumulative;
 
-      setDisplay({ t: v, weight: v >= TOTAL_S ? TOTAL_WEIGHT : weight, pouring: v >= TOTAL_S ? false : pouring, idx });
+      setDisplay({
+        t: v,
+        weight: v >= TOTAL_S ? TOTAL_WEIGHT : weight,
+        serverLevel: v >= TOTAL_S ? TOTAL_WEIGHT : serverLevel,
+        pouring: v >= TOTAL_S ? false : pouring,
+        idx,
+      });
     });
   }, [elapsed]);
 
@@ -441,14 +453,14 @@ export default function LibraryV60Page() {
     setFinished(false);
     setPlaying(true);
     elapsed.set(0);
-    setDisplay({ t: 0, weight: 0, pouring: false, idx: 0 });
+    setDisplay({ t: 0, weight: 0, serverLevel: 0, pouring: false, idx: 0 });
     animate(elapsed, TOTAL_S, {
       duration: PLAYBACK_S,
       ease: "linear",
       onComplete: () => {
         setPlaying(false);
         setFinished(true);
-        setDisplay({ t: TOTAL_S, weight: TOTAL_WEIGHT, pouring: false, idx: POURS.length - 1 });
+        setDisplay({ t: TOTAL_S, weight: TOTAL_WEIGHT, serverLevel: TOTAL_WEIGHT, pouring: false, idx: POURS.length - 1 });
       },
     });
   };
@@ -506,7 +518,7 @@ export default function LibraryV60Page() {
         className="mx-5 mt-4 rounded-2xl border bg-card p-6"
       >
         <div className="flex justify-center">
-          <PourScene pouring={display.pouring} weight={display.weight} />
+          <PourScene pouring={display.pouring} level={display.serverLevel} />
         </div>
 
         <div className="mt-6">
