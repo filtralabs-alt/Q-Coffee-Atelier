@@ -654,7 +654,7 @@ export const cvCrisHtml = `
 
     <div class="cta-row">
       <a class="cta-btn" href="mailto:cris@obaristech.com">Demander une disponibilité</a>
-      <a class="cta-link" href="https://obaristech.com" target="_blank">Voir tous les formats sur obaristech.com →</a>
+      <a class="cta-link" href="https://app.obaristech.com/ateliers" target="_blank">app Baristech</a>
     </div>
 
     <div>
