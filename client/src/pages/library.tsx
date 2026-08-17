@@ -8,8 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  BookOpen, Lock, ChevronRight, Coffee, Beaker, MapPin, Scale, Wrench,
-  ExternalLink, MessageCircle, Flame,
+  BookOpen, ChevronRight, Coffee, Beaker, MapPin, Scale, Wrench,
+  ExternalLink, MessageCircle, Flame, LogIn,
 } from "lucide-react";
 import type { LibraryModule } from "@shared/schema";
 
@@ -42,27 +42,7 @@ export default function LibraryPage() {
 
   const { data: modules, isLoading } = useQuery<LibraryModule[]>({
     queryKey: ["/api/library-modules"],
-    enabled: isAuthenticated,
   });
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col min-h-full">
-        <div className="px-5 pt-5 pb-4">
-          <h1 className="font-serif text-xl font-semibold">{t("library.title")}</h1>
-        </div>
-        <div className="flex-1 flex items-center justify-center px-5">
-          <Card className="p-8 text-center max-w-sm mx-auto w-full">
-            <Lock className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
-            <p className="text-muted-foreground mb-4">{t("library.locked")}</p>
-            <Button asChild data-testid="button-library-login">
-              <a href="/api/login">{t("nav.login")}</a>
-            </Button>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -84,6 +64,19 @@ export default function LibraryPage() {
       <div className="px-5 pt-5 pb-4">
         <h1 className="font-serif text-xl font-semibold" data-testid="text-library-title">{t("library.title")}</h1>
       </div>
+      {!isAuthenticated && (
+        <div className="px-5 pb-2">
+          <Card className="flex items-center justify-between gap-3 p-4 bg-primary/5 border-primary/20">
+            <p className="text-xs text-muted-foreground">{t("library.loginPrompt")}</p>
+            <Button asChild size="sm" className="shrink-0" data-testid="button-library-login">
+              <Link href="/">
+                <LogIn className="h-3.5 w-3.5 mr-1.5" />
+                {t("nav.login")}
+              </Link>
+            </Button>
+          </Card>
+        </div>
+      )}
       <motion.div
         variants={listVariants}
         initial="hidden"

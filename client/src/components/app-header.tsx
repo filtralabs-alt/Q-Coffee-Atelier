@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogIn, LogOut, Settings, User } from "lucide-react";
 import { Link } from "wouter";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
@@ -35,38 +35,47 @@ export function AppHeader() {
         <div className="flex items-center gap-1.5">
           <LangToggle />
           <ThemeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full" data-testid="button-user-menu">
-                <Avatar className="h-7 w-7">
-                  <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.firstName || ""} />
-                  <AvatarFallback className="text-xs bg-primary text-primary-foreground">{initials}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center gap-2" data-testid="link-profile">
-                  <User className="h-4 w-4" />
-                  {t("nav.profile")}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin-panel" className="flex items-center gap-2" data-testid="link-admin">
-                  <Settings className="h-4 w-4" />
-                  {t("nav.admin")}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-2 cursor-pointer"
-                data-testid="button-logout"
-                onSelect={() => logout()}
-              >
-                <LogOut className="h-4 w-4" />
-                {t("nav.logout")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full" data-testid="button-user-menu">
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.firstName || ""} />
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">{initials}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="flex items-center gap-2" data-testid="link-profile">
+                    <User className="h-4 w-4" />
+                    {t("nav.profile")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin-panel" className="flex items-center gap-2" data-testid="link-admin">
+                    <Settings className="h-4 w-4" />
+                    {t("nav.admin")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-2 cursor-pointer"
+                  data-testid="button-logout"
+                  onSelect={() => logout()}
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t("nav.logout")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button asChild size="sm" data-testid="button-header-login">
+              <Link href="/">
+                <LogIn className="h-3.5 w-3.5 mr-1.5" />
+                {t("nav.login")}
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

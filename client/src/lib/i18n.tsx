@@ -170,9 +170,11 @@ const translations: Record<string, Record<Lang, string>> = {
     pt: "Na França, a SCA France foi fundada em 2005. É ela quem organiza todo ano os campeonatos nacionais (Barista, Latte Art, Coffee in Good Spirits...) — os mesmos que levam franceses como Brice Robin a representar o país no cenário mundial.",
   },
   "quiz.bonus2.source": { fr: "Source : coffee-spirit.maxicoffee.com", pt: "Fonte: coffee-spirit.maxicoffee.com" },
+  "quiz.loginPrompt.title": { fr: "Sauvegardez votre score", pt: "Salve sua pontuação" },
+  "quiz.loginPrompt.desc": { fr: "Créez votre compte pour garder l'historique de vos résultats et débloquer le reste de l'app.", pt: "Crie sua conta para guardar o histórico dos seus resultados e desbloquear o resto do app." },
 
   "library.title": { fr: "Bibliothèque de l'Atelier", pt: "Biblioteca do Workshop" },
-  "library.locked": { fr: "Contenu réservé aux membres", pt: "Conteúdo exclusivo para membros" },
+  "library.loginPrompt": { fr: "Créez votre compte pour enregistrer vos dégustations et suivre votre progression.", pt: "Crie sua conta para registrar suas degustações e acompanhar seu progresso." },
   "library.chemex": { fr: "Guide Chemex", pt: "Guia Chemex" },
   "library.chemex.desc": { fr: "Maîtrisez l'art de la Chemex, du ratio à la température", pt: "Domine a arte da Chemex, do ratio à temperatura" },
   "library.v60": { fr: "Guide V60", pt: "Guia V60" },

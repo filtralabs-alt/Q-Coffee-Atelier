@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { quizQuestions, type QuizQuestion } from "@/lib/quiz-data";
@@ -8,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { HelpCircle, CheckCircle, XCircle, Trophy, ArrowRight, RotateCcw, ArrowLeft, Star, Sparkles, Award } from "lucide-react";
+import { HelpCircle, CheckCircle, XCircle, Trophy, ArrowRight, RotateCcw, ArrowLeft, Star, Sparkles, Award, LogIn } from "lucide-react";
 
 type Level = "basic" | "intermediate" | "advanced";
 
@@ -143,6 +144,19 @@ export default function QuizPage() {
               </Button>
             </div>
           </Card>
+
+          {!user && (
+            <Card className="p-5 max-w-sm mx-auto w-full bg-primary/5 border-primary/20" data-testid="card-quiz-login-prompt">
+              <div className="flex items-center gap-2 mb-1.5">
+                <LogIn className="h-4 w-4 text-primary" />
+                <h3 className="font-serif text-sm font-semibold">{t("quiz.loginPrompt.title")}</h3>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-3">{t("quiz.loginPrompt.desc")}</p>
+              <Button asChild size="sm" className="w-full" data-testid="button-quiz-login">
+                <Link href="/">{t("nav.login")}</Link>
+              </Button>
+            </Card>
+          )}
 
           <Card className="p-5 max-w-sm mx-auto w-full" data-testid="card-quiz-bonus">
             <div className="flex items-center gap-2 mb-2">

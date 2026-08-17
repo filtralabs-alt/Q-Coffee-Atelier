@@ -25,6 +25,18 @@ import NotFound from "@/pages/not-found";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
 
+// Routes reachable without being logged in — the idea is to let visitors
+// explore content that hooks them (recipes, quiz, workshops) before asking
+// for an account, rather than gating everything behind the landing page.
+const PUBLIC_ROUTES = [
+  "/library",
+  "/library/torrefaction",
+  "/library/v60",
+  "/library/chemex",
+  "/ateliers",
+  "/quiz",
+];
+
 function AuthenticatedLayout() {
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
@@ -45,6 +57,25 @@ function AuthenticatedLayout() {
         </Switch>
       </main>
       <MobileNav />
+    </div>
+  );
+}
+
+function PublicLayout() {
+  return (
+    <div className="flex flex-col h-[100dvh] bg-background">
+      <AppHeader />
+      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px]">
+        <Switch>
+          <Route path="/quiz" component={QuizPage} />
+          <Route path="/library" component={LibraryPage} />
+          <Route path="/library/torrefaction" component={LibraryTorrefactionPage} />
+          <Route path="/library/v60" component={LibraryV60Page} />
+          <Route path="/library/chemex" component={LibraryChemexPage} />
+          <Route path="/ateliers" component={AteliersPage} />
+        </Switch>
+      </main>
+      <MobileNav publicMode />
     </div>
   );
 }
@@ -76,6 +107,7 @@ function WelcomeScreen({ name, onDone }: { name: string; onDone: () => void }) {
 
 function UserApp() {
   const { user, isLoading } = useAuth();
+  const [location] = useLocation();
   const [showWelcome, setShowWelcome] = useState(false);
   const [prevUser, setPrevUser] = useState<typeof user>(null);
 
@@ -103,6 +135,9 @@ function UserApp() {
   }
 
   if (!user) {
+    if (PUBLIC_ROUTES.includes(location)) {
+      return <PublicLayout />;
+    }
     return <LandingPage />;
   }
 
