@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -612,8 +614,18 @@ function AtelierCard({ atelier, testimonials, isPast, onReview, onReserve }: {
 
 export default function AteliersPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [reviewAtelier, setReviewAtelier] = useState<Atelier | null>(null);
   const [reservationAtelier, setReservationAtelier] = useState<Atelier | null>(null);
+
+  const handleReserve = (atelier: Atelier) => {
+    if (!user) {
+      setLocation("/");
+      return;
+    }
+    setReservationAtelier(atelier);
+  };
 
   const { data: ateliers, isLoading } = useQuery<Atelier[]>({ queryKey: ["/api/ateliers"] });
   const { data: testimonials = [] } = useQuery<AtelierTestimonial[]>({ queryKey: ["/api/testimonials"] });
@@ -685,7 +697,7 @@ export default function AteliersPage() {
                       testimonials={[]}
                       isPast={false}
                       onReview={() => {}}
-                      onReserve={() => setReservationAtelier(a)}
+                      onReserve={() => handleReserve(a)}
                     />
                   ))}
                 </div>
