@@ -62,12 +62,12 @@ export default function AteliersTeamBuildingPage() {
         {/* Hero */}
         <div className="px-5 pt-6 pb-4">
           <Badge variant="secondary" className="mb-3 text-[10px] font-normal">
-            {lang === "pt" ? "Team building · Atividade de coesão" : "Team building · Activité de cohésion"}
+            {lang === "pt" ? "Team building · Atividade de conexão" : "Team building · Activité de connexion"}
           </Badge>
           <h1 className="font-serif text-2xl sm:text-3xl font-semibold leading-tight" data-testid="text-ateliers-team-building-title">
             {lang === "pt"
-              ? <>Uma pausa café que vira <span className="text-primary">coesão de equipe</span>.</>
-              : <>Une pause café qui devient un moment de <span className="text-primary">cohésion d'équipe</span>.</>}
+              ? <>Uma pausa café que vira <span className="text-primary">conexão de equipe</span>.</>
+              : <>Une pause café qui devient un moment de <span className="text-primary">connexion d'équipe</span>.</>}
           </h1>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
             {lang === "pt"
