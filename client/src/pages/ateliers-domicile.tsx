@@ -149,7 +149,7 @@ export default function AteliersDomicilePage() {
         <img
           src={heroPhoto}
           alt=""
-          className="w-full aspect-[4/3] object-cover object-top"
+          className="w-full aspect-[4/3] object-cover"
           data-testid="img-ateliers-domicile-hero"
         />
 
