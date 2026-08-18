@@ -997,7 +997,7 @@ export const cvCrisHtml = `
   </g>
   </svg>
       </a>
-      <p style="font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); max-width: 150px; line-height: 1.5;">Scanner pour l'app O Baristech</p>
+      <p style="font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); max-width: 150px; line-height: 1.5;">Scanner pour l'app<br>O Baristech</p>
     </div>
 
   </div>
