@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarCheck, Clock, Sparkles, Flame, Beaker, Globe } from "lucide-react";
 import heroPhoto from "@assets/atelier-domicile-hero.jpg";
-import galleryGraos from "@assets/atelier-domicile-galerie-graos.jpg";
+import galleryTasting from "@assets/atelier-domicile-galerie-degustacao.jpg";
 import gallerySack from "@assets/atelier-domicile-galerie-saco-cafe.jpg";
+import galleryGraos from "@assets/atelier-domicile-galerie-graos.jpg";
 
 const RESERVE_HREF = "/ateliers?reservar=domicile";
 
@@ -138,6 +139,11 @@ export default function AteliersDomicilePage() {
               {lang === "pt" ? "Reservar uma vaga" : "Réserver une place"}
             </Link>
           </Button>
+          <p className="text-[11px] text-muted-foreground mt-2" data-testid="text-espace-prive-note">
+            {lang === "pt"
+              ? "Também disponível em espaço privado (escritório, café parceiro) — não só a domicílio."
+              : "Également disponible en espace privé (bureau, café partenaire) — pas seulement à domicile."}
+          </p>
         </div>
 
         <img
@@ -215,9 +221,10 @@ export default function AteliersDomicilePage() {
             {lang === "pt" ? "Em imagens" : "En images"}
           </h2>
         </div>
-        <div className="px-5 pb-5 grid grid-cols-2 gap-2">
-          <img src={galleryGraos} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-graos" />
+        <div className="px-5 pb-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <img src={galleryTasting} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-tasting" />
           <img src={gallerySack} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-sack" />
+          <img src={galleryGraos} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-graos" />
         </div>
 
         {/* FAQ */}
