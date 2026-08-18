@@ -1,9 +1,10 @@
 import { storage } from "./storage";
 
 export async function buildChatSystemPrompt(userId: string): Promise<string> {
-  const [summary, quizResults] = await Promise.all([
+  const [summary, quizResults, coffeeSpots] = await Promise.all([
     storage.getTastingSummary(userId),
     storage.getQuizResults(userId),
+    storage.getCoffeeSpots(),
   ]);
 
   const lines: string[] = [
@@ -31,6 +32,22 @@ export async function buildChatSystemPrompt(userId: string): Promise<string> {
   if (quizResults?.length) {
     const best = quizResults[quizResults.length - 1];
     lines.push(`- Niveau de connaissance (dernier quiz) : ${best.level}, score ${best.score}/${best.totalQuestions}`);
+  }
+
+  const featuredShops = coffeeSpots.filter((spot) => spot.featured && spot.featuredLinkUrl);
+  if (featuredShops.length > 0) {
+    lines.push(
+      "Si l'utilisateur demande où acheter du café, recommande en priorité ces boutiques en ligne déjà partenaires de l'app (utilise le lien exact) :",
+      ...featuredShops.map((spot) => `- ${spot.name} : ${spot.featuredLinkUrl}`),
+    );
+  }
+
+  const otherSpots = coffeeSpots.filter((spot) => !spot.featured);
+  if (otherSpots.length > 0) {
+    lines.push(
+      "Cafés/torréfacteurs déjà référencés dans l'app (section Coffee Spots), à mentionner si pertinent pour une visite en personne :",
+      ...otherSpots.slice(0, 15).map((spot) => `- ${spot.name} (${spot.city})`),
+    );
   }
 
   return lines.filter(Boolean).join("\n");
