@@ -21,6 +21,7 @@ import LibraryChemexPage from "@/pages/library-chemex";
 import AteliersPage from "@/pages/ateliers";
 import AteliersEnfantsPage from "@/pages/ateliers-enfants";
 import AteliersDomicilePage from "@/pages/ateliers-domicile";
+import AteliersTeamBuildingPage from "@/pages/ateliers-team-building";
 import AdminDashboardPage from "@/pages/admin-dashboard";
 import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
@@ -38,6 +39,7 @@ const PUBLIC_ROUTES = [
   "/ateliers",
   "/ateliers-enfants",
   "/ateliers-domicile",
+  "/ateliers-team-building",
   "/quiz",
 ];
 
@@ -58,6 +60,7 @@ function AuthenticatedLayout() {
           <Route path="/ateliers" component={AteliersPage} />
           <Route path="/ateliers-enfants" component={AteliersEnfantsPage} />
           <Route path="/ateliers-domicile" component={AteliersDomicilePage} />
+          <Route path="/ateliers-team-building" component={AteliersTeamBuildingPage} />
           <Route path="/profile" component={ProfilePage} />
           <Route component={NotFound} />
         </Switch>
@@ -81,6 +84,7 @@ function PublicLayout() {
           <Route path="/ateliers" component={AteliersPage} />
           <Route path="/ateliers-enfants" component={AteliersEnfantsPage} />
           <Route path="/ateliers-domicile" component={AteliersDomicilePage} />
+          <Route path="/ateliers-team-building" component={AteliersTeamBuildingPage} />
         </Switch>
       </main>
       <MobileNav publicMode />
