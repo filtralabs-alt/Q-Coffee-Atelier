@@ -111,6 +111,12 @@ const translations: Record<string, Record<Lang, string>> = {
   "summary.noData": { fr: "Ajoutez des dégustations pour voir votre résumé", pt: "Adicione degustações para ver seu resumo" },
   "summary.tastings": { fr: "dégustations", pt: "degustações" },
   "summary.sensorProfile": { fr: "Profil Sensoriel", pt: "Perfil Sensorial" },
+  "chat.title": { fr: "Demandez conseil", pt: "Peça uma sugestão" },
+  "chat.subtitle": { fr: "Basé sur votre profil, découvrez de nouveaux cafés", pt: "Com base no seu perfil, descubra novos cafés" },
+  "chat.placeholder": { fr: "Ex : quel café essayer après celui-ci ?", pt: "Ex: que café experimentar depois desse?" },
+  "chat.send": { fr: "Envoyer", pt: "Enviar" },
+  "chat.error": { fr: "Une erreur est survenue, réessayez.", pt: "Ocorreu um erro, tente novamente." },
+  "chat.empty": { fr: "Posez une question sur vos goûts, des origines ou des méthodes à essayer.", pt: "Pergunte sobre seu gosto, origens ou métodos para experimentar." },
 
   "spots.title": { fr: "Coffee Spots", pt: "Coffee Spots" },
   "spots.subtitle": { fr: "Clermont-Ferrand & région", pt: "Clermont-Ferrand & região" },

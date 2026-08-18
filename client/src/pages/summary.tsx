@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3, Coffee, Droplets, Flame, Candy, Lightbulb, Heart } from "lucide-react";
+import { ChatWidget } from "@/components/chat-widget";
 
 interface TastingSummary {
   totalTastings: number;
@@ -120,6 +121,8 @@ export default function SummaryPage() {
                 </div>
               </div>
             </Card>
+
+            <ChatWidget />
           </>
         )}
       </div>

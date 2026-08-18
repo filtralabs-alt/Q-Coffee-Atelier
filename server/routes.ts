@@ -1,11 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
+import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import { sendReservationConfirmation, sendNewReservationNotification } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
+import { buildChatSystemPrompt } from "./chat-context";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
 import { cvCrisHtml } from "./cv-cris";
+
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
 
 export async function registerRoutes(
   httpServer: Server,
@@ -81,6 +87,38 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching summary:", error);
       res.status(500).json({ message: "Failed to fetch summary" });
+    }
+  });
+
+  app.post("/api/chat", isAuthenticated, async (req: any, res) => {
+    try {
+      if (!anthropic) {
+        return res.status(500).json({ message: "Chat is not configured" });
+      }
+      const message = String(req.body?.message ?? "").trim();
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const userId = req.user.id;
+      const systemPrompt = await buildChatSystemPrompt(userId);
+
+      const completion = await anthropic.messages.create({
+        model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5-20250929",
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: [{ role: "user", content: message }],
+      });
+
+      const reply = completion.content
+        .filter((block): block is Anthropic.TextBlock => block.type === "text")
+        .map((block) => block.text)
+        .join("\n");
+
+      res.json({ reply });
+    } catch (error) {
+      console.error("Error in chat:", error);
+      res.status(500).json({ message: "Failed to get chat reply" });
     }
   });
 
