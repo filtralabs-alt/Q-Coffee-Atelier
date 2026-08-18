@@ -45,7 +45,7 @@ export const EVENT_GOALS: { id: string; fr: string; pt: string }[] = [
 ];
 
 export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string; href?: string }[] = [
-  { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio" },
+  { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio", href: "/ateliers-domicile" },
   { id: "chocolat", fr: "Atelier café & chocolat", pt: "Workshop café & chocolate" },
   { id: "team-building", fr: "Atelier café pour team building", pt: "Workshop café para team building" },
   { id: "espace-prive", fr: "Atelier café en espace privé", pt: "Workshop café em espaço privado" },
