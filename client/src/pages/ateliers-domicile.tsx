@@ -21,10 +21,10 @@ const FACTS: { icon: typeof Clock; label: { fr: string; pt: string }; value: { f
 const STEPS: { time: string; title: { fr: string; pt: string }; body: { fr: string; pt: string } }[] = [
   {
     time: "10 min",
-    title: { fr: "La légende de Kaldi & les origines", pt: "A lenda de Kaldi & as origens" },
+    title: { fr: "La différence entre café spécial et café commodity", pt: "A diferença de café especial e café commodity" },
     body: {
-      fr: "Éthiopie, IXe siècle : des chèvres, des baies rouges, une découverte. Puis Arabica vs Robusta, et un tour des régions productrices du Brésil.",
-      pt: "Etiópia, século IX: cabras, cerejas vermelhas, uma descoberta. Depois Arábica vs Robusta, e um tour pelas regiões produtoras do Brasil.",
+      fr: "Un café commodity est acheté au poids, mélangé, coté en bourse. Un café specialty obtient un score de 80+ sur l'échelle de la SCA, acheté par lot, avec une traçabilité complète jusqu'au producteur.",
+      pt: "Um café commodity é comprado por peso, misturado, cotado em bolsa. Um café specialty obtém pontuação 80+ na escala da SCA, comprado por lote, com rastreabilidade completa até o produtor.",
     },
   },
   {
@@ -149,7 +149,7 @@ export default function AteliersDomicilePage() {
         <img
           src={heroPhoto}
           alt=""
-          className="w-full aspect-[4/3] object-cover"
+          className="w-full aspect-[4/3] object-cover object-top"
           data-testid="img-ateliers-domicile-hero"
         />
 
