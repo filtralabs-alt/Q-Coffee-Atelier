@@ -58,7 +58,7 @@ export function ChatWidget() {
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`text-sm rounded-lg px-3 py-2 leading-relaxed ${
+              className={`text-sm rounded-lg px-3 py-2 leading-relaxed break-words [overflow-wrap:anywhere] ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground ml-6"
                   : "bg-muted mr-6"
