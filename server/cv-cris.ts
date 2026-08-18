@@ -637,9 +637,9 @@ export const cvCrisHtml = `
       </div>
     </div>
 
-    <div style="margin: auto 0; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+    <div style="margin-top: 0.9rem; align-self: center; display: flex; flex-direction: row; align-items: center; gap: 0.9rem;">
       <a href="https://app.obaristech.com" target="_blank" rel="noopener" aria-label="Ouvrir l'app O Baristech" style="line-height: 0;">
-<svg width="132" height="132" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1155 1155">
+<svg width="96" height="96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1155 1155">
   <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 72)  -->
   <defs>
     <style>
@@ -997,7 +997,7 @@ export const cvCrisHtml = `
   </g>
   </svg>
       </a>
-      <p style="font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">Scanner pour l'app O Baristech</p>
+      <p style="font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); max-width: 150px; line-height: 1.5;">Scanner pour l'app O Baristech</p>
     </div>
 
   </div>
