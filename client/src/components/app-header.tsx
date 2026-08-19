@@ -1,18 +1,21 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
+import { useNavItems } from "@/hooks/use-nav-items";
+import { useLocation, Link } from "wouter";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogIn, LogOut, Settings, User } from "lucide-react";
-import { Link } from "wouter";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
 
-export function AppHeader() {
+export function AppHeader({ publicMode = false }: { publicMode?: boolean }) {
   const { user, logout } = useAuth();
   const { t } = useI18n();
+  const [location] = useLocation();
+  const navItems = useNavItems(publicMode);
 
   const initials = user
     ? (
@@ -23,16 +26,34 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <div className="flex items-center justify-between gap-2 px-5 h-14">
+      <div className="flex items-center gap-4 px-5 h-14">
         <Link href="/" data-testid="link-home">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             <img src={logoIcon} alt="Baristech" className="h-7 w-7 block dark:hidden" data-testid="img-header-logo" />
             <img src={logoIconWhite} alt="Baristech" className="h-7 w-7 hidden dark:block" data-testid="img-header-logo-dark" />
             <span className="font-sans text-lg font-semibold tracking-tight">{t("app.name")}</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-1.5">
+        <nav className="hidden md:flex items-center gap-0.5" data-testid="desktop-nav">
+          {navItems.map((item) => {
+            const isActive = location === item.href;
+            return (
+              <Link key={item.href} href={item.href} data-testid={`desktop-nav-link-${item.href.replace("/", "") || "home"}`}>
+                <div
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm transition-colors ${
+                    isActive ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  <item.icon className="h-4 w-4" strokeWidth={isActive ? 2.5 : 1.5} />
+                  <span>{item.label}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-1.5 ml-auto">
           <LangToggle />
           <ThemeToggle />
           {user ? (

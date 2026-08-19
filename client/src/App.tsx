@@ -47,7 +47,7 @@ function AuthenticatedLayout() {
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
       <AppHeader />
-      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px]">
+      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px] md:pb-4">
         <Switch>
           <Route path="/" component={JournalPage} />
           <Route path="/summary" component={SummaryPage} />
@@ -73,8 +73,8 @@ function AuthenticatedLayout() {
 function PublicLayout() {
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
-      <AppHeader />
-      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px]">
+      <AppHeader publicMode />
+      <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px] md:pb-4">
         <Switch>
           <Route path="/quiz" component={QuizPage} />
           <Route path="/library" component={LibraryPage} />
