@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useSearch } from "wouter";
+import { useLocation, useSearch, Link } from "wouter";
 import { useI18n } from "@/lib/i18n";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -7,7 +7,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Coffee, BookOpen, Award } from "lucide-react";
+import { Coffee, BookOpen, Award, ArrowRight } from "lucide-react";
 import logoIcon from "@assets/baristech-icon.png";
 import logoIconWhite from "@assets/baristech-icon-white.png";
 import logoFull from "@assets/baristech-logo-full.png";
@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function LandingPage() {
   const { t } = useI18n();
-  const { identify, isIdentifying } = useAuth();
+  const { user, identify, isIdentifying } = useAuth();
   const [, setLocation] = useLocation();
   const search = useSearch();
   const [name, setName] = useState("");
@@ -80,30 +80,39 @@ export default function LandingPage() {
                 {t("app.hero.subtitle")}
               </p>
 
-              {/* Login form */}
+              {/* Login form / logged-in shortcut */}
               <div className="max-w-sm mx-auto pt-2">
-                <form onSubmit={handleIdentify} className="flex flex-col gap-3">
-                  <Input
-                    type="text"
-                    placeholder={t("profile.firstName")}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    data-testid="input-name"
-                  />
-                  <Input
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    data-testid="input-email"
-                  />
-                  <Button type="submit" disabled={isIdentifying} data-testid="button-hero-cta">
-                    {isIdentifying ? <span className="animate-spin">⏳</span> : t("app.hero.cta")}
+                {user ? (
+                  <Button asChild size="lg" data-testid="button-hero-go-journal">
+                    <Link href="/journal">
+                      {t("app.hero.goToJournal")}
+                      <ArrowRight className="h-4 w-4 ml-1.5" />
+                    </Link>
                   </Button>
-                  {error && <p className="text-sm text-destructive text-center">{error}</p>}
-                </form>
+                ) : (
+                  <form onSubmit={handleIdentify} className="flex flex-col gap-3">
+                    <Input
+                      type="text"
+                      placeholder={t("profile.firstName")}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      data-testid="input-name"
+                    />
+                    <Input
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      data-testid="input-email"
+                    />
+                    <Button type="submit" disabled={isIdentifying} data-testid="button-hero-cta">
+                      {isIdentifying ? <span className="animate-spin">⏳</span> : t("app.hero.cta")}
+                    </Button>
+                    {error && <p className="text-sm text-destructive text-center">{error}</p>}
+                  </form>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground pt-2">
@@ -182,7 +191,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      <MobileNav publicMode />
+      <MobileNav publicMode={!user} />
 
       <Dialog open={showPrivacy} onOpenChange={setShowPrivacy}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">

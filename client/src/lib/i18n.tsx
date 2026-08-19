@@ -14,6 +14,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "app.hero.title": { fr: "Explorez l'univers du café de spécialité", pt: "Explore o universo do café especial" },
   "app.hero.subtitle": { fr: "Participez à nos ateliers de dégustation, notez vos impressions et découvrez votre profil café unique.", pt: "Participe dos nossos workshops de degustação, anote suas impressões e descubra seu perfil de café único." },
   "app.hero.cta": { fr: "Commencer", pt: "Começar" },
+  "app.hero.goToJournal": { fr: "Aller à mon journal", pt: "Ir para o meu diário" },
   "app.hero.feature1.title": { fr: "Journal de Dégustation", pt: "Diário de Degustação" },
   "app.hero.feature1.desc": { fr: "Notez chaque café que vous goûtez avec des notes aromatiques détaillées", pt: "Anote cada café que você prova com notas aromáticas detalhadas" },
   "app.hero.feature2.title": { fr: "Profil Personnalisé", pt: "Perfil Personalizado" },

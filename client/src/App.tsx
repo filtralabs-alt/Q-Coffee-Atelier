@@ -51,7 +51,7 @@ function AuthenticatedLayout() {
       <AppHeader />
       <main className="flex-1 overflow-y-auto overscroll-contain pb-[72px] md:pb-4">
         <Switch>
-          <Route path="/" component={JournalPage} />
+          <Route path="/journal" component={JournalPage} />
           <Route path="/summary" component={SummaryPage} />
           <Route path="/spots" component={SpotsPage} />
           <Route path="/quiz" component={QuizPage} />
@@ -159,6 +159,10 @@ function UserApp() {
 
   if (showWelcome) {
     return <WelcomeScreen name={user.firstName || user.email || ""} onDone={() => setShowWelcome(false)} />;
+  }
+
+  if (location === "/") {
+    return <LandingPage />;
   }
 
   return <AuthenticatedLayout />;

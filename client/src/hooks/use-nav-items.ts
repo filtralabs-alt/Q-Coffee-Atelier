@@ -12,7 +12,7 @@ export function useNavItems(publicMode = false) {
         { href: "/", icon: LogIn, label: t("nav.login") },
       ]
     : [
-        { href: "/", icon: Coffee, label: t("nav.journal") },
+        { href: "/journal", icon: Coffee, label: t("nav.journal") },
         { href: "/summary", icon: BarChart3, label: t("nav.summary") },
         { href: "/ateliers", icon: Calendar, label: t("nav.ateliers") },
         { href: "/spots", icon: Map, label: t("nav.spots") },
