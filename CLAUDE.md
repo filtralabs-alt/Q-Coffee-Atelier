@@ -1,10 +1,10 @@
-# Q-Coffee-Atelier — CLAUDE.md
+# Q-Coffee-Atelier (O Baristech) — CLAUDE.md
 
 ## Visão Geral
 
-PWA mobile-first bilíngue (Français / Português-BR) para workshops de degustação de café. Usuários fazem login, registram degustações, veem seu perfil sensorial, exploram cafeterias locais, fazem quiz de conhecimento e acessam uma biblioteca educacional sobre café.
+PWA mobile-first bilíngue (Français / Português-BR) para workshops de degustação de café. Usuários se identificam (nome + e-mail, sem senha), registram degustações, veem seu perfil sensorial, pedem sugestões a um chatbot com IA, exploram cafeterias locais, fazem quiz de conhecimento e acessam uma biblioteca educacional. O app também vende ateliers presenciais (crianças, degustação a domicílio/espaço privado, team building para empresas, e um atelier de tecnologia/IA) com páginas de venda dedicadas e um fluxo de reserva.
 
-**Estado atual:** UI 100% completa, API completa, schema do banco definido. Falta conectar o banco (Supabase), migrar autenticação do Replit Auth → Supabase Auth e fazer deploy no Railway.
+**Estado atual:** em produção, deploy ativo no Railway (`app.obaristech.com`), banco Postgres real hospedado no Supabase (usado só como Postgres, sem Supabase Auth/SDK).
 
 ---
 
@@ -21,149 +21,73 @@ PWA mobile-first bilíngue (Français / Português-BR) para workshops de degusta
 | Build | Vite 7 |
 | Backend | Express 5 + TypeScript |
 | ORM | Drizzle ORM |
-| Banco | PostgreSQL via Supabase |
-| Auth | Supabase Auth (a migrar — atualmente Replit OIDC) |
+| Banco | PostgreSQL via Supabase (só o Postgres — sem `@supabase/supabase-js`) |
+| Auth | Fluxo próprio e leve — ver seção Autenticação abaixo |
+| IA | Anthropic API (`@anthropic-ai/sdk`) — chatbot em `/summary` |
 | Sessions | express-session + connect-pg-simple |
-| Deploy | Railway |
+| Deploy | Railway, auto-deploy no push pra `main` do GitHub |
+
+---
+
+## Autenticação (correção importante)
+
+**Não é Replit OIDC nem Supabase Auth.** É um fluxo próprio, sem senha:
+- `POST /api/auth/identify` recebe `{name, email}`, faz upsert em `users` por e-mail, seta `req.session.userId`.
+- Sessão via `express-session` + `connect-pg-simple` (tabela `sessions` no Postgres).
+- Middleware `isAuthenticated` (`server/auth/index.ts`) — usado em toda rota protegida.
+- Admin é **separado**: `req.session.isAdmin`, login próprio em `/api/admin/login` com `ADMIN_EMAIL`/`ADMIN_PASSWORD_HASH`. Não tem relação com `req.user`.
 
 ---
 
 ## Estrutura de Arquivos
 
 ```
-Q-Coffee-Atelier/
-├── client/src/
-│   ├── components/
-│   │   ├── ui/              # 50+ componentes shadcn/ui
-│   │   ├── app-header.tsx   # Header com logo, lang toggle, theme toggle
-│   │   ├── mobile-nav.tsx   # Bottom nav (5 tabs)
-│   │   └── tasting-wizard.tsx # Form wizard 4 passos
-│   ├── hooks/
-│   │   └── use-auth.ts      # Hook de autenticação (a migrar p/ Supabase)
-│   ├── lib/
-│   │   ├── i18n.tsx         # 140+ chaves FR/PT-BR, persiste em localStorage
-│   │   ├── constants.ts     # Aroma tags, métodos de preparo, URLs externas
-│   │   ├── quiz-data.ts     # Perguntas dos 3 níveis do quiz (FR+PT)
-│   │   └── queryClient.ts   # TanStack Query client + apiRequest helper
-│   └── pages/
-│       ├── landing.tsx      # Tela de boas-vindas (visitante)
-│       ├── journal.tsx      # Diário de degustações (home logado)
-│       ├── summary.tsx      # Perfil sensorial + dicas personalizadas
-│       ├── spots.tsx        # Diretório de cafeterias
-│       ├── quiz.tsx         # Quiz 3 níveis
-│       ├── library.tsx      # Módulos educacionais
-│       └── admin-dashboard.tsx # Painel admin (stats, users, CRUD conteúdo)
+projetos/baristech/
+├── client/
+│   ├── public/               # arquivos estáticos servidos sem hash (favicon, manifest, email/*)
+│   │   └── email/            # campanhas de e-mail marketing hospedadas (imagens + HTML "ver no navegador")
+│   └── src/
+│       ├── components/
+│       │   ├── ui/              # 50+ componentes shadcn/ui
+│       │   ├── app-header.tsx   # Header: logo (→ home "/"), nav desktop (md+), lang/theme toggle, user menu
+│       │   ├── mobile-nav.tsx   # Bottom nav mobile (md:hidden), usa useNavItems()
+│       │   ├── chat-widget.tsx  # Widget de chat IA, embutido em summary.tsx
+│       │   └── tasting-wizard.tsx
+│       ├── hooks/
+│       │   ├── use-auth.ts       # user, identify, logout
+│       │   └── use-nav-items.ts  # itens de navegação compartilhados entre mobile-nav e app-header (desktop)
+│       ├── lib/
+│       │   ├── i18n.tsx          # 250+ chaves FR/PT-BR, persiste em localStorage
+│       │   ├── constants.ts      # Aroma tags, métodos, ATELIER_THEMES (banners de /ateliers), AI_LEVELS, TECH_GOALS
+│       │   ├── quiz-data.ts
+│       │   └── queryClient.ts    # apiRequest helper (cookie de sessão)
+│       └── pages/
+│           ├── landing.tsx           # Home pública ("/") — hero + login OU botão "ir pro diário" se já logado
+│           ├── journal.tsx           # Diário de degustações — rota "/journal" (não é mais "/")
+│           ├── summary.tsx           # Perfil sensorial + chatbot IA
+│           ├── spots.tsx
+│           ├── quiz.tsx
+│           ├── library.tsx / library-v60.tsx / library-chemex.tsx / library-torrefaction.tsx
+│           ├── ateliers.tsx          # Listagem + carrossel de banners + dialog de reserva (multi-modo de perguntas)
+│           ├── ateliers-enfants.tsx        # Venda: atelier pintura com café (crianças)
+│           ├── ateliers-domicile.tsx       # Venda: atelier a domicílio / espaço privado
+│           ├── ateliers-team-building.tsx  # Venda: atelier team building (empresas)
+│           ├── ateliers-cafe-tech.tsx      # Venda: atelier IA/automação (empresas + autônomos)
+│           └── admin-dashboard.tsx
 ├── server/
-│   ├── index.ts             # Inicialização Express
-│   ├── routes.ts            # 25+ endpoints API
-│   ├── storage.ts           # Camada de acesso ao banco (IStorage interface)
-│   ├── db.ts                # Instância Drizzle ORM
-│   ├── seed.ts              # Seed inicial (5 spots, 6 módulos biblioteca)
-│   └── replit_integrations/ # AUTH ATUAL — REMOVER ao migrar para Supabase
-│       └── auth/
+│   ├── index.ts               # Bootstrap Express
+│   ├── routes.ts              # Todas as rotas API (um arquivo só, sem "API routes" à la Next.js)
+│   ├── chat-context.ts        # Monta o system prompt do chatbot (perfil sensorial + coffee spots + conhecimento de terroir)
+│   ├── auth/index.ts          # identify, isAuthenticated, setupAuth
+│   ├── storage.ts             # Camada de acesso ao banco (IStorage)
+│   ├── db.ts                  # Instância Drizzle
+│   ├── email.ts               # Envio de e-mails transacionais (Resend) — confirmação/notificação de reserva
+│   └── seed.ts                # Seed inicial (coffee spots, library modules)
 ├── shared/
-│   ├── schema.ts            # Tabelas Drizzle: user_profiles, tasting_entries,
-│   │                        # coffee_spots, quiz_results, library_modules
-│   └── models/auth.ts       # Tabelas: users, sessions (Replit Auth)
-├── drizzle.config.ts        # Config Drizzle (aponta para DATABASE_URL)
-└── vite.config.ts           # Aliases: @/* → client/src, @shared/* → shared
-```
-
----
-
-## Schema do Banco (Drizzle ORM)
-
-### `users` (shared/models/auth.ts)
-```
-id (varchar PK, uuid auto)  email (varchar unique)
-firstName, lastName         profileImageUrl
-createdAt, updatedAt
-```
-> Ao migrar para Supabase Auth, adicionar campo `role varchar default 'user'`
-
-### `sessions` (shared/models/auth.ts)
-```
-sid (varchar PK)  sess (jsonb)  expire (timestamp, indexed)
-```
-> Pode ser removida quando migrar para Supabase Auth (Supabase gerencia sessões)
-
-### `user_profiles` (shared/schema.ts)
-```
-userId (FK users PK)  whatsapp  displayName
-rgpdConsent (bool)    preferredLanguage (default 'fr')
-```
-
-### `tasting_entries` (shared/schema.ts)
-```
-id (uuid PK)    userId (FK users)     coffeeName (required)
-origin          variety               process
-roastDate       method (required)     methodOther
-aromaTags[]     acidity/bitterness/sweetness (1-5, default 3)
-notes           favoriteMethod (bool) wouldDrinkAgain (yes/no/maybe)
-createdAt
-```
-
-### `coffee_spots` (shared/schema.ts)
-```
-id (uuid PK)  name (required)  city (required)
-instagram     website           tags[]
-approved (bool default true)   createdAt
-```
-
-### `quiz_results` (shared/schema.ts)
-```
-id (uuid PK)  userId (FK)  level (basic/intermediate/advanced)
-score         totalQuestions                completedAt
-```
-
-### `library_modules` (shared/schema.ts)
-```
-id (uuid PK)  key (unique)  titleFr/titlePt  descFr/descPt
-contentFr/contentPt (markdown)  icon  sortOrder
-isActive (bool)  externalUrl
-```
-
----
-
-## API Routes (server/routes.ts)
-
-### Públicas
-```
-GET  /api/health          — Health check
-GET  /api/auth/user       — Usuário atual (null se não logado)
-GET  /api/coffee-spots    — Cafeterias aprovadas
-GET  /api/library-modules — Módulos ativos
-```
-
-### Auth (Replit — a substituir por Supabase)
-```
-GET /api/login    → Redirect Replit OIDC
-GET /api/callback → OAuth callback
-GET /api/logout   → Logout
-```
-
-### Protegidas (usuário logado)
-```
-GET    /api/tastings          — Degustações do usuário
-POST   /api/tastings          — Criar degustação
-DELETE /api/tastings/:id      — Deletar degustação
-GET    /api/tastings/summary  — Resumo/perfil sensorial
-POST   /api/quiz-results      — Salvar resultado quiz
-GET    /api/quiz-results       — Histórico quiz
-```
-
-### Admin (session-based — a migrar para Supabase role)
-```
-POST  /api/admin/login
-POST  /api/admin/logout
-GET   /api/admin/session
-GET   /api/admin/stats
-GET   /api/admin/users
-GET   /api/admin/tastings
-GET|POST|PATCH|DELETE /api/admin/coffee-spots
-GET|POST|PATCH|DELETE /api/admin/coffee-spots/:id
-GET|POST|PATCH|DELETE /api/admin/library-modules
-GET|POST|PATCH|DELETE /api/admin/library-modules/:id
+│   ├── schema.ts              # Tabelas Drizzle principais
+│   └── models/auth.ts         # users, sessions
+├── drizzle.config.ts
+└── vite.config.ts             # Aliases: @/* → client/src, @assets/* → attached_assets/
 ```
 
 ---
@@ -172,24 +96,66 @@ GET|POST|PATCH|DELETE /api/admin/library-modules/:id
 
 | Rota | Página | Auth |
 |------|--------|------|
-| `/` | landing (visitante) ou journal (logado) | — |
-| `/summary` | Perfil sensorial + dicas | Sim |
+| `/` | **Home** (landing.tsx) — hero, login OU CTA "ir pro diário" se logado, rodapé com contato (cris@obaristech.com) | — |
+| `/journal` | Diário de degustações | Sim |
+| `/summary` | Perfil sensorial + **chatbot IA** | Sim |
 | `/spots` | Diretório de cafeterias | Sim |
-| `/quiz` | Quiz 3 níveis (basic/intermediate/advanced) | Sim |
-| `/library` | Módulos educacionais | Sim |
+| `/quiz` | Quiz 3 níveis | Sim |
+| `/library`, `/library/v60`, `/library/chemex`, `/library/torrefaction` | Módulos educacionais | Pública (visitante) |
+| `/ateliers` | Listagem + banners + reserva | Pública (visitante) |
+| `/ateliers-enfants`, `/ateliers-domicile`, `/ateliers-team-building`, `/ateliers-cafe-tech` | Páginas de venda por atelier | Pública (visitante) |
 | `/admin-panel` | Dashboard admin | Admin only |
+
+**Importante:** `/` deixou de ser o Diário (era antes) — agora é sempre a home/landing, pra visitante ou logado. O Diário só está em `/journal`. O logo no header sempre leva pra `/`.
+
+**Navegação:** mobile usa bottom tab bar (`mobile-nav.tsx`, escondida em `md+`); desktop mostra os mesmos itens compactos no header, ao lado do logo (`app-header.tsx`). Ambos usam `useNavItems()`.
+
+---
+
+## Chatbot (Anthropic API) — `/summary`
+
+- Rota: `POST /api/chat`, protegida por `isAuthenticated`.
+- Modelo configurável via `ANTHROPIC_MODEL` (default `claude-sonnet-4-5-20250929`).
+- `server/chat-context.ts` monta o system prompt com: persona "Baristech" (tom próximo/sensorial, respostas curtas), perfil sensorial real do usuário (`getTastingSummary`), histórico de quiz, **lojas parceiras reais** (`getCoffeeSpots` — recomenda com link real quando perguntam onde comprar), e conhecimento geral de terroir/regiões produtoras do mundo (vem do próprio modelo, não do banco).
+- Sem streaming (resposta completa via `res.json`).
+- Frontend: `client/src/components/chat-widget.tsx`, embutido só em `summary.tsx` (piloto isolado, ainda não expandido pro app inteiro).
+
+---
+
+## Ateliers — páginas de venda + reserva
+
+4 ateliers com página de venda dedicada (todas seguem o mesmo template: hero + facts + steps + benefícios/diferenciais + galeria + FAQ + CTA final):
+
+| Atelier | Rota | Tema (`theme`) | Modo de perguntas na reserva |
+|---|---|---|---|
+| Crianças (pintura com café) | `/ateliers-enfants` | `peinture-enfants` | `kids` (idade das crianças, acompanhado de adulto) |
+| A domicílio / espaço privado | `/ateliers-domicile` | `domicile`, `espace-prive` | `coffee` (conhecimento de café, método em casa, objetivo) |
+| Team building | `/ateliers-team-building` | `team-building` | `team` (empresa, objetivo do evento) |
+| Café Tech (IA, automação, sites/apps) | `/ateliers-cafe-tech` | `cafe-tech` | `tech` (nível de relação com IA, objetivo, contexto do negócio) |
+
+O carrossel de banners em `/ateliers` usa `ATELIER_THEMES` (`client/src/lib/constants.ts`) — cada tema tem `image` (foto de fundo, overlay azul ~60%) e opcionalmente `desktopImage` (crop diferente só pra telas `md+`, pra banners largos não ficarem esticados). O reservation dialog (`ateliers.tsx`) decide o `questionsMode` a partir de `atelier.theme` e mostra só as perguntas daquele modo.
+
+Reservas ficam na tabela `atelier_reservations` — campos condicionais por modo: `coffeeKnowledge/homeBrewMethod/learningGoal` (coffee), `companyName/eventGoal` (team), `childAges/parentAccompanying` (kids), `aiLevel/techGoal/techContext` (tech). Notificação por e-mail (`server/email.ts`) lista os campos preenchidos conforme o modo.
+
+---
+
+## E-mail marketing
+
+Campanhas HTML ficam em `client/public/email/<nome-da-campanha>/` — arquivos servidos com URL estável (sem hash), então imagens e o link "ver no navegador" não quebram entre deploys. Enviado via Gmail (MCP conectado). Ver campanha de exemplo em `client/public/email/cafe-tech-launch/` (ateliers pra empresas — team building + Café Tech).
 
 ---
 
 ## Comandos
 
 ```bash
-npm run dev       # Dev server (Express + Vite HMR) na porta 5000
-npm run build     # Build produção → dist/index.cjs
+npm run dev       # Dev server (Express + Vite HMR) na porta 3001 (local) / definida por PORT
+npm run build     # Build produção → dist/index.cjs + dist/public
 npm start         # Inicia produção
-npm run db:push   # Aplica schema ao banco PostgreSQL
+npm run db:push   # Aplica schema (shared/schema.ts) ao banco PostgreSQL — não precisa de migration manual
 npm run check     # Validação TypeScript
 ```
+
+**Fluxo de deploy:** commit + `git push origin main` → Railway detecta e faz build/deploy automático. Verificar propagação comparando o hash do bundle (`assets/index-XXXX.js`) servido em produção antes/depois do push — pode levar de alguns segundos a ~4 min.
 
 ---
 
@@ -197,78 +163,42 @@ npm run check     # Validação TypeScript
 
 | Variável | Descrição |
 |----------|-----------|
-| `DATABASE_URL` | PostgreSQL connection string do Supabase |
-| `SUPABASE_URL` | URL do projeto Supabase (ex: https://xxx.supabase.co) |
-| `SUPABASE_ANON_KEY` | Chave pública Supabase (safe para cliente) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Chave privada (só servidor — nunca expor no cliente) |
-| `SESSION_SECRET` | Secret para express-session |
-| `NODE_ENV` | development \| production |
-| `PORT` | Railway define automaticamente via `process.env.PORT` |
-
----
-
-## Checklist de Migração Supabase + Deploy Railway
-
-### Passo 1 — Supabase Project Setup
-- [ ] Criar projeto em supabase.com
-- [ ] Copiar `DATABASE_URL` (Settings > Database > Connection string > URI)
-- [ ] Copiar `SUPABASE_URL` e `SUPABASE_ANON_KEY` (Settings > API)
-- [ ] Copiar `SUPABASE_SERVICE_ROLE_KEY` (Settings > API > service_role)
-- [ ] Criar arquivo `.env` local com essas variáveis
-- [ ] Rodar `npm run db:push` para criar todas as tabelas
-- [ ] Rodar o seed: `tsx server/seed.ts`
-
-### Passo 2 — Instalar Supabase SDK
-```bash
-npm install @supabase/supabase-js
-```
-
-### Passo 3 — Migrar Autenticação do Servidor
-- [ ] Criar `server/auth/supabase.ts` com middleware JWT do Supabase
-- [ ] Substituir `server/replit_integrations/auth/` pelas novas rotas
-- [ ] Atualizar `server/index.ts` para usar novo auth middleware
-- [ ] Adicionar campo `role` na tabela `users`: `varchar role default 'user'`
-- [ ] Middleware `isAdmin` passa a verificar `user.role === 'admin'` (não mais `req.session.isAdmin`)
-- [ ] Remover dependências Replit: `openid-client`, `passport`, `passport-local`
-
-### Passo 4 — Migrar Autenticação do Cliente
-- [ ] Criar `client/src/lib/supabase.ts` com cliente Supabase
-- [ ] Atualizar `client/src/hooks/use-auth.ts` para usar Supabase Auth
-- [ ] Configurar providers no painel Supabase (Google OAuth ou Magic Link)
-- [ ] Atualizar landing.tsx com botão de login Supabase
-- [ ] Configurar redirect URL no Supabase: `https://seu-dominio.railway.app/auth/callback`
-
-### Passo 5 — Limpar Replit
-- [ ] Deletar `server/replit_integrations/`
-- [ ] Remover plugins Replit do `vite.config.ts`:
-  - `@replit/vite-plugin-cartographer`
-  - `@replit/vite-plugin-dev-banner`
-  - `@replit/vite-plugin-runtime-error-modal`
-- [ ] Remover dos devDependencies no `package.json`
-- [ ] Remover env vars: `REPL_ID`, `ISSUER_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`
-
-### Passo 6 — Railway Deploy
-- [ ] Criar projeto Railway em railway.app
-- [ ] Conectar repositório GitHub (push o projeto antes)
-- [ ] Adicionar todas as variáveis de ambiente no Railway
-- [ ] Garantir que `npm start` usa `process.env.PORT` (já configurado)
-- [ ] Verificar health check em `/api/health`
-- [ ] Testar fluxo completo: login → criar degustação → ver perfil → spots → quiz
+| `DATABASE_URL` | PostgreSQL connection string (pooler Supabase) |
+| `SESSION_SECRET` | Secret do express-session |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` | Login do admin |
+| `ANTHROPIC_API_KEY` | Chave da API Anthropic (chatbot) — configurada no Railway |
+| `ANTHROPIC_MODEL` | Opcional, override do modelo (default `claude-sonnet-4-5-20250929`) |
+| `RESEND_API_KEY` / `EMAIL_FROM` / `ADMIN_NOTIFICATION_EMAIL` | E-mails transacionais de reserva |
+| `SUPABASE_URL`, `VITE_SUPABASE_URL`, `*_SUPABASE_*` | Presentes no `.env` mas **não usados no código** — Supabase é só o host do Postgres |
+| `NODE_ENV`, `PORT` | Padrão Express/Railway |
 
 ---
 
 ## Notas Importantes
 
-**i18n:** Sistema custom sem biblioteca externa. Contexto em `client/src/lib/i18n.tsx`. Idioma padrão: francês. Persiste em `localStorage`. Todas as strings novas devem ser adicionadas nas duas línguas.
+**i18n:** Sistema custom sem biblioteca externa. Contexto em `client/src/lib/i18n.tsx`. Idioma padrão: francês. Persiste em `localStorage`. Toda string nova precisa das duas línguas.
 
-**Tasting Summary:** Algoritmo em `server/storage.ts` — calcula método favorito por frequência, top 5 aroma tags, médias de acidez/amargor/doçura e gera dica personalizada baseada no perfil.
+**Tasting Summary:** Algoritmo em `server/storage.ts` (`getTastingSummary`) — calcula método favorito, top aroma tags, médias de acidez/amargor/doçura, dica personalizada. É o mesmo dado usado pelo chatbot.
 
-**Admin:** Atualmente qualquer usuário com `req.session.isAdmin = true` tem acesso. Após migração, checar `user.role === 'admin'` via JWT do Supabase. Definir o primeiro admin diretamente no banco: `UPDATE users SET role = 'admin' WHERE email = 'seu@email.com'`.
+**Admin:** `req.session.isAdmin`, sem relação com `req.user`/login de usuário comum.
 
-**Seed Data:** `server/seed.ts` tem 5 cafeterias (Clermont-Ferrand) e 6 módulos de biblioteca pré-carregados. Rodar após criar as tabelas.
+**Background color:** `#EDEFED` (definido no CSS global). **Cor primária:** azul `#1E39B0` (`hsl(232 76% 55%)`), texto sobre foto/banner em cream `#F0DAB2`.
 
-**Background color:** `#EDEFED` (definido no CSS global, não remover).
+**Processamento de imagem:** usar **Python Pillow**, nunca `sips` pra rotacionar+redimensionar junto (sips reverte a rotação quando combinado com resize — bug confirmado). Fotos de celular geralmente têm EXIF de orientação — usar `ImageOps.exif_transpose()` antes de salvar, senão a imagem pode sair deitada/rotacionada errado mesmo com pixels "corretos" a olho nu no preview local.
 
-**PWA:** Manifesto configurado. App é mobile-first com bottom navigation de 5 tabs. Viewport: `h-[100dvh]`.
+**PWA:** Manifesto configurado. Mobile-first com bottom nav de 6 tabs (Diário, Resumo, Workshops, Coffee Spots, Biblioteca, Quiz) — some em telas `md+`, substituída pela nav compacta no header.
 
-**URLs externas:** Q Coffee Go e Grand Maître ChatGPT GPT — definidos em `client/src/lib/constants.ts`.
+---
+
+## Histórico recente (últimas sessões)
+
+Registro cronológico do que foi construído, pra não perder contexto entre conversas:
+
+1. **Páginas de venda dos ateliers** — criadas as 4 páginas dedicadas (crianças, domicílio/espaço-privado, team building, café tech), todas seguindo o mesmo template visual, com fotos reais processadas (crop + compressão via Pillow), deep-link de reserva (`/ateliers?reservar=<theme>`) e fluxo de login preservando a intenção (`?next=`).
+2. **Chatbot com Anthropic API** — avaliação técnica completa do stack (corrigindo a suposição inicial de Next.js/Supabase Auth), implementação em fases: rota `/api/chat` → contexto pessoal (`getTastingSummary`) → widget piloto isolado em `/summary`. Persona "Baristech", tom próximo/sensorial, respostas curtas. Depois enriquecido com conhecimento de terroir multi-origem e recomendação de lojas parceiras reais (`getCoffeeSpots`).
+3. **Atelier Café Tech (novo)** — criado do zero (sem roteiro prévio, a partir de uma descrição breve): página de venda, tema no carrossel de `/ateliers`, e um **formulário de reserva dedicado** (`questionsMode: "tech"`) com perguntas de nível de IA/objetivo/contexto do negócio — incluiu migration de banco (`ai_level`, `tech_goal`, `tech_context` em `atelier_reservations`) e atualização do e-mail de notificação interno.
+4. **Ajustes visuais nos banners de `/ateliers`** — fotos de fundo por tema, opacidade do overlay azul ajustada (70% → 50% → 60% de azul, testado até o efeito "azulado" desejado), correção de rotação EXIF numa foto, e imagem dedicada por tema (`desktopImage`) pra banners largos não esticarem no desktop.
+5. **Navegação** — reordenada (Diário, Resumo, Workshops, Coffee Spots, Biblioteca, Quiz), espaçamento entre ícones corrigido (era `flex-1` com larguras iguais gerando espaço desigual entre labels curtos/longos; trocado por `justify-between` com itens de largura natural), e criada versão desktop compacta no header (nav some do rodapé em telas `md+`).
+6. **Reestruturação de rotas** — `/` deixou de mostrar o Diário pra usuários logados (comportamento inconsistente com visitantes); agora `/` é sempre a home/landing (com botão "ir pro diário" se já logado), e o Diário ganhou rota própria `/journal`, no padrão de `/summary`.
+7. **E-mail marketing B2B** — campanha HTML (tabelas + CSS inline, compatível com clientes de e-mail) promovendo os ateliers Team Building e Café Tech pra empresas, com vídeo (gerado por IA) representado como imagem+botão de play linkando pra página real (e-mail não toca vídeo nativo). Assets hospedados em `client/public/email/`. Enviado via Gmail conectado.
+8. **Pequenos ajustes de copy/UI** — remoção do módulo "Grand Maître du Café" da Biblioteca, "Meu Resumo"/"Mon Résumé" → "Resumo"/"Résumé", "Meu Diário..." → "Diário...", "Boutique en ligne" com "(nós recomendamos)", e-mail de contato (`cris@obaristech.com`) adicionado ao rodapé da home.
