@@ -147,6 +147,11 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-5 py-10 text-center text-sm text-muted-foreground space-y-2">
           <p>&copy; {new Date().getFullYear()} Baristech &middot; Clermont-Ferrand, France</p>
           <p>
+            <a href="mailto:cris@obaristech.com" className="underline underline-offset-2 hover:text-foreground transition-colors">
+              cris@obaristech.com
+            </a>
+          </p>
+          <p>
             <button
               onClick={() => setShowPrivacy(true)}
               className="underline underline-offset-2 hover:text-foreground transition-colors"
