@@ -8,6 +8,7 @@ const ATELIER_LABELS_FR: Record<string, string> = {
   "team-building": "Atelier café pour team building",
   "espace-prive": "Atelier café en espace privé",
   "peinture-enfants": "Atelier peinture café enfants",
+  "cafe-tech": "Café Tech · IA & automatisation",
 };
 
 const COFFEE_KNOWLEDGE_LABELS_FR: Record<string, string> = {
@@ -32,9 +33,26 @@ const EVENT_GOAL_LABELS_FR: Record<string, string> = {
   other: "Autre",
 };
 
+const AI_LEVEL_LABELS_FR: Record<string, string> = {
+  none: "Je n'ai jamais utilisé l'IA",
+  curious: "J'ai testé une ou deux fois, par curiosité",
+  regular: "J'utilise déjà l'IA régulièrement",
+  business: "J'utilise déjà l'IA dans mon activité",
+  advanced: "Je suis à l'aise, je veux aller plus loin",
+};
+
+const TECH_GOAL_LABELS_FR: Record<string, string> = {
+  automate: "Automatiser des tâches",
+  "product-content": "Créer des images/vidéos de produits",
+  "build-site": "Créer un site ou une application",
+  "understand-ai": "Mieux comprendre l'IA en général",
+  other: "Autre",
+};
+
 const DURATION_MINUTES_BY_THEME: Record<string, number> = {
   "team-building": 105,
   "peinture-enfants": 60,
+  "cafe-tech": 120,
 };
 const DEFAULT_DURATION_MINUTES = 90;
 
@@ -125,6 +143,9 @@ export async function sendNewReservationNotification(opts: {
   eventGoal?: string | null;
   childAges?: number[] | null;
   parentAccompanying?: boolean | null;
+  aiLevel?: string | null;
+  techGoal?: string | null;
+  techContext?: string | null;
   message?: string | null;
 }) {
   const notifyTo = process.env.ADMIN_NOTIFICATION_EMAIL;
@@ -145,6 +166,9 @@ export async function sendNewReservationNotification(opts: {
   if (opts.eventGoal) details.push(`Objectif : ${EVENT_GOAL_LABELS_FR[opts.eventGoal] || opts.eventGoal}`);
   if (opts.childAges && opts.childAges.length > 0) details.push(`Âge des enfants : ${opts.childAges.join(", ")} ans`);
   if (opts.parentAccompanying != null) details.push(`Accompagné d'un parent : ${opts.parentAccompanying ? "Oui" : "Non"}`);
+  if (opts.aiLevel) details.push(`Niveau IA : ${AI_LEVEL_LABELS_FR[opts.aiLevel] || opts.aiLevel}`);
+  if (opts.techGoal) details.push(`Objectif IA : ${TECH_GOAL_LABELS_FR[opts.techGoal] || opts.techGoal}`);
+  if (opts.techContext) details.push(`Activité/projet : "${opts.techContext}"`);
   if (opts.message) details.push(`Message : "${opts.message}"`);
 
   await resend.emails.send({

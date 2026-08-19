@@ -220,6 +220,9 @@ export async function registerRoutes(
           eventGoal: row.reservation.eventGoal,
           childAges: row.reservation.childAges,
           parentAccompanying: row.reservation.parentAccompanying,
+          aiLevel: row.reservation.aiLevel,
+          techGoal: row.reservation.techGoal,
+          techContext: row.reservation.techContext,
           message: row.reservation.message,
         }).catch((error) => console.error("Error sending new reservation notification:", error));
       }

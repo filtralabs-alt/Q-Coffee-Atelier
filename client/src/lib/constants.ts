@@ -42,6 +42,22 @@ export const EVENT_GOALS: { id: string; fr: string; pt: string }[] = [
   { id: "other", fr: "Autre", pt: "Outro" },
 ];
 
+export const AI_LEVELS: { id: string; fr: string; pt: string }[] = [
+  { id: "none", fr: "Je n'ai jamais utilisé l'IA", pt: "Nunca usei IA" },
+  { id: "curious", fr: "J'ai testé une ou deux fois, par curiosité", pt: "Testei uma ou duas vezes, por curiosidade" },
+  { id: "regular", fr: "J'utilise déjà l'IA régulièrement", pt: "Já uso IA regularmente" },
+  { id: "business", fr: "J'utilise déjà l'IA dans mon activité", pt: "Já uso IA no meu negócio" },
+  { id: "advanced", fr: "Je suis à l'aise, je veux aller plus loin", pt: "Já manjo bem, quero ir além" },
+];
+
+export const TECH_GOALS: { id: string; fr: string; pt: string }[] = [
+  { id: "automate", fr: "Automatiser des tâches", pt: "Automatizar tarefas" },
+  { id: "product-content", fr: "Créer des images/vidéos de produits", pt: "Criar imagens/vídeos de produtos" },
+  { id: "build-site", fr: "Créer un site ou une application", pt: "Criar um site ou aplicativo" },
+  { id: "understand-ai", fr: "Mieux comprendre l'IA en général", pt: "Entender melhor a IA em geral" },
+  { id: "other", fr: "Autre", pt: "Outro" },
+];
+
 import atelierDomicileHero from "@assets/atelier-domicile-hero.jpg";
 import atelierTeamBuildingHero from "@assets/atelier-team-building-hero.jpg";
 import atelierEnfantsHero from "@assets/atelier-enfants-hero.jpg";

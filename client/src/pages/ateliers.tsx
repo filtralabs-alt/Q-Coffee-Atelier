@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
-import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS, AI_LEVELS, TECH_GOALS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Atelier, AtelierTestimonial } from "@shared/schema";
 import { Card } from "@/components/ui/card";
@@ -264,8 +264,11 @@ function ReviewDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => v
 function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: () => void }) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
-  const questionsMode: "team" | "kids" | "coffee" =
-    atelier.theme === "team-building" ? "team" : atelier.theme === "peinture-enfants" ? "kids" : "coffee";
+  const questionsMode: "team" | "kids" | "tech" | "coffee" =
+    atelier.theme === "team-building" ? "team"
+      : atelier.theme === "peinture-enfants" ? "kids"
+      : atelier.theme === "cafe-tech" ? "tech"
+      : "coffee";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -277,6 +280,9 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   const [eventGoal, setEventGoal] = useState("");
   const [childAges, setChildAges] = useState<string[]>([""]);
   const [parentAccompanying, setParentAccompanying] = useState("");
+  const [aiLevel, setAiLevel] = useState("");
+  const [techGoal, setTechGoal] = useState("");
+  const [techContext, setTechContext] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [reservationId, setReservationId] = useState<string | null>(null);
@@ -298,6 +304,9 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
           ? childAges.slice(0, Number(seats) || 1).map((a) => (a ? parseInt(a, 10) : null)).filter((a): a is number => a != null)
           : undefined,
         parentAccompanying: questionsMode === "kids" && parentAccompanying ? parentAccompanying === "yes" : undefined,
+        aiLevel: questionsMode === "tech" ? aiLevel || undefined : undefined,
+        techGoal: questionsMode === "tech" ? techGoal || undefined : undefined,
+        techContext: questionsMode === "tech" ? techContext || undefined : undefined,
         message: message || undefined,
       });
       return res.json();
@@ -467,6 +476,46 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
                       <SelectItem value="no">{t("ateliers.reservation.no")}</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </>
+            )}
+            {questionsMode === "tech" && (
+              <>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.aiLevel")}</Label>
+                  <Select value={aiLevel} onValueChange={setAiLevel}>
+                    <SelectTrigger data-testid="select-reservation-ai-level">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AI_LEVELS.map((level) => (
+                        <SelectItem key={level.id} value={level.id}>{level[lang]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("ateliers.reservation.techGoal")}</Label>
+                  <Select value={techGoal} onValueChange={setTechGoal}>
+                    <SelectTrigger data-testid="select-reservation-tech-goal">
+                      <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TECH_GOALS.map((goal) => (
+                        <SelectItem key={goal.id} value={goal.id}>{goal[lang]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reservation-tech-context">{t("ateliers.reservation.techContext")}</Label>
+                  <Textarea
+                    id="reservation-tech-context"
+                    rows={2}
+                    value={techContext}
+                    onChange={(e) => setTechContext(e.target.value)}
+                    data-testid="textarea-reservation-tech-context"
+                  />
                 </div>
               </>
             )}
