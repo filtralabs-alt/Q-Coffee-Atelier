@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarCheck, Users, Clock, Sparkles, Bot, Workflow, Rocket, Laptop } from "lucide-react";
 import heroPhoto from "@assets/atelier-cafe-tech-hero.jpg";
-import gallery1 from "@assets/atelier-cafe-tech-galerie-1.jpg";
-import gallery2 from "@assets/atelier-cafe-tech-galerie-2.jpg";
-import gallery3 from "@assets/atelier-cafe-tech-galerie-3.jpg";
+import galleryVideo from "@assets/atelier-cafe-tech-video-humaita.mp4";
+import galleryImage from "@assets/atelier-cafe-tech-galerie-humaita.jpg";
 
 const RESERVE_HREF = "/ateliers?reservar=cafe-tech";
 
@@ -216,9 +215,16 @@ export default function AteliersCafeTechPage() {
           </h2>
         </div>
         <div className="px-5 pb-5 grid grid-cols-2 gap-2">
-          <img src={gallery1} alt="" className="col-span-2 aspect-[4/3] object-cover rounded-md" data-testid="img-gallery-1" />
-          <img src={gallery2} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-2" />
-          <img src={gallery3} alt="" className="aspect-square object-cover rounded-md" data-testid="img-gallery-3" />
+          <video
+            src={galleryVideo}
+            className="aspect-[3/4] object-cover rounded-md w-full"
+            autoPlay
+            muted
+            loop
+            playsInline
+            data-testid="video-gallery-humaita"
+          />
+          <img src={galleryImage} alt="" className="aspect-[3/4] object-cover rounded-md" data-testid="img-gallery-humaita" />
         </div>
 
         {/* FAQ */}
