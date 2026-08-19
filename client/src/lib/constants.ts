@@ -59,13 +59,14 @@ export const TECH_GOALS: { id: string; fr: string; pt: string }[] = [
 ];
 
 import atelierDomicileHero from "@assets/atelier-domicile-hero.jpg";
+import atelierDomicileBannerDesktop from "@assets/atelier-domicile-banner-desktop.jpg";
 import atelierTeamBuildingHero from "@assets/atelier-team-building-hero.jpg";
 import atelierEnfantsHero from "@assets/atelier-enfants-hero.jpg";
 import atelierEspacePriveHero from "@assets/atelier-espace-prive-hero.jpg";
 import atelierCafeTechBanner from "@assets/atelier-cafe-tech-banner.jpg";
 
-export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string; href?: string }[] = [
-  { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio", image: atelierDomicileHero, href: "/ateliers-domicile" },
+export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string; desktopImage?: string; href?: string }[] = [
+  { id: "domicile", fr: "Atelier café à domicile", pt: "Workshop café a domicílio", image: atelierDomicileHero, desktopImage: atelierDomicileBannerDesktop, href: "/ateliers-domicile" },
   { id: "team-building", fr: "Atelier café pour team building", pt: "Workshop café para team building", image: atelierTeamBuildingHero, href: "/ateliers-team-building" },
   { id: "espace-prive", fr: "Atelier café en espace privé", pt: "Workshop café em espaço privado", image: atelierEspacePriveHero, href: "/ateliers-domicile" },
   { id: "peinture-enfants", fr: "Atelier peinture café enfants", pt: "Workshop pintura com café para crianças", image: atelierEnfantsHero, href: "/ateliers-enfants" },

@@ -72,18 +72,30 @@ function ThemeBanners() {
             <Wrapper
               key={theme.id}
               {...(wrapperProps as any)}
-              className={`relative w-full shrink-0 snap-center flex items-center justify-center px-8 ${theme.href ? "cursor-pointer" : ""}`}
-              style={{
-                height: 340,
-                backgroundColor: BANNER_BG,
-                backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.6), rgba(30,57,176,0.6)), url(${theme.image})` : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
+              className={`relative w-full shrink-0 snap-center flex items-center justify-center px-8 overflow-hidden ${theme.href ? "cursor-pointer" : ""}`}
+              style={{ height: 340, backgroundColor: BANNER_BG }}
               data-testid={`banner-theme-${theme.id}`}
             >
+              <div
+                className={theme.desktopImage ? "absolute inset-0 md:hidden" : "absolute inset-0"}
+                style={{
+                  backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.6), rgba(30,57,176,0.6)), url(${theme.image})` : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+              {theme.desktopImage && (
+                <div
+                  className="absolute inset-0 hidden md:block"
+                  style={{
+                    backgroundImage: `linear-gradient(0deg, rgba(30,57,176,0.6), rgba(30,57,176,0.6)), url(${theme.desktopImage})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              )}
               <h2
-                className="text-center text-4xl leading-tight italic"
+                className="relative z-10 text-center text-4xl leading-tight italic"
                 style={{ fontFamily: "'Playfair Display', serif", color: BANNER_TEXT }}
               >
                 {theme[lang]}
