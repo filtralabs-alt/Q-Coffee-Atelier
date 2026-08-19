@@ -44,7 +44,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "app.welcome.title": { fr: "Bienvenue !", pt: "Bem-vindo(a)!" },
   "app.welcome.subtitle": { fr: "Votre espace café est prêt", pt: "Seu espaço café está pronto" },
 
-  "journal.title": { fr: "Mon Journal de Dégustation", pt: "Meu Diário de Degustação" },
+  "journal.title": { fr: "Journal de Dégustation", pt: "Diário de Degustação" },
   "journal.empty": { fr: "Aucune dégustation enregistrée. Ajoutez votre première !", pt: "Nenhuma degustação registrada. Adicione a primeira!" },
   "journal.add": { fr: "Nouvelle Dégustation", pt: "Nova Degustação" },
 "journal.drinkAgain": { fr: "Boire à nouveau ?", pt: "Beber de novo?" },
