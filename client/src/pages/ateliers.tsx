@@ -76,7 +76,7 @@ function ThemeBanners() {
               style={{
                 height: 340,
                 backgroundColor: BANNER_BG,
-                backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.55), rgba(30,57,176,0.55)), url(${theme.image})` : undefined,
+                backgroundImage: theme.image ? `linear-gradient(0deg, rgba(30,57,176,0.3), rgba(30,57,176,0.3)), url(${theme.image})` : undefined,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
