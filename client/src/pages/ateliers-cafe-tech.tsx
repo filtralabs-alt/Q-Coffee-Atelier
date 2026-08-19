@@ -13,7 +13,7 @@ const RESERVE_HREF = "/ateliers?reservar=cafe-tech";
 const FACTS: { icon: typeof Users; label: { fr: string; pt: string }; value: { fr: string; pt: string } }[] = [
   { icon: Users, label: { fr: "Public", pt: "Público" }, value: { fr: "Entrepreneurs & curieux", pt: "Empreendedores e curiosos" } },
   { icon: Clock, label: { fr: "Durée", pt: "Duração" }, value: { fr: "~2h", pt: "~2h" } },
-  { icon: Laptop, label: { fr: "À prévoir", pt: "Levar" }, value: { fr: "Un ordinateur portable", pt: "Um notebook" } },
+  { icon: Laptop, label: { fr: "À prévoir", pt: "Levar" }, value: { fr: "Un ordinateur ou smartphone", pt: "Um notebook ou smartphone" } },
   { icon: Sparkles, label: { fr: "Niveau", pt: "Nível" }, value: { fr: "Aucun prérequis technique", pt: "Sem pré-requisito técnico" } },
 ];
 
@@ -98,8 +98,8 @@ const FAQ: { q: { fr: string; pt: string }; a: { fr: string; pt: string } }[] = 
   {
     q: { fr: "Dois-je apporter mon ordinateur ?", pt: "Preciso levar meu computador?" },
     a: {
-      fr: "Oui, un ordinateur portable est recommandé pour suivre la partie pratique et repartir avec votre projet déjà commencé.",
-      pt: "Sim, um notebook é recomendado para acompanhar a parte prática e sair com seu projeto já iniciado.",
+      fr: "Un ordinateur ou un smartphone suffit pour suivre la partie pratique et repartir avec votre projet déjà commencé.",
+      pt: "Um notebook ou smartphone é suficiente para acompanhar a parte prática e sair com seu projeto já iniciado.",
     },
   },
   {
