@@ -31,8 +31,8 @@ const STEPS: { time: string; title: { fr: string; pt: string }; body: { fr: stri
     time: "20 min",
     title: { fr: "L'IA au quotidien, avec Claude", pt: "IA no dia a dia, com o Claude" },
     body: {
-      fr: "Ce qu'est vraiment une IA comme Claude, et comment elle peut déjà vous faire gagner du temps aujourd'hui — écrire, résumer, organiser, décider.",
-      pt: "O que realmente é uma IA como o Claude, e como ela já pode economizar seu tempo hoje — escrever, resumir, organizar, decidir.",
+      fr: "Ce qu'est vraiment une IA comme Claude, et comment elle peut déjà vous faire gagner du temps aujourd'hui — écrire, résumer, organiser, décider. On découvre aussi comment créer des images de produits et des vidéos avec l'IA : une solution accessible pour les boutiques, l'e-commerce et les indépendants avec un petit budget, sans studio photo ni tournage.",
+      pt: "O que realmente é uma IA como o Claude, e como ela já pode economizar seu tempo hoje — escrever, resumir, organizar, decidir. Também mostramos como criar imagens de produto e vídeos com IA: uma solução acessível para lojas, e-commerce e profissionais autônomos com orçamento baixo, sem precisar de estúdio fotográfico ou gravação.",
     },
   },
   {
