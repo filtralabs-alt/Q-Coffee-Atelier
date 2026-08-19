@@ -22,7 +22,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "app.hero.feature3.desc": { fr: "Testez vos connaissances et montez en niveau dans l'art du café", pt: "Teste seus conhecimentos e suba de nível na arte do café" },
 
   "nav.journal": { fr: "Journal", pt: "Diário" },
-  "nav.summary": { fr: "Mon Résumé", pt: "Meu Resumo" },
+  "nav.summary": { fr: "Résumé", pt: "Resumo" },
   "nav.spots": { fr: "Coffee Spots", pt: "Coffee Spots" },
   "nav.quiz": { fr: "Quiz", pt: "Quiz" },
   "nav.library": { fr: "Bibliothèque", pt: "Biblioteca" },
