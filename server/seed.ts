@@ -56,19 +56,6 @@ export async function seedDatabase() {
     console.log("Seeding library modules...");
     await db.insert(libraryModules).values([
       {
-        key: "grandmaitre",
-        titleFr: "Grand Maître du Café",
-        titlePt: "Grand Maître du Café",
-        descFr: "Posez vos questions à notre maître Yoda du café",
-        descPt: "Tire suas dúvidas com nosso mestre Yoda do café",
-        contentFr: "",
-        contentPt: "",
-        icon: "message-circle",
-        sortOrder: 6,
-        isActive: true,
-        externalUrl: "https://chatgpt.com/g/g-695eef447f20819196b922de01c5cc7e-grand-maitre-du-cafe",
-      },
-      {
         key: "chemex",
         titleFr: "Guide Chemex",
         titlePt: "Guia Chemex",

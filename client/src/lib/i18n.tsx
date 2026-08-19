@@ -191,9 +191,6 @@ const translations: Record<string, Record<Lang, string>> = {
   "library.specialty.desc": { fr: "Comprendre la différence entre cafés de spécialité et industriels", pt: "Entenda a diferença entre cafés especiais e industriais" },
   "library.equipment": { fr: "Équipement de Base", pt: "Equipamento Básico" },
   "library.equipment.desc": { fr: "Tout ce dont vous avez besoin pour commencer à la maison", pt: "Tudo que você precisa para começar em casa" },
-  "library.grandmaitre": { fr: "Grand Maître du Café", pt: "Grand Maître du Café" },
-  "library.grandmaitre.desc": { fr: "Posez vos questions à notre maître Yoda du café", pt: "Tire suas dúvidas com nosso mestre Yoda do café" },
-  "library.grandmaitre.cta": { fr: "Poser une question", pt: "Fazer uma pergunta" },
 
   "ateliers.title": { fr: "Ateliers", pt: "Workshops" },
   "ateliers.subtitle": { fr: "Nos ateliers de dégustation, à venir et passés", pt: "Nossos workshops de degustação, próximos e passados" },
