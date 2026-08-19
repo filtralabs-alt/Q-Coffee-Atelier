@@ -838,6 +838,13 @@ function AteliersTab() {
       toast({ title: "Supprimé" });
       setDeleteId(null);
     },
+    onError: () => {
+      toast({
+        title: "Impossible de supprimer",
+        description: "Cet atelier a probablement des réservations ou avis liés. Supprimez-les d'abord.",
+        variant: "destructive",
+      });
+    },
   });
 
   const openEdit = (item: Atelier) => {
