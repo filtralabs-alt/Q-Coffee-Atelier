@@ -143,6 +143,8 @@ Reservas ficam na tabela `atelier_reservations` — campos condicionais por modo
 
 Campanhas HTML ficam em `client/public/email/<nome-da-campanha>/` — arquivos servidos com URL estável (sem hash), então imagens e o link "ver no navegador" não quebram entre deploys. Enviado via Gmail (MCP conectado). Ver campanha de exemplo em `client/public/email/cafe-tech-launch/` (ateliers pra empresas — team building + Café Tech).
 
+**Saudação personalizada:** o template tem um placeholder `Bonjour {{nome}},` no topo do e-mail — antes de cada envio, trocar `{{nome}}` pelo nome real do destinatário (ex: `Bonjour Madame Chal-Duarte,`) no HTML que vai no `htmlBody` do envio. Pra lista grande (mail merge automático), ver opção de usar o Resend (`server/email.ts`) já configurado no backend, em vez de enviar um por um via Gmail.
+
 ---
 
 ## Comandos
