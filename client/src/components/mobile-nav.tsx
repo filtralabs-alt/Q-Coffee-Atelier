@@ -24,7 +24,7 @@ export function MobileNav({ publicMode = false }: { publicMode?: boolean }) {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-t border-border/50" data-testid="mobile-nav">
-      <div className="flex items-stretch justify-around gap-1">
+      <div className="flex items-stretch justify-between px-2">
         {navItems.map((item) => {
           const isActive = location === item.href;
           return (
@@ -32,7 +32,6 @@ export function MobileNav({ publicMode = false }: { publicMode?: boolean }) {
               key={item.href}
               href={item.href}
               data-testid={`nav-link-${item.href.replace("/", "") || "home"}`}
-              className="flex-1"
             >
               <div className={`flex flex-col items-center justify-center gap-1 py-2.5 min-h-[56px] relative transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                 {isActive && (
