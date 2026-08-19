@@ -62,7 +62,7 @@ import atelierDomicileHero from "@assets/atelier-domicile-hero.jpg";
 import atelierDomicileBannerDesktop from "@assets/atelier-domicile-banner-desktop.jpg";
 import atelierTeamBuildingHero from "@assets/atelier-team-building-hero.jpg";
 import atelierEnfantsHero from "@assets/atelier-enfants-hero.jpg";
-import atelierEspacePriveHero from "@assets/atelier-espace-prive-hero.jpg";
+import atelierEspacePriveHero from "@assets/atelier-espace-prive-banner.jpg";
 import atelierCafeTechBanner from "@assets/atelier-cafe-tech-banner.jpg";
 
 export const ATELIER_THEMES: { id: string; fr: string; pt: string; image?: string; desktopImage?: string; href?: string }[] = [
