@@ -804,7 +804,10 @@ export default function AteliersPage() {
 
     const now = new Date();
     const match = ateliers
-      .filter((a) => a.theme === theme && new Date(a.dateTime) >= now)
+      .filter((a) => {
+        const isFull = a.seatsAvailable !== null && a.seatsAvailable !== undefined && a.seatsAvailable <= 0;
+        return a.theme === theme && new Date(a.dateTime) >= now && !isFull;
+      })
       .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())[0];
 
     deepLinkHandled.current = true;
