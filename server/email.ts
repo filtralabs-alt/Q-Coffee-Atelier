@@ -13,8 +13,11 @@ export async function sendCampaignEmail(opts: { to: string; name: string; campai
     throw new Error("RESEND_API_KEY not set");
   }
 
-  const campaignDir = path.resolve(import.meta.dirname, "..", "client", "public", "email", opts.campaign);
-  const templatePath = path.join(campaignDir, "email.html");
+  // Production bundle runs from dist/, where Vite copies client/public/* to dist/public/.
+  // In dev, the server runs straight from source, so the files are still under client/public/.
+  const prodTemplatePath = path.resolve(__dirname, "public", "email", opts.campaign, "email.html");
+  const devTemplatePath = path.resolve(__dirname, "..", "client", "public", "email", opts.campaign, "email.html");
+  const templatePath = fs.existsSync(prodTemplatePath) ? prodTemplatePath : devTemplatePath;
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Campaign "${opts.campaign}" not found`);
   }
