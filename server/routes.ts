@@ -3,10 +3,10 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
-import { sendReservationConfirmation, sendNewReservationNotification } from "./email";
+import { sendReservationConfirmation, sendNewReservationNotification, sendNewQuoteRequestNotification } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { buildChatSystemPrompt } from "./chat-context";
-import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema } from "@shared/schema";
+import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema, insertAtelierQuoteRequestSchema } from "@shared/schema";
 import { cvCrisHtml } from "./cv-cris";
 
 const anthropic = process.env.ANTHROPIC_API_KEY
@@ -157,6 +157,23 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error redirecting spot click:", error);
       res.status(500).send("Error");
+    }
+  });
+
+  app.post("/api/quote-requests", async (req, res) => {
+    try {
+      const parsed = insertAtelierQuoteRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+      }
+      const request = await storage.createQuoteRequest(parsed.data);
+      res.json(request);
+      sendNewQuoteRequestNotification(request).catch((error) =>
+        console.error("Error sending new quote request notification:", error)
+      );
+    } catch (error) {
+      console.error("Error creating quote request:", error);
+      res.status(500).json({ message: "Failed to create quote request" });
     }
   });
 

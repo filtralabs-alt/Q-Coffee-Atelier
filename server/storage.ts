@@ -8,6 +8,7 @@ import {
   ateliers, type Atelier, type InsertAtelier,
   atelierTestimonials, type AtelierTestimonial, type InsertAtelierTestimonial,
   atelierReservations, type AtelierReservation, type InsertAtelierReservation,
+  atelierQuoteRequests, type AtelierQuoteRequest, type InsertAtelierQuoteRequest,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, count } from "drizzle-orm";
@@ -60,6 +61,8 @@ export interface IStorage {
   acceptReservationPolicy(id: string): Promise<AtelierReservation | undefined>;
   getReservationWithAtelier(id: string): Promise<{ reservation: AtelierReservation; atelier: Atelier } | undefined>;
   markReservationConfirmed(id: string): Promise<AtelierReservation>;
+
+  createQuoteRequest(request: InsertAtelierQuoteRequest): Promise<AtelierQuoteRequest>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -382,6 +385,11 @@ export class DatabaseStorage implements IStorage {
       .set({ status: "confirmed", confirmationEmailSentAt: new Date() })
       .where(eq(atelierReservations.id, id))
       .returning();
+    return result;
+  }
+
+  async createQuoteRequest(request: InsertAtelierQuoteRequest): Promise<AtelierQuoteRequest> {
+    const [result] = await db.insert(atelierQuoteRequests).values(request).returning();
     return result;
   }
 }

@@ -561,6 +561,99 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   );
 }
 
+function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => void }) {
+  const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const showCompany = theme === "team-building" || theme === "cafe-tech";
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/quote-requests", {
+        theme,
+        name,
+        email,
+        phone: phone || undefined,
+        companyName: showCompany && companyName ? companyName : undefined,
+        message: message || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: () => setSubmitted(true),
+    onError: () => {
+      toast({ title: t("ateliers.quote.error"), variant: "destructive" });
+    },
+  });
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent data-testid="dialog-quote-request">
+        <DialogHeader>
+          <DialogTitle>{t("ateliers.quote.title")}</DialogTitle>
+        </DialogHeader>
+
+        {submitted ? (
+          <div className="py-2" data-testid="text-quote-success">
+            <p className="text-center text-sm text-muted-foreground">{t("ateliers.quote.success")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {t("ateliers.quote.intro").replace("{theme}", themeLabel(theme, lang))}
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="quote-name">{t("ateliers.reservation.name")}</Label>
+              <Input id="quote-name" value={name} onChange={(e) => setName(e.target.value)} data-testid="input-quote-name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quote-email">{t("ateliers.reservation.email")}</Label>
+              <Input id="quote-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-quote-email" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quote-phone">{t("ateliers.reservation.phone")}</Label>
+              <Input id="quote-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="input-quote-phone" />
+            </div>
+            {showCompany && (
+              <div className="space-y-2">
+                <Label htmlFor="quote-company">{t("ateliers.reservation.companyName")}</Label>
+                <Input id="quote-company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} data-testid="input-quote-company" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="quote-message">{t("ateliers.quote.message")}</Label>
+              <Textarea id="quote-message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-quote-message" />
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          {submitted ? (
+            <Button onClick={onClose} data-testid="button-quote-done">{t("common.save")}</Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={onClose} data-testid="button-quote-cancel">
+                {t("ateliers.reservation.cancel")}
+              </Button>
+              <Button
+                onClick={() => submitMutation.mutate()}
+                disabled={!name.trim() || !email.trim() || submitMutation.isPending}
+                data-testid="button-quote-submit"
+              >
+                {submitMutation.isPending ? t("ateliers.reservation.submitting") : t("ateliers.quote.submit")}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function AtelierCard({ atelier, testimonials, isPast, onReview, onReserve }: {
   atelier: Atelier;
   testimonials: AtelierTestimonial[];
@@ -685,6 +778,7 @@ export default function AteliersPage() {
   const search = useSearch();
   const [reviewAtelier, setReviewAtelier] = useState<Atelier | null>(null);
   const [reservationAtelier, setReservationAtelier] = useState<Atelier | null>(null);
+  const [quoteTheme, setQuoteTheme] = useState<string | null>(null);
   const deepLinkHandled = useRef(false);
 
   const handleReserve = (atelier: Atelier) => {
@@ -712,10 +806,13 @@ export default function AteliersPage() {
     const match = ateliers
       .filter((a) => a.theme === theme && new Date(a.dateTime) >= now)
       .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())[0];
-    if (!match) return;
 
     deepLinkHandled.current = true;
-    handleReserve(match);
+    if (match) {
+      handleReserve(match);
+    } else {
+      setQuoteTheme(theme);
+    }
   }, [ateliers, search, user, authLoading]);
 
   const testimonialsByAtelier = useMemo(() => {
@@ -819,6 +916,7 @@ export default function AteliersPage() {
       {reservationAtelier && (
         <ReservationDialog atelier={reservationAtelier} onClose={() => setReservationAtelier(null)} />
       )}
+      {quoteTheme && <QuoteRequestDialog theme={quoteTheme} onClose={() => setQuoteTheme(null)} />}
     </div>
   );
 }

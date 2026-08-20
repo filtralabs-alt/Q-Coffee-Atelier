@@ -193,3 +193,40 @@ export async function sendNewReservationNotification(opts: {
     `,
   });
 }
+
+export async function sendNewQuoteRequestNotification(opts: {
+  theme: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  companyName?: string | null;
+  message?: string | null;
+}) {
+  const notifyTo = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!resend || !notifyTo) {
+    if (!notifyTo) console.warn("ADMIN_NOTIFICATION_EMAIL not set, skipping new quote request notification");
+    return;
+  }
+
+  const title = ATELIER_LABELS_FR[opts.theme] || opts.theme;
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
+    to: notifyTo,
+    subject: `Demande de devis : ${title} — ${opts.name}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #1C0F08;">
+        <h2>Nouvelle demande de devis ☕</h2>
+        <p style="font-size: 13px; color: #6b6558;">Aucune date n'était disponible pour cet atelier — la personne a laissé ses coordonnées au lieu de réserver.</p>
+        <ul style="line-height: 1.8;">
+          <li><strong>Atelier souhaité :</strong> ${title}</li>
+          <li><strong>Nom :</strong> ${opts.name}</li>
+          <li><strong>E-mail :</strong> ${opts.email}</li>
+          ${opts.phone ? `<li><strong>Téléphone :</strong> ${opts.phone}</li>` : ""}
+          ${opts.companyName ? `<li><strong>Entreprise :</strong> ${opts.companyName}</li>` : ""}
+        </ul>
+        ${opts.message ? `<p style="line-height: 1.8;">Message : "${opts.message}"</p>` : ""}
+      </div>
+    `,
+  });
+}

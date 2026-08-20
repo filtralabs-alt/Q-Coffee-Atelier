@@ -165,6 +165,24 @@ export const insertAtelierReservationSchema = createInsertSchema(atelierReservat
 export type InsertAtelierReservation = z.infer<typeof insertAtelierReservationSchema>;
 export type AtelierReservation = typeof atelierReservations.$inferSelect;
 
+// No upcoming atelier of that theme was found — this captures interest
+// (theme + contact + free-text need) so Cris can follow up directly,
+// instead of the visitor hitting a dead end on /ateliers.
+export const atelierQuoteRequests = pgTable("atelier_quote_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  theme: varchar("theme").notNull(),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  phone: varchar("phone"),
+  companyName: varchar("company_name"),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAtelierQuoteRequestSchema = createInsertSchema(atelierQuoteRequests).omit({ id: true, createdAt: true });
+export type InsertAtelierQuoteRequest = z.infer<typeof insertAtelierQuoteRequestSchema>;
+export type AtelierQuoteRequest = typeof atelierQuoteRequests.$inferSelect;
+
 export const ateliersRelations = relations(ateliers, ({ many }) => ({
   testimonials: many(atelierTestimonials),
   reservations: many(atelierReservations),
