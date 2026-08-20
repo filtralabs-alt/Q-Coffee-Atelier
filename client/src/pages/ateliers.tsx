@@ -565,10 +565,13 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const showCompany = theme === "team-building" || theme === "cafe-tech";
+  const objectiveOptions = theme === "team-building" ? EVENT_GOALS : theme === "cafe-tech" ? TECH_GOALS : null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [estimatedPeople, setEstimatedPeople] = useState("");
+  const [objective, setObjective] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -580,6 +583,8 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
         email,
         phone: phone || undefined,
         companyName: showCompany && companyName ? companyName : undefined,
+        estimatedPeople: estimatedPeople || undefined,
+        objective: objectiveOptions && objective ? objective : undefined,
         message: message || undefined,
       });
       return res.json();
@@ -622,6 +627,35 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
               <div className="space-y-2">
                 <Label htmlFor="quote-company">{t("ateliers.reservation.companyName")}</Label>
                 <Input id="quote-company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} data-testid="input-quote-company" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="quote-estimated-people">
+                {theme === "peinture-enfants" ? t("ateliers.quote.estimatedChildren") : t("ateliers.quote.estimatedPeople")}
+              </Label>
+              <Input
+                id="quote-estimated-people"
+                type="number"
+                min={1}
+                max={500}
+                value={estimatedPeople}
+                onChange={(e) => setEstimatedPeople(e.target.value)}
+                data-testid="input-quote-estimated-people"
+              />
+            </div>
+            {objectiveOptions && (
+              <div className="space-y-2">
+                <Label>{t("ateliers.quote.objective")}</Label>
+                <Select value={objective} onValueChange={setObjective}>
+                  <SelectTrigger data-testid="select-quote-objective">
+                    <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {objectiveOptions.map((opt) => (
+                      <SelectItem key={opt.id} value={opt.id}>{opt[lang]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
             <div className="space-y-2">

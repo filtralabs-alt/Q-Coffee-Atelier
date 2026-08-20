@@ -175,11 +175,15 @@ export const atelierQuoteRequests = pgTable("atelier_quote_requests", {
   email: varchar("email").notNull(),
   phone: varchar("phone"),
   companyName: varchar("company_name"),
+  estimatedPeople: integer("estimated_people"),
+  objective: varchar("objective"),
   message: text("message"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertAtelierQuoteRequestSchema = createInsertSchema(atelierQuoteRequests).omit({ id: true, createdAt: true });
+export const insertAtelierQuoteRequestSchema = createInsertSchema(atelierQuoteRequests, {
+  estimatedPeople: z.coerce.number().int().min(1).max(500).optional(),
+}).omit({ id: true, createdAt: true });
 export type InsertAtelierQuoteRequest = z.infer<typeof insertAtelierQuoteRequestSchema>;
 export type AtelierQuoteRequest = typeof atelierQuoteRequests.$inferSelect;
 

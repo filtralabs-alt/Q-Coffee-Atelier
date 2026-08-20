@@ -200,6 +200,8 @@ export async function sendNewQuoteRequestNotification(opts: {
   email: string;
   phone?: string | null;
   companyName?: string | null;
+  estimatedPeople?: number | null;
+  objective?: string | null;
   message?: string | null;
 }) {
   const notifyTo = process.env.ADMIN_NOTIFICATION_EMAIL;
@@ -209,6 +211,9 @@ export async function sendNewQuoteRequestNotification(opts: {
   }
 
   const title = ATELIER_LABELS_FR[opts.theme] || opts.theme;
+  const objectiveLabel = opts.objective
+    ? EVENT_GOAL_LABELS_FR[opts.objective] || TECH_GOAL_LABELS_FR[opts.objective] || opts.objective
+    : null;
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
@@ -224,6 +229,8 @@ export async function sendNewQuoteRequestNotification(opts: {
           <li><strong>E-mail :</strong> ${opts.email}</li>
           ${opts.phone ? `<li><strong>Téléphone :</strong> ${opts.phone}</li>` : ""}
           ${opts.companyName ? `<li><strong>Entreprise :</strong> ${opts.companyName}</li>` : ""}
+          ${opts.estimatedPeople ? `<li><strong>Nombre de personnes estimé :</strong> ${opts.estimatedPeople}</li>` : ""}
+          ${objectiveLabel ? `<li><strong>Objectif :</strong> ${objectiveLabel}</li>` : ""}
         </ul>
         ${opts.message ? `<p style="line-height: 1.8;">Message : "${opts.message}"</p>` : ""}
       </div>
