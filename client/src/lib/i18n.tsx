@@ -250,7 +250,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "ateliers.quote.intro": { fr: "Aucune date n'est disponible pour l'instant pour « {theme} ». Laissez vos coordonnées, on vous recontacte pour en discuter.", pt: "Não há data disponível no momento para \"{theme}\". Deixe seus dados que entramos em contato pra conversar." },
   "ateliers.quote.message": { fr: "Votre besoin (optionnel)", pt: "Seu objetivo/necessidade (opcional)" },
   "ateliers.quote.submit": { fr: "Envoyer la demande", pt: "Enviar pedido" },
-  "ateliers.quote.success": { fr: "Merci ! On vous recontacte très vite pour organiser ça.", pt: "Obrigado! Vamos entrar em contato bem rápido pra organizar isso." },
+  "ateliers.quote.success": { fr: "Merci ! Nous vous recontactons très vite pour organiser votre atelier.", pt: "Obrigado! Entraremos em contato bem rápido para organizar o seu atelier." },
   "ateliers.quote.error": { fr: "Une erreur est survenue, réessayez.", pt: "Ocorreu um erro, tente novamente." },
   "ateliers.reservation.policy": {
     fr: "Le paiement se fait sur place, à la fin de l'atelier. En cochant cette case, je m'engage à honorer ma réservation. Annulation gratuite jusqu'à 48h avant l'atelier. En cas d'annulation sans explication ni proposition de nouvelle date, le montant total reste dû.",
