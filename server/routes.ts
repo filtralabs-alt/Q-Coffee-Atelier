@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcryptjs";
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
-import { sendReservationConfirmation, sendNewReservationNotification, sendNewQuoteRequestNotification } from "./email";
+import { sendReservationConfirmation, sendNewReservationNotification, sendNewQuoteRequestNotification, sendCampaignEmail } from "./email";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { buildChatSystemPrompt } from "./chat-context";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema, insertAtelierQuoteRequestSchema } from "@shared/schema";
@@ -329,6 +329,20 @@ export async function registerRoutes(
 
   app.get("/api/admin/session", (req: any, res) => {
     res.json({ isAdmin: !!req.session?.isAdmin });
+  });
+
+  app.post("/api/admin/campaigns/send-test", isAdmin, async (req, res) => {
+    try {
+      const { to, name, campaign } = req.body || {};
+      if (!to || !name || !campaign) {
+        return res.status(400).json({ message: "to, name and campaign are required" });
+      }
+      await sendCampaignEmail({ to, name, campaign });
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Error sending campaign test email:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to send campaign email" });
+    }
   });
 
   app.get("/api/admin/stats", isAdmin, async (_req, res) => {

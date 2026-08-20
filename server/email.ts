@@ -1,6 +1,39 @@
 import { Resend } from "resend";
+import fs from "fs";
+import path from "path";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+const CAMPAIGN_SUBJECTS: Record<string, string> = {
+  "cafe-tech-launch": "Deux ateliers pensés pour vos équipes — O Baristech",
+};
+
+export async function sendCampaignEmail(opts: { to: string; name: string; campaign: string }) {
+  if (!resend) {
+    throw new Error("RESEND_API_KEY not set");
+  }
+
+  const campaignDir = path.resolve(import.meta.dirname, "..", "client", "public", "email", opts.campaign);
+  const templatePath = path.join(campaignDir, "email.html");
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Campaign "${opts.campaign}" not found`);
+  }
+
+  const publicHtml = fs.readFileSync(templatePath, "utf-8");
+  // The published email.html is generic ("Bonjour,") since it also serves as the
+  // static "view in browser" page, which has no per-recipient personalization.
+  // The sent copy gets the recipient's name injected on top of that.
+  const personalizedHtml = publicHtml.replace("Bonjour,", `Bonjour ${opts.name},`);
+
+  const subject = CAMPAIGN_SUBJECTS[opts.campaign] || "O Baristech";
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
+    to: opts.to,
+    subject,
+    html: personalizedHtml,
+  });
+}
 
 const ATELIER_LABELS_FR: Record<string, string> = {
   domicile: "Atelier café à domicile",
