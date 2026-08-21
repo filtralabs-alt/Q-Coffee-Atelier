@@ -58,6 +58,11 @@ export const TECH_GOALS: { id: string; fr: string; pt: string }[] = [
   { id: "other", fr: "Autre", pt: "Outro" },
 ];
 
+export const QUOTE_INTENTS: { id: string; fr: string; pt: string }[] = [
+  { id: "notify", fr: "Être prévenu(e) dès qu'une date est disponible", pt: "Ser avisado(a) assim que tiver uma data disponível" },
+  { id: "propose", fr: "Proposer d'accueillir l'atelier dans mon espace", pt: "Propor sediar o atelier no meu espaço" },
+];
+
 import atelierDomicileHero from "@assets/atelier-domicile-hero.jpg";
 import atelierDomicileBannerDesktop from "@assets/atelier-domicile-banner-desktop.jpg";
 import atelierTeamBuildingHero from "@assets/atelier-team-building-hero.jpg";

@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
-import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS, AI_LEVELS, TECH_GOALS } from "@/lib/constants";
+import { ATELIER_THEMES, COFFEE_KNOWLEDGE_LEVELS, HOME_BREW_METHODS, EVENT_GOALS, AI_LEVELS, TECH_GOALS, QUOTE_INTENTS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Atelier, AtelierTestimonial } from "@shared/schema";
 import { Card } from "@/components/ui/card";
@@ -566,6 +566,7 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
   const { toast } = useToast();
   const showCompany = theme === "team-building" || theme === "cafe-tech";
   const objectiveOptions = theme === "team-building" ? EVENT_GOALS : theme === "cafe-tech" ? TECH_GOALS : null;
+  const [intent, setIntent] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -574,17 +575,19 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
   const [objective, setObjective] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const isProposing = intent === "propose";
 
   const submitMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/quote-requests", {
         theme,
+        intent: intent || undefined,
         name,
         email,
         phone: phone || undefined,
-        companyName: showCompany && companyName ? companyName : undefined,
-        estimatedPeople: estimatedPeople || undefined,
-        objective: objectiveOptions && objective ? objective : undefined,
+        companyName: isProposing && showCompany && companyName ? companyName : undefined,
+        estimatedPeople: isProposing && estimatedPeople ? estimatedPeople : undefined,
+        objective: isProposing && objectiveOptions && objective ? objective : undefined,
         message: message || undefined,
       });
       return res.json();
@@ -611,6 +614,21 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
             <p className="text-sm text-muted-foreground">
               {t("ateliers.quote.intro").replace("{theme}", themeLabel(theme, lang))}
             </p>
+
+            <div className="space-y-2">
+              <Label>{t("ateliers.quote.intent")}</Label>
+              <Select value={intent} onValueChange={setIntent}>
+                <SelectTrigger data-testid="select-quote-intent">
+                  <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUOTE_INTENTS.map((opt) => (
+                    <SelectItem key={opt.id} value={opt.id}>{opt[lang]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="quote-name">{t("ateliers.reservation.name")}</Label>
               <Input id="quote-name" value={name} onChange={(e) => setName(e.target.value)} data-testid="input-quote-name" />
@@ -623,41 +641,47 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
               <Label htmlFor="quote-phone">{t("ateliers.reservation.phone")}</Label>
               <Input id="quote-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="input-quote-phone" />
             </div>
-            {showCompany && (
-              <div className="space-y-2">
-                <Label htmlFor="quote-company">{t("ateliers.reservation.companyName")}</Label>
-                <Input id="quote-company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} data-testid="input-quote-company" />
-              </div>
+
+            {isProposing && (
+              <>
+                {showCompany && (
+                  <div className="space-y-2">
+                    <Label htmlFor="quote-company">{t("ateliers.reservation.companyName")}</Label>
+                    <Input id="quote-company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} data-testid="input-quote-company" />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="quote-estimated-people">
+                    {theme === "peinture-enfants" ? t("ateliers.quote.estimatedChildren") : t("ateliers.quote.estimatedPeople")}
+                  </Label>
+                  <Input
+                    id="quote-estimated-people"
+                    type="number"
+                    min={1}
+                    max={500}
+                    value={estimatedPeople}
+                    onChange={(e) => setEstimatedPeople(e.target.value)}
+                    data-testid="input-quote-estimated-people"
+                  />
+                </div>
+                {objectiveOptions && (
+                  <div className="space-y-2">
+                    <Label>{t("ateliers.quote.objective")}</Label>
+                    <Select value={objective} onValueChange={setObjective}>
+                      <SelectTrigger data-testid="select-quote-objective">
+                        <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {objectiveOptions.map((opt) => (
+                          <SelectItem key={opt.id} value={opt.id}>{opt[lang]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="quote-estimated-people">
-                {theme === "peinture-enfants" ? t("ateliers.quote.estimatedChildren") : t("ateliers.quote.estimatedPeople")}
-              </Label>
-              <Input
-                id="quote-estimated-people"
-                type="number"
-                min={1}
-                max={500}
-                value={estimatedPeople}
-                onChange={(e) => setEstimatedPeople(e.target.value)}
-                data-testid="input-quote-estimated-people"
-              />
-            </div>
-            {objectiveOptions && (
-              <div className="space-y-2">
-                <Label>{t("ateliers.quote.objective")}</Label>
-                <Select value={objective} onValueChange={setObjective}>
-                  <SelectTrigger data-testid="select-quote-objective">
-                    <SelectValue placeholder={t("ateliers.reservation.selectPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {objectiveOptions.map((opt) => (
-                      <SelectItem key={opt.id} value={opt.id}>{opt[lang]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+
             <div className="space-y-2">
               <Label htmlFor="quote-message">{t("ateliers.quote.message")}</Label>
               <Textarea id="quote-message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} data-testid="textarea-quote-message" />
@@ -675,7 +699,7 @@ function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => 
               </Button>
               <Button
                 onClick={() => submitMutation.mutate()}
-                disabled={!name.trim() || !email.trim() || submitMutation.isPending}
+                disabled={!intent || !name.trim() || !email.trim() || submitMutation.isPending}
                 data-testid="button-quote-submit"
               >
                 {submitMutation.isPending ? t("ateliers.reservation.submitting") : t("ateliers.quote.submit")}

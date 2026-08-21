@@ -171,6 +171,7 @@ export type AtelierReservation = typeof atelierReservations.$inferSelect;
 export const atelierQuoteRequests = pgTable("atelier_quote_requests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   theme: varchar("theme").notNull(),
+  intent: varchar("intent"),
   name: varchar("name").notNull(),
   email: varchar("email").notNull(),
   phone: varchar("phone"),

@@ -247,6 +247,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "ateliers.reservation.no": { fr: "Non", pt: "Não" },
   "ateliers.reservation.message": { fr: "Message (optionnel)", pt: "Mensagem (opcional)" },
   "ateliers.quote.title": { fr: "Demander un devis", pt: "Pedir um orçamento" },
+  "ateliers.quote.intent": { fr: "Qu'aimeriez-vous faire ?", pt: "O que você gostaria de fazer?" },
   "ateliers.quote.intro": { fr: "Aucune date n'est disponible pour l'instant pour « {theme} ». Laissez vos coordonnées, on vous recontacte pour en discuter.", pt: "Não há data disponível no momento para \"{theme}\". Deixe seus dados que entramos em contato pra conversar." },
   "ateliers.quote.estimatedPeople": { fr: "Nombre de personnes (estimation)", pt: "Quantidade de pessoas (estimativa)" },
   "ateliers.quote.estimatedChildren": { fr: "Nombre d'enfants (estimation)", pt: "Quantidade de crianças (estimativa)" },

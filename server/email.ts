@@ -230,8 +230,14 @@ export async function sendNewReservationNotification(opts: {
   });
 }
 
+const QUOTE_INTENT_LABELS_FR: Record<string, string> = {
+  notify: "Être prévenu(e) dès qu'une date est disponible",
+  propose: "Proposer d'accueillir l'atelier dans son espace",
+};
+
 export async function sendNewQuoteRequestNotification(opts: {
   theme: string;
+  intent?: string | null;
   name: string;
   email: string;
   phone?: string | null;
@@ -250,6 +256,7 @@ export async function sendNewQuoteRequestNotification(opts: {
   const objectiveLabel = opts.objective
     ? EVENT_GOAL_LABELS_FR[opts.objective] || TECH_GOAL_LABELS_FR[opts.objective] || opts.objective
     : null;
+  const intentLabel = opts.intent ? QUOTE_INTENT_LABELS_FR[opts.intent] || opts.intent : null;
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM || "Baristech <onboarding@resend.dev>",
@@ -261,6 +268,7 @@ export async function sendNewQuoteRequestNotification(opts: {
         <p style="font-size: 13px; color: #6b6558;">Aucune date n'était disponible pour cet atelier — la personne a laissé ses coordonnées au lieu de réserver.</p>
         <ul style="line-height: 1.8;">
           <li><strong>Atelier souhaité :</strong> ${title}</li>
+          ${intentLabel ? `<li><strong>Souhait :</strong> ${intentLabel}</li>` : ""}
           <li><strong>Nom :</strong> ${opts.name}</li>
           <li><strong>E-mail :</strong> ${opts.email}</li>
           ${opts.phone ? `<li><strong>Téléphone :</strong> ${opts.phone}</li>` : ""}
