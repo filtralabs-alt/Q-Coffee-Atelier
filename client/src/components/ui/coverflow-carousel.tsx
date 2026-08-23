@@ -80,6 +80,7 @@ export function CoverflowCarousel({
     pos: number;
     v: number;
     t: number;
+    index: number | null;
   } | null>(null);
 
   const [selected, setSelected] = React.useState(0);
@@ -184,6 +185,11 @@ export function CoverflowCarousel({
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
+    // setPointerCapture retargets the eventual pointerup/click to this frame
+    // element (a known cross-browser quirk with mouse input), so the card
+    // actually pressed has to be identified now, before capture kicks in.
+    const pressedCard = (event.target as HTMLElement).closest<HTMLElement>("[data-index]");
+    const pressedIndex = pressedCard ? Number(pressedCard.dataset.index) : null;
     event.currentTarget.setPointerCapture(event.pointerId);
     targetRef.current = posRef.current;
     draggedRef.current = false;
@@ -193,6 +199,7 @@ export function CoverflowCarousel({
       pos: posRef.current,
       v: 0,
       t: performance.now(),
+      index: pressedIndex,
     };
   };
 
@@ -224,10 +231,11 @@ export function CoverflowCarousel({
     // Let a flick carry, but never more than two cards.
     const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
     settle(clamp(Math.round(posRef.current + carried)));
+
+    if (!draggedRef.current && drag.index !== null) onCardClick(drag.index);
   };
 
   const onCardClick = (index: number) => {
-    if (draggedRef.current) return;
     if (index !== indexAt(targetRef.current)) {
       goTo(index);
       onSlideSelect?.(index, false);
@@ -313,7 +321,7 @@ export function CoverflowCarousel({
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${index + 1} of ${count}`}
-                onClick={() => onCardClick(index)}
+                data-index={index}
                 className={cn(
                   "absolute left-1/2 top-0 aspect-square overflow-hidden rounded-2xl bg-muted shadow-xl will-change-transform",
                   onSlideSelect && "cursor-pointer",
