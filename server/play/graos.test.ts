@@ -64,6 +64,13 @@ describe("applyPlaySession", () => {
     expect(r.currentStreak).toBe(4);
   });
 
+  it("clamps correct to total (anti-cheat)", async () => {
+    const store = makeStore();
+    const r = await applyPlaySession(store, "u1", { gameKey: "quiz-basic", correct: 999, total: 10, firstTry: false }, "2026-08-28");
+    expect(r.graosEarned).toBe(10); // 10 * 1, not 999 * 1
+    expect(store.sessions[0].correct).toBe(10);
+  });
+
   it("rejeita gameKey invalido", async () => {
     const store = makeStore();
     await expect(

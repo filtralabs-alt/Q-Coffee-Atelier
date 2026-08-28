@@ -61,32 +61,36 @@ export async function applyPlaySession(
   if (!GAME_KEYS.includes(input.gameKey)) {
     throw new Error(`invalid gameKey: ${input.gameKey}`);
   }
-  const correct = Math.max(0, Math.floor(input.correct));
   const total = Math.max(0, Math.floor(input.total));
+  const clampedCorrect = Math.min(Math.max(0, Math.floor(input.correct)), total);
 
   const prev = await store.getPlayProgress(userId);
   const isFirstGame = !prev;
   const prevTotal = prev?.totalGraos ?? 0;
   const prevBadges = prev?.badges ?? [];
 
-  const raw = graosForGame(input.gameKey, correct, input.firstTry);
+  const raw = graosForGame(input.gameKey, clampedCorrect, input.firstTry);
   const earnedToday = await store.getTodayGraosEarned(userId, today);
   const graosEarned = applyDailyCap(raw, earnedToday);
   const newTotal = prevTotal + graosEarned;
 
   const currentStreak = nextStreak(prev?.lastPlayedDate ?? null, today, prev?.currentStreak ?? 0);
 
+  // Deliberate order: log the session BEFORE advancing progress. If the
+  // upsert throws, the session row still counts against the daily cap, so a
+  // retried request can't farm Grãos. The reverse order would let a failed
+  // createPlaySession advance the total without a cap-accounting row.
   await store.createPlaySession({
     userId,
     gameKey: input.gameKey,
     graosEarned,
-    correct,
+    correct: clampedCorrect,
     total,
   });
 
   const badges = computeBadges(prevBadges, {
     gameKey: input.gameKey,
-    correct,
+    correct: clampedCorrect,
     total,
     firstTry: input.firstTry,
     streak: currentStreak,
