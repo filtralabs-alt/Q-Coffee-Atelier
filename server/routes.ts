@@ -9,7 +9,7 @@ import { buildChatSystemPrompt } from "./chat-context";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema, insertAtelierQuoteRequestSchema } from "@shared/schema";
 import { cvCrisHtml } from "./cv-cris";
 import { applyPlaySession } from "./play/graos";
-import { levelForGraos } from "@shared/play/graos";
+import { levelForGraos, GAME_KEYS, type GameKey } from "@shared/play/graos";
 
 const anthropic = process.env.ANTHROPIC_API_KEY
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -301,11 +301,16 @@ export async function registerRoutes(
     try {
       const userId = req.user.id;
       const { gameKey, correct, total, firstTry } = req.body ?? {};
-      if (typeof gameKey !== "string" || typeof correct !== "number" || typeof total !== "number") {
+      if (
+        typeof gameKey !== "string" ||
+        !(GAME_KEYS as readonly string[]).includes(gameKey) ||
+        typeof correct !== "number" ||
+        typeof total !== "number"
+      ) {
         return res.status(400).json({ message: "Invalid data" });
       }
       const result = await applyPlaySession(storage, userId, {
-        gameKey,
+        gameKey: gameKey as GameKey,
         correct,
         total,
         firstTry: Boolean(firstTry),
