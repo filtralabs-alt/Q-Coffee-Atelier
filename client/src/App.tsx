@@ -44,6 +44,7 @@ const PUBLIC_ROUTES = [
   "/ateliers-domicile",
   "/ateliers-team-building",
   "/ateliers-cafe-tech",
+  "/quiz",
   "/play",
   "/play/quiz",
   "/play/ordem",
