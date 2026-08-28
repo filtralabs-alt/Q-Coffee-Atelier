@@ -149,6 +149,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "spots.featured.title": { fr: "Boutique en ligne (nous recommandons)", pt: "Loja online (nós recomendamos)" },
   "spots.featured.cta": { fr: "Voir l'offre →", pt: "Ver a oferta →" },
 
+  "play.ordem.cardDesc": { fr: "Remettez les étapes de préparation dans le bon ordre", pt: "Coloque os passos do preparo na ordem certa" },
   "play.quiz.title": { fr: "Quiz Café", pt: "Quiz Café" },
   "play.quiz.subtitle": { fr: "Testez vos connaissances !", pt: "Teste seus conhecimentos!" },
   "play.quiz.basic": { fr: "Basique", pt: "Básico" },
