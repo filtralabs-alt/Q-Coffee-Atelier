@@ -8,6 +8,8 @@ import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth";
 import { buildChatSystemPrompt } from "./chat-context";
 import { insertTastingEntrySchema, insertCoffeeSpotSchema, insertQuizResultSchema, insertLibraryModuleSchema, insertAtelierSchema, insertAtelierTestimonialSchema, insertAtelierReservationSchema, insertAtelierQuoteRequestSchema } from "@shared/schema";
 import { cvCrisHtml } from "./cv-cris";
+import { applyPlaySession } from "./play/graos";
+import { levelForGraos } from "@shared/play/graos";
 
 const anthropic = process.env.ANTHROPIC_API_KEY
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -292,6 +294,43 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching quiz results:", error);
       res.status(500).json({ message: "Failed to fetch quiz results" });
+    }
+  });
+
+  app.post("/api/play/session", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { gameKey, correct, total, firstTry } = req.body ?? {};
+      if (typeof gameKey !== "string" || typeof correct !== "number" || typeof total !== "number") {
+        return res.status(400).json({ message: "Invalid data" });
+      }
+      const result = await applyPlaySession(storage, userId, {
+        gameKey,
+        correct,
+        total,
+        firstTry: Boolean(firstTry),
+      });
+      res.json(result);
+    } catch (error) {
+      console.error("Error saving play session:", error);
+      res.status(500).json({ message: "Failed to save play session" });
+    }
+  });
+
+  app.get("/api/play/progress", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const progress = await storage.getPlayProgress(userId);
+      const totalGraos = progress?.totalGraos ?? 0;
+      res.json({
+        totalGraos,
+        level: levelForGraos(totalGraos),
+        currentStreak: progress?.currentStreak ?? 0,
+        badges: progress?.badges ?? [],
+      });
+    } catch (error) {
+      console.error("Error fetching play progress:", error);
+      res.status(500).json({ message: "Failed to fetch play progress" });
     }
   });
 
