@@ -9,9 +9,11 @@ import {
   atelierTestimonials, type AtelierTestimonial, type InsertAtelierTestimonial,
   atelierReservations, type AtelierReservation, type InsertAtelierReservation,
   atelierQuoteRequests, type AtelierQuoteRequest, type InsertAtelierQuoteRequest,
+  playProgress, type PlayProgress, type InsertPlayProgress,
+  playSessions, type PlaySession, type InsertPlaySession,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql, count } from "drizzle-orm";
+import { eq, desc, sql, count, and, gte, lt } from "drizzle-orm";
 
 export interface IStorage {
   getTastingEntries(userId: string): Promise<TastingEntry[]>;
@@ -29,6 +31,11 @@ export interface IStorage {
 
   getQuizResults(userId: string): Promise<QuizResult[]>;
   createQuizResult(result: InsertQuizResult): Promise<QuizResult>;
+
+  getPlayProgress(userId: string): Promise<PlayProgress | undefined>;
+  upsertPlayProgress(userId: string, data: { totalGraos: number; currentStreak: number; lastPlayedDate: string; badges: string[] }): Promise<PlayProgress>;
+  createPlaySession(data: InsertPlaySession): Promise<PlaySession>;
+  getTodayGraosEarned(userId: string, date: string): Promise<number>;
 
   getUserProfile(userId: string): Promise<UserProfile | undefined>;
   upsertUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
@@ -203,6 +210,48 @@ export class DatabaseStorage implements IStorage {
   async createQuizResult(result: InsertQuizResult): Promise<QuizResult> {
     const [row] = await db.insert(quizResults).values(result).returning();
     return row;
+  }
+
+  async getPlayProgress(userId: string): Promise<PlayProgress | undefined> {
+    const [row] = await db.select().from(playProgress).where(eq(playProgress.userId, userId));
+    return row;
+  }
+
+  async upsertPlayProgress(
+    userId: string,
+    data: { totalGraos: number; currentStreak: number; lastPlayedDate: string; badges: string[] },
+  ): Promise<PlayProgress> {
+    const [row] = await db
+      .insert(playProgress)
+      .values({ userId, ...data, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: playProgress.userId,
+        set: { ...data, updatedAt: new Date() },
+      })
+      .returning();
+    return row;
+  }
+
+  async createPlaySession(data: InsertPlaySession): Promise<PlaySession> {
+    const [row] = await db.insert(playSessions).values(data).returning();
+    return row;
+  }
+
+  async getTodayGraosEarned(userId: string, date: string): Promise<number> {
+    const start = new Date(`${date}T00:00:00`);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    const [row] = await db
+      .select({ value: sql<number>`coalesce(sum(${playSessions.graosEarned}), 0)` })
+      .from(playSessions)
+      .where(
+        and(
+          eq(playSessions.userId, userId),
+          gte(playSessions.playedAt, start),
+          lt(playSessions.playedAt, end),
+        ),
+      );
+    return Number(row?.value ?? 0);
   }
 
   async getUserProfile(userId: string): Promise<UserProfile | undefined> {
