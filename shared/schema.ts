@@ -81,6 +81,34 @@ export const insertQuizResultSchema = createInsertSchema(quizResults).omit({ id:
 export type InsertQuizResult = z.infer<typeof insertQuizResultSchema>;
 export type QuizResult = typeof quizResults.$inferSelect;
 
+export const playProgress = pgTable("play_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+  totalGraos: integer("total_graos").notNull().default(0),
+  currentStreak: integer("current_streak").notNull().default(0),
+  lastPlayedDate: varchar("last_played_date"),
+  badges: jsonb("badges").notNull().default(sql`'[]'::jsonb`).$type<string[]>(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPlayProgressSchema = createInsertSchema(playProgress).omit({ id: true, updatedAt: true });
+export type InsertPlayProgress = z.infer<typeof insertPlayProgressSchema>;
+export type PlayProgress = typeof playProgress.$inferSelect;
+
+export const playSessions = pgTable("play_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  gameKey: varchar("game_key").notNull(),
+  graosEarned: integer("graos_earned").notNull(),
+  correct: integer("correct").notNull(),
+  total: integer("total").notNull(),
+  playedAt: timestamp("played_at").defaultNow(),
+});
+
+export const insertPlaySessionSchema = createInsertSchema(playSessions).omit({ id: true, playedAt: true });
+export type InsertPlaySession = z.infer<typeof insertPlaySessionSchema>;
+export type PlaySession = typeof playSessions.$inferSelect;
+
 export const libraryModules = pgTable("library_modules", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   key: varchar("key").notNull().unique(),
@@ -205,6 +233,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfiles, { fields: [users.id], references: [userProfiles.userId] }),
   tastingEntries: many(tastingEntries),
   quizResults: many(quizResults),
+  playProgress: one(playProgress, { fields: [users.id], references: [playProgress.userId] }),
+  playSessions: many(playSessions),
 }));
 
 export const tastingEntriesRelations = relations(tastingEntries, ({ one }) => ({
@@ -214,4 +244,12 @@ export const tastingEntriesRelations = relations(tastingEntries, ({ one }) => ({
 
 export const quizResultsRelations = relations(quizResults, ({ one }) => ({
   user: one(users, { fields: [quizResults.userId], references: [users.id] }),
+}));
+
+export const playProgressRelations = relations(playProgress, ({ one }) => ({
+  user: one(users, { fields: [playProgress.userId], references: [users.id] }),
+}));
+
+export const playSessionsRelations = relations(playSessions, ({ one }) => ({
+  user: one(users, { fields: [playSessions.userId], references: [users.id] }),
 }));
