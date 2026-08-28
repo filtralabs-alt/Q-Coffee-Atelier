@@ -37,7 +37,7 @@ export const GRAOS_LEVELS = [
 ] as const;
 
 export function levelForGraos(total: number): { key: string; min: number; next: number | null } {
-  let current = GRAOS_LEVELS[0];
+  let current: { key: string; min: number } = GRAOS_LEVELS[0];
   for (const level of GRAOS_LEVELS) {
     if (total >= level.min) current = level;
   }
