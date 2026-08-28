@@ -141,11 +141,16 @@ Reservas ficam na tabela `atelier_reservations` — campos condicionais por modo
 
 ## E-mail marketing
 
-Campanhas HTML ficam em `client/public/email/<nome-da-campanha>/` — arquivos servidos com URL estável (sem hash), então imagens e o link "ver no navegador" não quebram entre deploys. Enviado via Gmail (MCP conectado). Ver campanha de exemplo em `client/public/email/cafe-tech-launch/` (ateliers pra empresas — team building + Café Tech).
+Campanhas HTML ficam em `client/public/email/<nome-da-campanha>/` — arquivos servidos com URL estável (sem hash), então imagens e o link "ver no navegador" não quebram entre deploys. Ver campanha de exemplo em `client/public/email/cafe-tech-launch/` (ateliers pra empresas — team building + Café Tech).
 
-**Saudação personalizada:** o template tem um placeholder `Bonjour {{nome}},` no topo do e-mail — antes de cada envio, trocar `{{nome}}` pelo nome real do destinatário no HTML que vai no `htmlBody`. Regra de formalidade:
-- **Só o primeiro nome disponível** (ex: "Cristiano") → usar direto, informal: `Bonjour Cristiano,`
-- **Nome completo disponível** (ex: "Cristiano Chal Duarte") → formal, só com o sobrenome: `Bonjour Monsieur Chal Duarte,` (ou `Madame`, conforme o destinatário)
+**Envio:** via **Resend** (domínio autenticado `obaristech.com`), não mais pelo Gmail MCP — envio pelo Gmail pessoal disparava o "Aviso de redirecionamento" do Google nos links, porque o domínio do link não batia com o remetente autenticado. O envio é feito chamando a rota admin `POST /api/admin/campaigns/send-test` (`server/routes.ts` + `sendCampaignEmail` em `server/email.ts`), protegida por login admin (`POST /api/admin/login` com `ADMIN_EMAIL`/senha, depois usar o cookie de sessão). Body: `{ to, name, campaign }` — `campaign` é o nome da pasta em `client/public/email/`.
+
+**Saudação personalizada:** o arquivo `email.html` publicado é genérico (`Bonjour,`) — ele também serve como página estática do "ver no navegador", que não tem como saber o nome de quem clicou. A personalização por destinatário acontece só na cópia enviada: o servidor troca `Bonjour,` por `Bonjour {nome},` em cima do HTML público, no `sendCampaignEmail`. Regra de formalidade pro campo `name`:
+- **Só o primeiro nome disponível** (ex: "Cristiano") → usar direto, informal: `Cristiano` → `Bonjour Cristiano,`
+- **Nome completo disponível** (ex: "Cristiano Chal Duarte") → formal, só com o sobrenome: `Monsieur Chal Duarte` → `Bonjour Monsieur Chal Duarte,` (ou `Madame`, conforme o destinatário)
+- **Responsável não identificado** (contato genérico da empresa) → usar `l'équipe <Nome da Empresa>` → `Bonjour l'équipe Turbulences,`
+
+**Categorização "Promoções" no Gmail:** é baseada no conteúdo do e-mail (layout com imagens/botões de CTA), não em quem envia — trocar o remetente não resolve isso. Decisão tomada: manter o design como está.
 
 Pra lista grande (mail merge automático), ver opção de usar o Resend (`server/email.ts`) já configurado no backend, em vez de enviar um por um via Gmail.
 
