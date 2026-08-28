@@ -62,6 +62,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "profile.save": { fr: "Enregistrer", pt: "Salvar" },
   "profile.saved": { fr: "Profil mis à jour !", pt: "Perfil atualizado!" },
   "profile.emailNote": { fr: "L'e-mail ne peut pas être modifié", pt: "O e-mail não pode ser alterado" },
+  "profile.play.title": { fr: "Ma progression", pt: "Meu progresso" },
+  "profile.play.empty": { fr: "Jouez pour accumuler des Grains", pt: "Jogue para acumular Grãos" },
   "app.login.secure": { fr: "Connexion sécurisée via Replit", pt: "Login seguro via Replit" },
   "app.login.redirect": { fr: "Vous serez redirigé vers une page de connexion sécurisée", pt: "Você será redirecionado para uma página de login segura" },
   "app.welcome.title": { fr: "Bienvenue !", pt: "Bem-vindo(a)!" },

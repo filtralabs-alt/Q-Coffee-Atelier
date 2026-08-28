@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -7,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "lucide-react";
+import { User, Sprout } from "lucide-react";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -17,6 +18,11 @@ export default function ProfilePage() {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [isSaving, setIsSaving] = useState(false);
+
+  const { data: play } = useQuery<{ totalGraos: number; level: { key: string }; currentStreak: number; badges: string[] }>({
+    queryKey: ["/api/play/progress"],
+    enabled: !!user,
+  });
 
   useEffect(() => {
     setFirstName(user?.firstName || "");
@@ -79,6 +85,29 @@ export default function ProfilePage() {
               {isSaving ? "..." : t("profile.save")}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Sprout className="h-4 w-4 text-primary" /> {t("profile.play.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {play && play.totalGraos > 0 ? (
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-semibold">{t(`play.level.${play.level.key}`)}</span>
+              <span className="text-primary font-bold">{play.totalGraos} {t("play.graos.unit")}</span>
+              {play.currentStreak > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {play.currentStreak} {t("play.graos.streak")}
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("profile.play.empty")}</p>
+          )}
         </CardContent>
       </Card>
     </div>
