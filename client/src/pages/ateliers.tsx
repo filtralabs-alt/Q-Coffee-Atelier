@@ -561,6 +561,37 @@ function ReservationDialog({ atelier, onClose }: { atelier: Atelier; onClose: ()
   );
 }
 
+function QuoteThemePicker({ onPick }: { onPick: (theme: string) => void }) {
+  const { t, lang } = useI18n();
+  const [value, setValue] = useState("");
+
+  return (
+    <div className="pt-2 space-y-2" data-testid="quote-theme-picker">
+      <p className="text-sm text-muted-foreground">{t("ateliers.quote.pickPrompt")}</p>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          onPick(v);
+          // O dialog aberto é controlado pelo estado `quoteTheme` da página;
+          // reseta o Select pro placeholder logo em seguida.
+          setValue("");
+        }}
+      >
+        <SelectTrigger data-testid="select-quote-theme-picker">
+          <SelectValue placeholder={t("ateliers.quote.pickPlaceholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          {ATELIER_THEMES.map((theme) => (
+            <SelectItem key={theme.id} value={theme.id}>
+              {themeLabel(theme.id, lang)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 function QuoteRequestDialog({ theme, onClose }: { theme: string; onClose: () => void }) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
@@ -948,6 +979,7 @@ export default function AteliersPage() {
                   ))}
                 </div>
               )}
+              <QuoteThemePicker onPick={setQuoteTheme} />
             </section>
 
             <section className="space-y-3">
