@@ -291,6 +291,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "ateliers.quote.submit": { fr: "Envoyer la demande", pt: "Enviar pedido" },
   "ateliers.quote.success": { fr: "Merci ! Nous vous recontactons très vite pour organiser votre atelier.", pt: "Obrigado! Entraremos em contato bem rápido para organizar o seu atelier." },
   "ateliers.quote.error": { fr: "Une erreur est survenue, réessayez.", pt: "Ocorreu um erro, tente novamente." },
+  "ateliers.quote.pickPrompt": { fr: "Pas de date qui vous convient ? Demandez un devis pour l'atelier de votre choix.", pt: "Nenhuma data disponível? Peça um orçamento para o atelier que quiser." },
+  "ateliers.quote.pickPlaceholder": { fr: "Choisissez un atelier", pt: "Escolha um atelier" },
   "ateliers.reservation.policy": {
     fr: "Le paiement se fait sur place, à la fin de l'atelier. En cochant cette case, je m'engage à honorer ma réservation. Annulation gratuite jusqu'à 48h avant l'atelier. En cas d'annulation sans explication ni proposition de nouvelle date, le montant total reste dû.",
     pt: "O pagamento é feito no local, ao final do atelier. Ao marcar esta caixa, concordo em honrar meu compromisso. Cancelamento gratuito até 48h antes do atelier. Em caso de cancelamento sem explicação ou sugestão de nova data, o valor total permanece devido.",
