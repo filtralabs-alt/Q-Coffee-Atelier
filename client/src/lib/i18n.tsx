@@ -317,6 +317,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "admin.delete": { fr: "Supprimer", pt: "Excluir" },
 
   "privacy.link": { fr: "Politique de confidentialité", pt: "Política de privacidade" },
+  "legal.link": { fr: "Mentions légales", pt: "Termos legais" },
   "privacy.banner": { fr: "Nous utilisons vos données uniquement pour faire fonctionner l'app. En continuant, vous acceptez notre", pt: "Usamos seus dados apenas para o funcionamento do app. Ao continuar, você aceita nossa" },
   "privacy.accept": { fr: "J'accepte", pt: "Aceitar" },
   "privacy.title": { fr: "Politique de Confidentialité", pt: "Política de Privacidade" },

@@ -167,6 +167,15 @@ export default function LandingPage() {
             >
               {t("privacy.link")}
             </button>
+            {" · "}
+            <a
+              href="https://coffeethinking.com/mentions-legales/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-foreground transition-colors"
+            >
+              {t("legal.link")}
+            </a>
           </p>
         </div>
       </footer>
