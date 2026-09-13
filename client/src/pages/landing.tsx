@@ -22,6 +22,7 @@ export default function LandingPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showLegal, setShowLegal] = useState(false);
   const [consentGiven, setConsentGiven] = useState(() =>
     localStorage.getItem("baristech_privacy_consent") === "1"
   );
@@ -168,14 +169,12 @@ export default function LandingPage() {
               {t("privacy.link")}
             </button>
             {" · "}
-            <a
-              href="https://coffeethinking.com/mentions-legales/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setShowLegal(true)}
               className="underline underline-offset-2 hover:text-foreground transition-colors"
             >
               {t("legal.link")}
-            </a>
+            </button>
           </p>
         </div>
       </footer>
@@ -214,6 +213,27 @@ export default function LandingPage() {
             ["privacy.s3.title", "privacy.s3.body"],
             ["privacy.s4.title", "privacy.s4.body"],
             ["privacy.s5.title", "privacy.s5.body"],
+          ].map(([titleKey, bodyKey]) => (
+            <div key={titleKey} className="space-y-1">
+              <h3 className="font-semibold text-sm">{t(titleKey)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(bodyKey)}</p>
+            </div>
+          ))}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showLegal} onOpenChange={setShowLegal}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("legal.title")}</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground">{t("legal.updated")}</p>
+          {[
+            ["legal.s1.title", "legal.s1.body"],
+            ["legal.s2.title", "legal.s2.body"],
+            ["legal.s3.title", "legal.s3.body"],
+            ["legal.s4.title", "legal.s4.body"],
+            ["legal.s5.title", "legal.s5.body"],
           ].map(([titleKey, bodyKey]) => (
             <div key={titleKey} className="space-y-1">
               <h3 className="font-semibold text-sm">{t(titleKey)}</h3>
