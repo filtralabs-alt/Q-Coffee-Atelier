@@ -125,8 +125,8 @@ export default function AteliersDomicilePage() {
           </Badge>
           <h1 className="font-serif text-2xl sm:text-3xl font-semibold leading-tight" data-testid="text-ateliers-domicile-title">
             {lang === "pt"
-              ? <>Atelier café em <span className="text-primary">domicílio</span> ou espaço privado</>
-              : <>Atelier café à <span className="text-primary">domicile</span> ou en espace privé</>}
+              ? <>Atelier de café em <span className="text-primary">domicílio</span> ou em espaço privado, com uma pequena gourmandise</>
+              : <>Atelier café à <span className="text-primary">domicile</span> ou en espace privé, avec une petite gourmandise</>}
           </h1>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
             {lang === "pt"
